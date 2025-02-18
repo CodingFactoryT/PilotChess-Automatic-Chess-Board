@@ -6,12 +6,11 @@
 enum StepperDirection;
 //------------- </Forward Declarations> ------------------
 
+Gantry* gantry;
 void setup() {
   Serial.begin(SERIAL_BAUD_RATE);
   Serial.setTimeout(SERIAL_TIMEOUT);
-  Serial.println("Before main");
-  Gantry gantry;
-  Serial.println("After main");
+  gantry = new Gantry();
 }
 
 void loop() {
@@ -20,4 +19,5 @@ void loop() {
     Serial.println("Text received: " + messageReceived);
   }
 
+  gantry->update();
 }
