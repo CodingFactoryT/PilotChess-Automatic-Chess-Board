@@ -1,8 +1,8 @@
 #include "AccelStepper.h"
-#include "Position.h"
+#include "./util/Position.h"
 #include "../pins.h"
 #include "../config.h"
-#include "StepperDirection.h"
+#include "./util/StepperDirection.h"
 
 class Gantry {
 private:

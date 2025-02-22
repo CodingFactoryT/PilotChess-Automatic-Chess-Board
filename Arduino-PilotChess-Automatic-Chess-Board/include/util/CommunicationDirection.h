@@ -1,0 +1,5 @@
+
+enum CommunicationDirection {
+    REQUEST,
+    RESPONSE
+};

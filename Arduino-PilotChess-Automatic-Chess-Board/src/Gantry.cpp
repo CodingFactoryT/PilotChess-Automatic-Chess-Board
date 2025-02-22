@@ -10,8 +10,8 @@ Gantry::Gantry() :
     pinMode(LIMIT_SWITCH_X_PIN, INPUT_PULLUP);
     pinMode(LIMIT_SWITCH_Y_PIN, INPUT_PULLUP);
 
-    _leftStepper.setEnablePin(ENABLE_PIN);
-    _rightStepper.setEnablePin(ENABLE_PIN);
+    _leftStepper.setEnablePin(STEPPER_ENABLE_PIN);
+    _rightStepper.setEnablePin(STEPPER_ENABLE_PIN);
 
     _leftStepper.setMaxSpeed(MAX_SPEED);
     _rightStepper.setMaxSpeed(MAX_SPEED);
