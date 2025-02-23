@@ -8,12 +8,12 @@ class Exchange {
 private:
     CommunicationDirection _direction;
     RequestedDataType _type;
-    String* _data;
+    char** _data;
 
 public:
     static const int DATA_ARRAY_SIZE = dataArraySize;
-    Exchange(CommunicationDirection direction, RequestedDataType type, String* data);
+    Exchange(CommunicationDirection direction, RequestedDataType type, char** data);
     CommunicationDirection getDirection();
     RequestedDataType getType();
-    String* getData();
+    char** getData();
 };

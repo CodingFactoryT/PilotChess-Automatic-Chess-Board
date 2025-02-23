@@ -2,18 +2,37 @@
 
 class Util {
 public:
-    static void splitString(String str, char delimiter, String* output) {
-        int startIndex = 0; // Start index of the substring
-        int endIndex = 0;   // End index of the substring
-        int count = 0;         // Number of substrings
+    static char** splitCharArray(char* input, char delimiter, int size) {
+        char** output = new char* [size];
 
-        while ((endIndex = str.indexOf(delimiter, startIndex)) != -1) {
-            // Extract the substring
-            output[count++] = str.substring(startIndex, endIndex);
-            startIndex = endIndex + 1; // Move past the delimiter
+        for (int i = 0; i < size; i++) {
+            output[i] = new char[SERIAL_RX_BUFFER_SIZE];
         }
 
-        // Add the last substring after the final delimiter
-        output[count++] = str.substring(startIndex);
+        int inputIterationIndex = 0;
+        int outputSingleArrayIndex = 0;
+        int outputArrayIndex = 0;
+        char currentChar;
+        while ((currentChar = input[inputIterationIndex]) != '\0') {
+            if (currentChar == delimiter) {
+                output[outputArrayIndex][outputSingleArrayIndex] = '\0';
+                outputSingleArrayIndex = 0;
+                outputArrayIndex++;
+                inputIterationIndex++;
+                continue;
+            }
+
+            output[outputArrayIndex][outputSingleArrayIndex] = currentChar;
+            outputSingleArrayIndex++;
+            inputIterationIndex++;
+        }
+        return output;
+    }
+
+    static void delete2DArray(char** arr, int rows) {
+        for (int i = 0; i < rows; i++) {
+            delete[] arr[i];
+        }
+        delete[] arr;
     }
 };

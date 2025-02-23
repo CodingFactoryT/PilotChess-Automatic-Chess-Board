@@ -1,5 +1,5 @@
 #define SERIAL_BAUD_RATE 115200
-#define SERIAL_TIMEOUT 100
+#define SERIAL_TIMEOUT 50
 
 #define MAX_SPEED 4000.0f   //max 4000.0f, the library can't handle more
 #define ACCELERATION 0.3f * MAX_SPEED
