@@ -26,6 +26,9 @@ public:
             outputSingleArrayIndex++;
             inputIterationIndex++;
         }
+
+        output[outputArrayIndex][outputSingleArrayIndex] = '\0';
+
         return output;
     }
 
