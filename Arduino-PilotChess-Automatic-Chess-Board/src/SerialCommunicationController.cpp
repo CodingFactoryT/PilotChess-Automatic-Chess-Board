@@ -84,7 +84,23 @@ char* SerialCommunicationController::buildMessage(String responseType, String re
     }
 
     message[messageIndex++] = ':';
-    //TODO DATA
+    for (int i = 0; i < 4; i++) {
+        if (data[i][0] == '\0') {
+            break;
+        }
+        for (int j = 0; j < SERIAL_TX_BUFFER_SIZE; j++) {
+            if (data[i][j] == '\0') {
+                break;
+            }
+
+            message[messageIndex++] = data[i][j];
+        }
+
+        if (i != 3 && data[i + 1][0] != '\0') {
+            message[messageIndex++] = ',';
+        }
+    }
+
     message[messageIndex] = '\0';
 
     return message;
