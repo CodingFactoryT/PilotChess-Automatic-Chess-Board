@@ -1,3 +1,4 @@
+#pragma once
 #include "Arduino.h"
 
 class Util {
@@ -37,5 +38,25 @@ public:
             delete[] arr[i];
         }
         delete[] arr;
+    }
+
+    static void bytesToHexString(byte* input, int inputSize, char* output, int outputSize) {
+        for (int i = 0; i < inputSize; i++) {
+            sprintf(output + (i * 2), "%02X", input[i]);
+        }
+
+        output[outputSize - 1] = '\0';
+    }
+
+    static char* toCharArray(String input, char* output) {
+        int size = input.length();
+
+        for (int i = 0; i < size; i++) {
+            output[i] = input[i];
+        }
+
+        output[size] = '\0';
+
+        return output;
     }
 };

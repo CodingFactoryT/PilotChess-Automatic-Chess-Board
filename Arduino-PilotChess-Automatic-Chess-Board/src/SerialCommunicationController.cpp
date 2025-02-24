@@ -8,24 +8,14 @@ char* SerialCommunicationController::readRequestFromSerial() {
     char* buffer = new char[SERIAL_RX_BUFFER_SIZE]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
     int index = 0;
     char currentChar;
-    while ((currentChar = Serial.read()) != '\n') {
+    while ((currentChar = Serial.read()) != '\n' && index < SERIAL_RX_BUFFER_SIZE - 1) {
         buffer[index] = currentChar;
         index++;
-        delayMicroseconds(100);   //wait for next character to be able to arrive via Serial
+        delayMicroseconds(SERIAL_READ_DELAY_MICROS);   //wait for next character to be able to arrive via Serial
     }
 
     buffer[index] = '\0';
     return buffer;
-}
-
-void SerialCommunicationController::handleRequest(char* rawRequest) {
-    Exchange request = parseRequest(rawRequest);
-    Exchange response = calculateResponse(request);
-
-    respond(response);
-
-    Util::delete2DArray(response.getData(), 4);
-    delete[] rawRequest;
 }
 
 /**
@@ -42,26 +32,23 @@ Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
     char requestDataTypeString[5]{ rawRequest[4], rawRequest[5], rawRequest[6], rawRequest[7], '\0' }; //4 more characters after the first colon
     RequestedDataType requestDataType = getRequestedDataTypeFromPointer(requestDataTypeString);
 
-    char* data = new char[SERIAL_RX_BUFFER_SIZE];
+    char* rawData = new char[SERIAL_RX_BUFFER_SIZE];
     int index = 9;  //starting index of the data characters
 
     char currentChar;
     while ((currentChar = rawRequest[index]) != '\0') {
-        data[index - 9] = currentChar;
+        rawData[index - 9] = currentChar;
         index++;
     }
-    data[index - 9] = '\0';
+    rawData[index - 9] = '\0';
 
-    char** splittedData = Util::splitCharArray(data, ',', 4);
-    delete[] data;
+    char** splittedData = Util::splitCharArray(rawData, ',', 4);
+    delete[] rawData;
     return Exchange(direction, requestDataType, splittedData);
 }
 
-Exchange SerialCommunicationController::calculateResponse(Exchange request) {
-    return Exchange(CommunicationDirection::RESPONSE, request.getType(), request.getData());    //example response, will be replaced with real data
-}
-
-void SerialCommunicationController::respond(Exchange response) {
+void SerialCommunicationController::respond(RequestedDataType dataType, char** data) {
+    Exchange response = Exchange(CommunicationDirection::RESPONSE, dataType, data);
     String responseDataType = getResponseDataTypeAsString(response.getType());
     char* message = buildMessage("RES", responseDataType, response.getData());
 
@@ -71,7 +58,7 @@ void SerialCommunicationController::respond(Exchange response) {
 }
 
 char* SerialCommunicationController::buildMessage(String responseType, String responseDataType, char** data) {
-    char* message = new char[SERIAL_TX_BUFFER_SIZE] {};
+    char* message = new char[SERIAL_TX_BUFFER_SIZE];
     int messageIndex = 0;
     for (unsigned int i = 0; i < responseType.length(); i++) {
         message[messageIndex++] = responseType[i];
@@ -106,11 +93,11 @@ char* SerialCommunicationController::buildMessage(String responseType, String re
     return message;
 }
 
-void SerialCommunicationController::sendMessage(String message) {
+void SerialCommunicationController::sendMessage(char* message) {
     Serial.println(message);
 }
 
-RequestedDataType SerialCommunicationController::getRequestedDataTypeFromPointer(char* dataType) {
+RequestedDataType SerialCommunicationController::getRequestedDataTypeFromPointer(char dataType[]) {
     if (strcmp(dataType, "HOME") == 0) {
         return RequestedDataType::HOME;
     }

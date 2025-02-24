@@ -18,7 +18,6 @@ void setup() {
   pinMode(TILE_MATRIX_ROW_SELECT_C_PIN, OUTPUT);
   pinMode(TILE_MATRIX_DATA_PIN, INPUT_PULLUP);
 }
-bool scanArrayA[] = {true, false, false, true, false, true, false, true};
 
 void loop() {
   digitalWrite(TILE_MATRIX_COL_SELECT_ENABLE_PIN, LOW); //activate
@@ -32,7 +31,6 @@ void loop() {
     digitalWrite(TILE_MATRIX_ROW_SELECT_B_PIN, isRowSelectBEnabled);
     digitalWrite(TILE_MATRIX_ROW_SELECT_C_PIN, isRowSelectCEnabled);
     for(int col = 0; col <= 7; col++) {
-      byte currentRowReading;
       boolean isColSelectAEnabled = col == 0 || col == 2 || col == 4 || col == 7; //results in: 1,0,1,0,1,0,0,1
       boolean isColSelectBEnabled = col == 2 || col == 3 || col == 6 || col == 7; //results in: 0,0,1,1,0,0,1,1
       boolean isColSelectCEnabled = col >= 4;                                     //results in: 0,0,0,0,1,1,1,1
