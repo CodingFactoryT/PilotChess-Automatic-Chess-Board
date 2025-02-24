@@ -20,6 +20,8 @@ TileMatrixController::~TileMatrixController() {
 }
 
 byte* TileMatrixController::read() {
+    memset(_data, 0, ROWS); //reset _data to all zeros
+
     setMatrixActivated(true);
 
     for(int row = 0; row <= 7; row++) {
@@ -49,7 +51,7 @@ byte* TileMatrixController::read() {
 }
 
 char* TileMatrixController::readHexString() {
-    Util::bytesToHexString(read(), 4, _dataHexString, ROWS * 2 + 1);
+    Util::bytesToHexString(read(), ROWS, _dataHexString, ROWS * 2 + 1);
     return _dataHexString;
 }
 

@@ -7,6 +7,10 @@ private:
     //Gantry _gantry;
     SerialCommunicationController _communicationController;
     TileMatrixController _tileMatrixController;
+    void clearData();
+    char** _data;
 public:
+    Controller();
+    ~Controller();
     void update();
 };
