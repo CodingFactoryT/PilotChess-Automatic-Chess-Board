@@ -25,6 +25,8 @@ public:
     void setSteppersEnabled(bool areEnabled);
     void home();
     void moveToPosition(double x, double y);
+    void moveRelative(double deltaX, double deltaY);
+    void moveToTile(char column, int row);
     void update();
 
     static void setLeftStepperDirection(StepperDirection direction);

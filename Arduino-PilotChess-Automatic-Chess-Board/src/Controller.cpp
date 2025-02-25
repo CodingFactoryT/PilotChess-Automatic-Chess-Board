@@ -32,6 +32,7 @@ void Controller::update() {
             _data[1] = _tileMatrixController.readHexString();
             break;
         case RequestedDataType::ERR:
+            _gantry.moveRelative(10, -150);
             Util::toCharArray("ERROR", _data[0]);
             break;
         }

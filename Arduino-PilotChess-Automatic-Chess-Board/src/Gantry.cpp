@@ -67,8 +67,21 @@ void Gantry::update() {
 }
 
 void Gantry::moveToPosition(double x, double y) {
-    _leftStepper.moveTo(STEPS_PER_MM * 100);
-    _rightStepper.moveTo(STEPS_PER_MM * 100);
+    //TODO check if inside bounds
+    int deltaX = x - _currentPosition.getX();
+    int deltaY = y - _currentPosition.getY();
+    moveRelative(deltaX, deltaY);
+}
+
+void Gantry::moveRelative(double deltaX, double deltaY) {
+    double scaledX = deltaX * STEPS_PER_MM_X;
+    double scaledY = deltaY * STEPS_PER_MM_Y;
+
+    long leftMotorSteps = scaledY - scaledX;
+    long rightMotorSteps = scaledX + scaledY;
+
+    _leftStepper.move(-leftMotorSteps);
+    _rightStepper.move(rightMotorSteps);
 }
 
 bool Gantry::isLimitSwitchXTriggered() {
@@ -116,4 +129,14 @@ void Gantry::moveUntilTrue(StepperDirection leftStepperDirection, StepperDirecti
     // Ensure the motors are set to the correct target position (which should be the current position)
     _leftStepper.moveTo(_leftStepper.currentPosition());
     _rightStepper.moveTo(_rightStepper.currentPosition());
+}
+
+void Gantry::moveToTile(char column, int row) {
+    int columnIndex = column - 'a';
+    int rowIndex = row - 1;
+
+    int x = GANTRY_X_OFFSET_TO_A1 + columnIndex * TILE_SIZE_MM;
+    int y = GANTRY_Y_OFFSET_TO_A1 + rowIndex * TILE_SIZE_MM;
+
+    moveToPosition(x, y);
 }
