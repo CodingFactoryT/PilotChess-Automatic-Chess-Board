@@ -1,4 +1,5 @@
 #include "AccelStepper.h"
+#include "Servo.h"
 #include "./util/Position.h"
 #include "../pins.h"
 #include "../config.h"
@@ -7,7 +8,6 @@
 class Gantry {
 private:
     Position _currentPosition;
-    Position _targetPosition;
 
     AccelStepper _leftStepper;
     AccelStepper _rightStepper;
@@ -28,6 +28,8 @@ public:
     void moveRelative(double deltaX, double deltaY);
     void moveToTile(char column, int row);
     void update();
+    void grabPiece();
+    void releasePiece();
 
     static void setLeftStepperDirection(StepperDirection direction);
     static void setRightStepperDirection(StepperDirection direction);

@@ -24,6 +24,12 @@ void Controller::update() {
             Util::toCharArray("OK", _data[0]);
             break;
         case RequestedDataType::MOVE:
+            if (request.getData()[0][0] == 'x') {
+                _gantry.moveToPosition(0, 42 * 6);
+            }
+            else {
+                _gantry.moveToPosition(42 * 3, 0);
+            }
             //_gantry.moveToPosition(); //or move with chess notation   TODO
             Util::toCharArray("OK", _data[0]);
             break;
@@ -32,7 +38,6 @@ void Controller::update() {
             _data[1] = _tileMatrixController.readHexString();
             break;
         case RequestedDataType::ERR:
-            _gantry.moveRelative(10, -150);
             Util::toCharArray("ERROR", _data[0]);
             break;
         }

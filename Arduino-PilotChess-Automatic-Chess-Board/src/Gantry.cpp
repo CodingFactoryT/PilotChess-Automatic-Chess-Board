@@ -2,7 +2,6 @@
 
 Gantry::Gantry() :
     _currentPosition(NAN, NAN),
-    _targetPosition(NAN, NAN),
     _leftStepper(STEPPER_DRIVER_TYPE, LEFT_MOTOR_STEP_PIN, LEFT_MOTOR_DIR_PIN),
     _rightStepper(STEPPER_DRIVER_TYPE, RIGHT_MOTOR_STEP_PIN, RIGHT_MOTOR_DIR_PIN),
     _isHomed(false) {
@@ -25,10 +24,6 @@ Gantry::Gantry() :
 
 Position Gantry::getCurrentPosition() {
     return _currentPosition;
-}
-
-Position Gantry::getTargetPosition() {
-    return _targetPosition;
 }
 
 void Gantry::setSteppersEnabled(bool areEnabled) {
@@ -58,6 +53,7 @@ void Gantry::home() {
     _leftStepper.setMaxSpeed(MAX_SPEED);   //set speed back to normal
     _rightStepper.setMaxSpeed(MAX_SPEED);
 
+    _currentPosition.setPosition(0, 0);
     _isHomed = true;
 }
 
@@ -67,6 +63,10 @@ void Gantry::update() {
 }
 
 void Gantry::moveToPosition(double x, double y) {
+    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
+        return;
+    }
+
     //TODO check if inside bounds
     int deltaX = x - _currentPosition.getX();
     int deltaY = y - _currentPosition.getY();
@@ -74,6 +74,14 @@ void Gantry::moveToPosition(double x, double y) {
 }
 
 void Gantry::moveRelative(double deltaX, double deltaY) {
+    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
+        return;
+    }
+    //TODO check if inside bounds
+
+    _currentPosition.setX(_currentPosition.getX() + deltaX);
+    _currentPosition.setY(_currentPosition.getY() + deltaY);
+
     double scaledX = deltaX * STEPS_PER_MM_X;
     double scaledY = deltaY * STEPS_PER_MM_Y;
 
@@ -139,4 +147,12 @@ void Gantry::moveToTile(char column, int row) {
     int y = GANTRY_Y_OFFSET_TO_A1 + rowIndex * TILE_SIZE_MM;
 
     moveToPosition(x, y);
+}
+
+void Gantry::grabPiece() {
+    //_magnetLiftServo.write(MAGNET_SERVO_POSITION_UP);
+}
+
+void Gantry::releasePiece() {
+    //_magnetLiftServo.write(MAGNET_SERVO_POSITION_DOWN);
 }
