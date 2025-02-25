@@ -4,7 +4,7 @@
 
 class Controller {
 private:
-    //Gantry _gantry;
+    Gantry _gantry;
     SerialCommunicationController _communicationController;
     TileMatrixController _tileMatrixController;
     void clearData();

@@ -20,9 +20,7 @@ Gantry::Gantry() :
     _rightStepper.setAcceleration(ACCELERATION);
     _rightStepper.setPinsInverted(true, false, true);
 
-    setSteppersEnabled(true);
-
-    home();
+    setSteppersEnabled(true);   //TODO improve by not enabling them all the time?
 }
 
 Position Gantry::getCurrentPosition() {

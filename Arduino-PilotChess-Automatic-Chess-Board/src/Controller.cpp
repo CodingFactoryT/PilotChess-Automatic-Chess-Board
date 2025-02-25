@@ -20,7 +20,7 @@ void Controller::update() {
 
         switch (request.getType()) {
         case RequestedDataType::HOME:
-            //_gantry.home();
+            _gantry.home();
             Util::toCharArray("OK", _data[0]);
             break;
         case RequestedDataType::MOVE:
@@ -41,7 +41,7 @@ void Controller::update() {
         delete[] rawRequest;
     }
 
-    //_gantry.update();
+    _gantry.update();
 }
 
 void Controller::clearData() {
