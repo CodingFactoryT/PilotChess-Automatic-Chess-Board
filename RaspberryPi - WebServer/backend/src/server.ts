@@ -26,10 +26,10 @@ if (process.env.NODE_ENV === "prod") {
 	dotenv.config({ path: resolve(__dirname, ".env"), override: true });
 	PORT = process.env.PROD_PORT;
 
-	app.use(express.static(path.join(__dirname, "../frontend/dist")));
+	app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 	app.get("*", (req, res) => {
-		res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+		res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
 	});
 }
 
