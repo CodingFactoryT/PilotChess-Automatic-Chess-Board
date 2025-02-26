@@ -9,5 +9,6 @@ export default defineConfig({
     proxy: {
       "/api": "http://localhost:5000", // Proxy API calls to Express
     },
+    open: "index.html"
   },
 })
