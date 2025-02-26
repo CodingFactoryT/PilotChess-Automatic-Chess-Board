@@ -25,10 +25,10 @@ void Controller::update() {
             break;
         case RequestedDataType::MOVE:
             if (request.getData()[0][0] == 'x') {
-                _gantry.moveToPosition(0, 42 * 6);
+                _gantry.moveToTile('a', 1);
             }
             else {
-                _gantry.moveToPosition(42 * 3, 0);
+                _gantry.moveToTile('h', 8);
             }
             //_gantry.moveToPosition(); //or move with chess notation   TODO
             Util::toCharArray("OK", _data[0]);

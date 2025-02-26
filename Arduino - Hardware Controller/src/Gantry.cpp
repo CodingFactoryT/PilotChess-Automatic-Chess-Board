@@ -140,6 +140,10 @@ void Gantry::moveUntilTrue(StepperDirection leftStepperDirection, StepperDirecti
 }
 
 void Gantry::moveToTile(char column, int row) {
+    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
+        return;
+    }
+
     int columnIndex = column - 'a';
     int rowIndex = row - 1;
 
