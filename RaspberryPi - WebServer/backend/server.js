@@ -1,14 +1,14 @@
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import path from "path";
+import path, { resolve } from "path";
 import { fileURLToPath } from "url";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-dotenv.config();
 const app = express();
 
 const corsOptions = {
-	origin: ["http://localhost:5174"], // Only allow frontend dev server
+	origin: ["http://localhost:5173"], // Only allow frontend dev server
 };
 
 app.use(cors(corsOptions)); //for development only
@@ -18,13 +18,13 @@ app.get("/api/message", (req, res) => {
 	res.json({ message: "Hello from Express backend!" });
 });
 
+dotenv.config({ path: resolve(__dirname, "..", ".env") });
 let PORT = process.env.DEV_PORT || 5000;
 
 //in dev, the vite dev server handles the frontend
 if (process.env.NODE_ENV === "prod") {
+	dotenv.config({ path: resolve(__dirname, ".env"), override: true });
 	PORT = process.env.PROD_PORT;
-	const __filename = fileURLToPath(import.meta.url);
-	const __dirname = path.dirname(__filename);
 
 	app.use(express.static(path.join(__dirname, "../frontend/dist")));
 

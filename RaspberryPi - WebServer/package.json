@@ -9,6 +9,7 @@
     "cliui": "^8.0.1",
     "color-convert": "^2.0.1",
     "color-name": "^1.1.4",
+    "cross-env": "^7.0.3",
     "emoji-regex": "^8.0.0",
     "escalade": "^3.2.0",
     "get-caller-file": "^2.0.5",
@@ -30,9 +31,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev:frontend\" \"npm run dev:backend\"",
+    "dev": "concurrently \"npm run dev:frontend\" \" cross-env NODE_ENV=dev npm run dev:backend\"",
     "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && npm run dev"
+    "dev:backend": "cd backend && npm run dev",
+    "prod": "cd frontend && npm run build && cd ../backend && cross-env NODE_ENV=prod npm run start"
   },
   "keywords": [],
   "author": "",
