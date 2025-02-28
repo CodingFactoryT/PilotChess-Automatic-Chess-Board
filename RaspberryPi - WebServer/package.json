@@ -2,6 +2,7 @@
   "name": "raspberrypi-webserver",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "module",
   "dependencies": {
     "ansi-regex": "^5.0.1",
     "ansi-styles": "^4.3.0",
@@ -10,6 +11,7 @@
     "color-convert": "^2.0.1",
     "color-name": "^1.1.4",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.4.7",
     "emoji-regex": "^8.0.0",
     "escalade": "^3.2.0",
     "get-caller-file": "^2.0.5",
@@ -31,10 +33,10 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "concurrently \"npm run dev:frontend\" \" cross-env NODE_ENV=dev npm run dev:backend\"",
+    "dev": "cross-env NODE_ENV=dev concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "prod": "cd frontend && npm run build && cd ../backend && cross-env NODE_ENV=prod npm run start"
+    "prod": "cd frontend && cross-env ENV=prod npm run build && cd ../backend && cross-env ENV=prod npm run start"
   },
   "keywords": [],
   "author": "",
