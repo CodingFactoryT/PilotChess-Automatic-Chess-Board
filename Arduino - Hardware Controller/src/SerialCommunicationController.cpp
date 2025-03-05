@@ -133,7 +133,13 @@ String SerialCommunicationController::getResponseDataTypeAsString(RequestedDataT
     case RequestedDataType::READ:
         responseDataType = "READ";
         break;
-    case RequestedDataType::ERRO:
+    case RequestedDataType::GRAB:
+        responseDataType = "GRAB";
+        break;
+    case RequestedDataType::RELS:
+        responseDataType = "RELS";
+        break;
+    default:
         responseDataType = "ERRO";
     }
 
