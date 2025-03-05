@@ -3,5 +3,7 @@ enum RequestedDataType {
     HOME,
     MOVE,
     READ,
-    ERR
+    GRAB,
+    RELS,
+    ERRO
 };

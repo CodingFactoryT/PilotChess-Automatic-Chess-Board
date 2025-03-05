@@ -4,12 +4,12 @@
 
 class Controller {
 private:
-    Gantry _gantry;
-    SerialCommunicationController _communicationController;
-    TileMatrixController _tileMatrixController;
     void clearData();
     char** _data;
 public:
+    Gantry _gantry;
+    SerialCommunicationController _communicationController;
+    TileMatrixController _tileMatrixController;
     Controller();
     ~Controller();
     void update();

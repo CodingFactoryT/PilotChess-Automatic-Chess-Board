@@ -22,6 +22,11 @@ Gantry::Gantry() :
     setSteppersEnabled(true);   //TODO improve by not enabling them all the time?
 }
 
+void Gantry::initPieceGrabberServo() {
+    _magnetLiftServo.attach(MAGNET_SERVO_PIN);
+    releasePiece();
+}
+
 Position Gantry::getCurrentPosition() {
     return _currentPosition;
 }
@@ -178,9 +183,9 @@ void Gantry::moveToTile(char column, int row) {
 }
 
 void Gantry::grabPiece() {
-    //_magnetLiftServo.write(MAGNET_SERVO_POSITION_UP);
+    _magnetLiftServo.write(MAGNET_SERVO_POSITION_UP);
 }
 
 void Gantry::releasePiece() {
-    //_magnetLiftServo.write(MAGNET_SERVO_POSITION_DOWN);
+    _magnetLiftServo.write(MAGNET_SERVO_POSITION_DOWN);
 }

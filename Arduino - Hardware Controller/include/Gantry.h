@@ -11,6 +11,7 @@ private:
 
     AccelStepper _leftStepper;
     AccelStepper _rightStepper;
+    Servo _magnetLiftServo;
 
     bool _isHomed;
 
@@ -28,6 +29,7 @@ public:
     void moveRelative(double deltaX, double deltaY);
     void moveToTile(char column, int row);
     void update();
+    void initPieceGrabberServo();
     void grabPiece();
     void releasePiece();
 

@@ -24,20 +24,22 @@ void Controller::update() {
             Util::toCharArray("OK", _data[0]);
             break;
         case RequestedDataType::MOVE:
-            if (request.getData()[0][0] == 'x') {
-                _gantry.moveToTile('a', 1);
-            }
-            else {
-                _gantry.moveToTile('h', 8);
-            }
-            //_gantry.moveToPosition(); //or move with chess notation   TODO
+            _gantry.moveToTile(request.getData()[0][0], request.getData()[0][1] - '0');
             Util::toCharArray("OK", _data[0]);
             break;
         case RequestedDataType::READ:
             Util::toCharArray("OK", _data[0]);
             _data[1] = _tileMatrixController.readHexString();
             break;
-        case RequestedDataType::ERR:
+        case RequestedDataType::GRAB:
+            _gantry.grabPiece();
+            Util::toCharArray("OK", _data[0]);
+            break;
+        case RequestedDataType::RELS:
+            _gantry.releasePiece();
+            Util::toCharArray("OK", _data[0]);
+            break;
+        case RequestedDataType::ERRO:
             Util::toCharArray("ERROR", _data[0]);
             break;
         }

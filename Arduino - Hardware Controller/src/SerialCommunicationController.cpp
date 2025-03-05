@@ -26,7 +26,6 @@ char* SerialCommunicationController::readRequestFromSerial() {
  * ______ = the request data, which is comma separated
  */
 Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
-
     char requestType[4] = { rawRequest[0], rawRequest[1], rawRequest[2], '\0' }; //first 3 characters
     CommunicationDirection direction = strcmp(requestType, "REQ") == 0 ? CommunicationDirection::REQUEST : CommunicationDirection::RESPONSE;
     char requestDataTypeString[5]{ rawRequest[4], rawRequest[5], rawRequest[6], rawRequest[7], '\0' }; //4 more characters after the first colon
@@ -110,7 +109,15 @@ RequestedDataType SerialCommunicationController::getRequestedDataTypeFromPointer
         return RequestedDataType::READ;
     }
 
-    return RequestedDataType::ERR;
+    if (strcmp(dataType, "GRAB") == 0) {
+        return RequestedDataType::GRAB;
+    }
+
+    if (strcmp(dataType, "RELS") == 0) {
+        return RequestedDataType::RELS;
+    }
+
+    return RequestedDataType::ERRO;
 }
 
 String SerialCommunicationController::getResponseDataTypeAsString(RequestedDataType dataType) {
@@ -126,7 +133,7 @@ String SerialCommunicationController::getResponseDataTypeAsString(RequestedDataT
     case RequestedDataType::READ:
         responseDataType = "READ";
         break;
-    case RequestedDataType::ERR:
+    case RequestedDataType::ERRO:
         responseDataType = "ERRO";
     }
 
