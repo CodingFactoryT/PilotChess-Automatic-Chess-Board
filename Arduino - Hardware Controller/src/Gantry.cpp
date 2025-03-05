@@ -40,6 +40,8 @@ void Gantry::setSteppersEnabled(bool areEnabled) {
 void Gantry::home() {
     _leftStepper.setMaxSpeed(HOMING_SPEED);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
     _rightStepper.setMaxSpeed(HOMING_SPEED);
+    _leftStepper.setAcceleration(ACCELERATION);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
+    _rightStepper.setAcceleration(ACCELERATION);
 
     moveUntilTrue(StepperDirection::COUNTERCLOCKWISE, StepperDirection::COUNTERCLOCKWISE, &Gantry::isLimitSwitchXTriggered); //=> gantry moves to the left (along the x-axis is negative direction, where the x limit switch is placed)
 
@@ -87,6 +89,28 @@ void Gantry::moveRelative(double deltaX, double deltaY) {
 
     long leftMotorSteps = scaledY - scaledX;
     long rightMotorSteps = scaledX + scaledY;
+
+    float leftStepperSpeed = MAX_SPEED;
+    float rightStepperSpeed = MAX_SPEED;
+    float leftStepperAcceleration = ACCELERATION;
+    float rightStepperAcceleration = ACCELERATION;
+
+    long absLeftMotorSteps = abs(leftMotorSteps);
+    long absRightMotorSteps = abs(rightMotorSteps);
+
+    if (absLeftMotorSteps > absRightMotorSteps) {
+        rightStepperSpeed = (MAX_SPEED * absRightMotorSteps) / absLeftMotorSteps;
+        rightStepperAcceleration = (ACCELERATION * absRightMotorSteps) / absLeftMotorSteps;
+    }
+    else {
+        leftStepperSpeed = (MAX_SPEED * absLeftMotorSteps) / absRightMotorSteps;
+        leftStepperAcceleration = (ACCELERATION * absLeftMotorSteps) / absRightMotorSteps;
+    }
+
+    _leftStepper.setMaxSpeed(leftStepperSpeed);
+    _rightStepper.setMaxSpeed(rightStepperSpeed);
+    _leftStepper.setAcceleration(leftStepperAcceleration);
+    _rightStepper.setAcceleration(rightStepperAcceleration);
 
     _leftStepper.move(-leftMotorSteps);
     _rightStepper.move(rightMotorSteps);
