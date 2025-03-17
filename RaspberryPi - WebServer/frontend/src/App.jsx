@@ -5,13 +5,14 @@ import ProfilePage from './pages/profilePage';
 import WifiConfigurationPage from './pages/wifiConfigurationPage';
 import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
+import DebugPage from './pages/debugPage';
 
 function App() {
 	return (
 		<BrowserRouter>
 			<Routes>
-				<Route path="/wifi-configuration" element={<WifiConfigurationPage/>} />
-				<Route path="/login" element={<LoginPage/>} />
+				<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
+				<Route path="/login" element={ <LoginPage/> } />
 				<Route path="/" element={
 					<AuthGuard>
 						<HomePage/>
@@ -22,7 +23,8 @@ function App() {
 						<ProfilePage/>
 					</AuthGuard>
 				} />
-				<Route path="/*" element={<NotFoundPage/>} />
+				<Route path="/debug" element={ <DebugPage/> }/>
+				<Route path="/*" element={ <NotFoundPage/> } />
 			</Routes>
 		</BrowserRouter>
 	);
