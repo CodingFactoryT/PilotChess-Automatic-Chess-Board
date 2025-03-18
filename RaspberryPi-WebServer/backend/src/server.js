@@ -7,20 +7,14 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: "*",
-	//origin: [`http://localhost:${config.vite_port}`], // Only allow frontend dev server
+	origin: config.env === "prod" ? "http://pilotchess.local" : [`http://http://pilotchess.local:${config.vite_port}`, `http://http://pilotchess.local:${config.node_port}`],
+	methods: "GET, POST, PUT, DELETE, OPTIONS",
+	allowedHeaders: ["Content-Type", "Authorization"],
+	credentials: true,
 };
 
-app.use(cors(corsOptions)); //for development only?
 app.use(express.json());
-
-app.options("*", (req, res) => {
-	//handle preflight requests
-	res.setHeader("Access-Control-Allow-Origin", "*");
-	res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
-	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
-	res.sendStatus(204);
-});
+app.use(cors(corsOptions));
 
 app.use("/api", apiRouter);
 
