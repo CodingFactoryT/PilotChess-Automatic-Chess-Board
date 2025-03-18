@@ -7,9 +7,9 @@ export default defineConfig({
   plugins: [react()],
   server: {
     port: config.vite_port,
-    proxy: {
-      "/api": config.env === "prod" ? `http://pilotchess.local:${config.node_port}`: `http://localhost:${config.node_port}`, // Proxy API calls to Express
-    },
+    proxy: config.env === "dev" ? {
+      "/api": `http://localhost:${config.node_port}` // Proxy API calls to Express
+    } : undefined,
     open: "index.html"
   },
 })
