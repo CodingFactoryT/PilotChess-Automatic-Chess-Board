@@ -37,7 +37,7 @@
     "dev": "cross-env NODE_ENV=dev concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
-    "prod": "cd frontend && cross-env ENV=prod npm run build && cd ../backend && cross-env ENV=prod npm run start"
+    "prod": "cd frontend && npm install && cross-env ENV=prod npm run build && cd ../backend && npm install && cross-env ENV=prod npm run start"
   },
   "keywords": [],
   "author": "",
