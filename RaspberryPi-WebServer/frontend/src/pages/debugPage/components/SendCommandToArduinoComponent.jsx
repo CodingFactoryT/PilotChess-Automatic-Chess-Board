@@ -28,9 +28,7 @@ export default function SendCommandToArduinoComponent() {
     .then((response) => {
 			console.log("Success: " + response.data);
 		})
-		.catch((error) => {
-			console.error(`Error while posting to backend: ${error}`);
-		});
+		.catch(e => {}); //axios handles the error message
   };
   
   return (

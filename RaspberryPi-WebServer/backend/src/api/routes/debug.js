@@ -22,7 +22,8 @@ router.post("/send-command-to-arduino", (req, res) => {
 		})
 		.catch((error) => {
 			console.error(`Error while posting to ${req.baseUrl}${req.url}: ${error}`);
-			res.status(500).send();
+			res.statusMessage = error;
+			res.status(500).end();
 		});
 });
 
