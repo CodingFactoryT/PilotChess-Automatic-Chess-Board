@@ -12,9 +12,9 @@ router.get("/send-command-to-arduino", (req, res) => {
 router.post("/send-command-to-arduino", (req, res) => {
 	console.log("Got post 1!");
 	const data = req.body;
-	console.log(data);
+	console.log(data.request);
 	console.log("Got post 2!");
-	fetchArduino(data)
+	fetchArduino(data.request)
 		.then((response) => {
 			console.log("Success: " + response.data);
 			res.status(200).send();
