@@ -7,10 +7,7 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: config.env === "prod" ? "http://pilotchess.local" : [`http://http://pilotchess.local:${config.vite_port}`, `http://http://pilotchess.local:${config.node_port}`],
-	methods: "GET, POST, PUT, DELETE, OPTIONS",
-	allowedHeaders: ["Content-Type", "Authorization"],
-	credentials: true,
+	origin: config.env === "prod" ? ["http://pilotchess.local"] : [`http://pilotchess.local:${config.vite_port}`, `http://http://pilotchess.local:${config.node_port}`],
 };
 
 app.use(express.json());
