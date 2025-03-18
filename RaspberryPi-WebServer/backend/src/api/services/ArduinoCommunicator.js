@@ -8,12 +8,6 @@ const port = new SerialPort({
 	baudRate: baudRate,
 });
 
-port.open((error) => {
-	if (error) {
-		console.error("Error while opening serial port: " + error);
-	}
-});
-
 port.on("error", (error) => {
 	console.error("Error with serial port: " + error);
 });
