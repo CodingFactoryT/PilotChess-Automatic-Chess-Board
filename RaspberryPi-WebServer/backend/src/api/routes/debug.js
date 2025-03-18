@@ -1,5 +1,4 @@
 import express from "express";
-console.log("Executed 0!");
 import fetchArduino from "../services/ArduinoCommunicator.js";
 
 const router = express.Router();
@@ -10,11 +9,8 @@ router.get("/send-command-to-arduino", (req, res) => {
 });
 
 router.post("/send-command-to-arduino", (req, res) => {
-	console.log("Got post 1!");
 	const data = req.body;
-	console.log(data);
-	console.log(data.message);
-	console.log("Got post 2!");
+	console.log("Retrieved Post request with data: " + data.message);
 	fetchArduino(data.message)
 		.then((response) => {
 			console.log("Success: " + response.data);
