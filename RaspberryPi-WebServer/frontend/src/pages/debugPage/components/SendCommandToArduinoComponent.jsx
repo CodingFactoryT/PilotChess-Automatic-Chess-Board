@@ -24,7 +24,7 @@ export default function SendCommandToArduinoComponent() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    apiPost("/debug/send-command-to-arduino/", formData)
+    apiPost("/debug/send-command-to-arduino/", JSON.stringify(formData))
     .then((response) => {
 			console.log("Success: " + response.data);
 		})

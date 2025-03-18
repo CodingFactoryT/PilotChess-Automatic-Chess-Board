@@ -10,8 +10,14 @@ router.get("/send-command-to-arduino", (req, res) => {
 
 router.post("/send-command-to-arduino", (req, res) => {
 	const data = req.body;
-	console.log("Retrieved Post request with data: " + data.message);
-	fetchArduino(data.message)
+	const type = data.type;
+	const method = data.method;
+	const argumentsStr = data.arguments;
+	const arduinoRequestStr = `${type}:${method}:${argumentsStr}`;
+
+	console.log("Retrieved Post request with data: " + arduinoRequestStr);
+
+	fetchArduino(arduinoRequestStr)
 		.then((response) => {
 			console.log("Success: " + response.data);
 			res.status(200).send();
