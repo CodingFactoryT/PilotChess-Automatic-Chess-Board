@@ -1,6 +1,6 @@
 import { SerialPort } from "serialport";
 
-const portPath = "/dev/ttyUSB0"; //TODO move to config
+const portPath = "/dev/ttyACM0"; //TODO move to config
 const baudRate = 115200; //TODO move to config
 
 const port = new SerialPort({
