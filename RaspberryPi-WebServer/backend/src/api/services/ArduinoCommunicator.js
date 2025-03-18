@@ -28,6 +28,7 @@ export default function fetchArduino(requestString) {
 
 	isBusy = true;
 
+	console.log(requestString + "\n");
 	return new Promise((resolve, reject) => {
 		console.log("Fetching Arduino 4!");
 		port.write(requestString + "\n", (error) => {

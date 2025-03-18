@@ -12,6 +12,7 @@ router.get("/send-command-to-arduino", (req, res) => {
 router.post("/send-command-to-arduino", (req, res) => {
 	console.log("Got post 1!");
 	const data = req.body;
+	console.log(data);
 	console.log("Got post 2!");
 	fetchArduino(data)
 		.then((response) => {
