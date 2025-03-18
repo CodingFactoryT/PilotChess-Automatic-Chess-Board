@@ -39,7 +39,7 @@
     "dev:backend": "cd backend && npm run dev",
     "prod": "npm run prod:build && npm run prod:execute",
     "prod:build": "npm install && cd frontend && npm install && cross-env ENV=prod npm run build && cd ../backend && npm install",
-    "prod:execute": "cd backend && -env ENV=prod npm run start"
+    "prod:execute": "cd backend && cross-env ENV=prod npm run start"
   },
   "keywords": [],
   "author": "",
