@@ -5,7 +5,8 @@ const router = express.Router();
 
 router.post("/send-command-to-arduino", (req, res) => {
 	const data = req.body;
-	fetchArduino(data)
+	res.status(200).json({ message: "Communication to backend works!" });
+	/* fetchArduino(data)
 		.then((response) => {
 			console.log("Success: " + response.data);
 			res.status(200).send();
@@ -13,7 +14,7 @@ router.post("/send-command-to-arduino", (req, res) => {
 		.catch((error) => {
 			console.error(`Error while posting to ${req.baseUrl}${req.url}: ${error}`);
 			res.status(500).send();
-		});
+		}); */
 });
 
 export default router;
