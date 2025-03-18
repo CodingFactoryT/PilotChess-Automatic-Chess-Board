@@ -7,7 +7,7 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: config.env === "prod" ? ["http://pilotchess.local"] : [`http://pilotchess.local:${config.vite_port}`, `http://http://pilotchess.local:${config.node_port}`],
+	origin: config.env === "prod" ? ["http://pilotchess.local"] : [`http://pilotchess.local:${config.vite_port}`, `http://pilotchess.local:${config.node_port}`],
 };
 
 app.use(express.json());
