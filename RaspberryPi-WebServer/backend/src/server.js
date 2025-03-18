@@ -14,6 +14,14 @@ const corsOptions = {
 app.use(cors(corsOptions)); //for development only?
 app.use(express.json());
 
+app.options("*", (req, res) => {
+	//handle preflight requests
+	res.setHeader("Access-Control-Allow-Origin", "*");
+	res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	res.setHeader("Access-Control-Allow-Headers", "Content-Type, Authorization");
+	res.sendStatus(204);
+});
+
 app.use("/api", apiRouter);
 
 //in dev mode, the vite dev server handles the frontend
@@ -22,6 +30,6 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-app.listen(config.node_port, "0.0.0.0", () => {
-	console.log(`Server running on http://localhost:${config.node_port}`);
+app.listen(config.node_port, () => {
+	console.log(`Server listening on port ${config.node_port}`);
 });
