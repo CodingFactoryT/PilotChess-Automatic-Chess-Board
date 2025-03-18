@@ -21,6 +21,6 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-app.listen(config.node_port, () => {
+app.listen(config.node_port, "0.0.0.0", () => {
 	console.log(`Server running on http://localhost:${config.node_port}`);
 });
