@@ -7,7 +7,8 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: [`http://localhost:${config.vite_port}`], // Only allow frontend dev server
+	origin: "*",
+	//origin: [`http://localhost:${config.vite_port}`], // Only allow frontend dev server
 };
 
 app.use(cors(corsOptions)); //for development only?
