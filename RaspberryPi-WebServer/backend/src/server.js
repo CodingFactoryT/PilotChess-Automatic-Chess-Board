@@ -7,7 +7,7 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: config.env === "prod" ? ["http://pilotchess.local"] : [`http://pilotchess.local:${config.vite_port}`, `http://pilotchess.local:${config.node_port}`],
+	origin: [`${config.base_url}:${config.vite_port}`, `${config.base_url}:${config.node_port}`], //only for dev
 };
 
 app.use(express.json());
@@ -22,5 +22,5 @@ if (config.env === "prod") {
 }
 
 app.listen(config.node_port, () => {
-	console.log(`Server listening on port ${config.node_port}`);
+	console.log(`Server listening on ${config.base_url}:${config.node_port}`);
 });

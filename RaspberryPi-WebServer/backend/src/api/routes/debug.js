@@ -15,8 +15,6 @@ router.post("/send-command-to-arduino", (req, res) => {
 	const argumentsStr = data.arguments;
 	const arduinoRequestStr = `${type}:${method}:${argumentsStr}`;
 
-	console.log("Retrieved Post request with data: " + arduinoRequestStr);
-
 	fetchArduino(arduinoRequestStr)
 		.then((response) => {
 			console.log("Success: " + response.data);
