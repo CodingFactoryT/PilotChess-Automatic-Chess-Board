@@ -8,5 +8,5 @@ const api = axios.create({
 });
 
 export function apiPost(endpoint, data, config = {}) {
-	return api.post(endpoint, data, config);
+	return api.post(endpoint, data);
 }
