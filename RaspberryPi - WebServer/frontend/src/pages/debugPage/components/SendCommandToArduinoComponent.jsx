@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
+import { apiPost } from "../../../helpers/fetchBackendAPI";
 
 const typeOptions = [
   "REQ",
@@ -23,7 +24,13 @@ export default function SendCommandToArduinoComponent() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    console.log("Form submitted:", formData);
+    apiPost("/debug/send-command-to-arduino/", formData)
+    .then((response) => {
+			console.log("Success: " + response.data);
+		})
+		.catch((error) => {
+			console.error(`Error while posting to backend: ${error}`);
+		});
   };
   
   return (
