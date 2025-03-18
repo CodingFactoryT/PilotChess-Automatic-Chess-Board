@@ -2,8 +2,8 @@
 import axios from "axios";
 
 const api = axios.create({
-	//baseURL: `http://localhost:${config.node_port}/api`,  //TODO: config cannot be used here
-	baseURL: "http://localhost:80/api",
+	//baseURL: `http://pilotchess.local:${config.node_port}/api`,  //TODO: config cannot be used here
+	baseURL: "http://pilotchess.local:80/api",
 	headers: { "Content-Type": "application/json" },
 });
 
