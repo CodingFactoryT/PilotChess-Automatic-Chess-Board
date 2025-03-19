@@ -37,7 +37,7 @@ export default function fetchArduino(requestString) {
 				port.removeListener("data", handleData);
 				if (response.includes("ERRO")) {
 					isBusy = false;
-					reject("Error from Arduino: " + response);
+					reject("Error from Arduino: " + response); //TODO still invalid char in http response code
 				}
 
 				isBusy = false;
