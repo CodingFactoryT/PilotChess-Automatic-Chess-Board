@@ -24,13 +24,11 @@ export default function SendCommandToArduinoComponent() {
 
   const handleSubmit = e => {
     e.preventDefault();
-    apiPost("/debug/send-command-to-arduino/", JSON.stringify(formData))
+    apiPost("/debug/send-command-to-arduino", JSON.stringify(formData))
     .then((response) => {
 			console.log("Success: " + response.data);
 		})
-		.catch((error) => {
-			console.error(`Error while posting to backend: ${error}`);
-		});
+		.catch(e => {}); //axios handles the error message
   };
   
   return (

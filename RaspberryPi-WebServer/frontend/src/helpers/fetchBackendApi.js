@@ -1,9 +1,8 @@
-//import config from "../../../config";  //TODO: config cannot be used here
 import axios from "axios";
+import config from "../../../config";
 
 const api = axios.create({
-	//baseURL: `http://localhost:${config.node_port}/api`,  //TODO: config cannot be used here
-	baseURL: "http://localhost:80/api",
+	baseURL: `${config.base_url}:${config.node_port}/api`,
 	headers: { "Content-Type": "application/json" },
 });
 

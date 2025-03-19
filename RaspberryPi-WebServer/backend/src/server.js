@@ -7,12 +7,11 @@ import frontendRouter from "./routes/frontend.js";
 const app = express();
 
 const corsOptions = {
-	origin: "*",
-	//origin: [`http://localhost:${config.vite_port}`], // Only allow frontend dev server
+	origin: [`${config.base_url}:${config.vite_port}`, `${config.base_url}:${config.node_port}`], //only for dev
 };
 
-app.use(cors(corsOptions)); //for development only?
 app.use(express.json());
+app.use(cors(corsOptions));
 
 app.use("/api", apiRouter);
 
@@ -22,6 +21,6 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-app.listen(config.node_port, "0.0.0.0", () => {
-	console.log(`Server running on http://localhost:${config.node_port}`);
+app.listen(config.node_port, () => {
+	console.log(`Server listening on ${config.base_url}:${config.node_port}`);
 });
