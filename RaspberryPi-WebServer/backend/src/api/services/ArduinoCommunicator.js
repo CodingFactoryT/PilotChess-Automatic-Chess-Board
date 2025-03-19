@@ -29,10 +29,11 @@ export default function fetchArduino(requestString) {
 		port.write(requestString + "\n", (error) => {
 			if (error) {
 				isBusy = false;
-				reject("Error while sending request: " + error.message);
+				reject("Error while sending request: " + error);
 			}
+
 			const handleData = (data) => {
-				const response = data.toString();
+				const response = data.toString().replaceAll("\n", "");
 				port.removeListener("data", handleData);
 				if (response.includes("ERRO")) {
 					isBusy = false;
