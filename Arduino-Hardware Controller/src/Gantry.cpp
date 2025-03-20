@@ -43,14 +43,37 @@ void Gantry::setSteppersEnabled(bool areEnabled) {
 }
 
 void Gantry::home() {
+    _isHomed = true;
+
     _leftStepper.setMaxSpeed(HOMING_SPEED);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
     _rightStepper.setMaxSpeed(HOMING_SPEED);
     _leftStepper.setAcceleration(ACCELERATION);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
     _rightStepper.setAcceleration(ACCELERATION);
 
-    double initialXMovement = isLimitSwitchXTriggered() ? TILE_SIZE_MM : 0.0;   //move one tile position if the corresponding switch is already pressed before homing to ensure consistency
-    double initialYMovement = isLimitSwitchYTriggered() ? TILE_SIZE_MM : 0.0;
-    moveRelative(initialXMovement, initialYMovement);
+    int leftStepperSign = 0;
+    int rightStepperSign = 0;
+
+    if (isLimitSwitchXTriggered() && isLimitSwitchYTriggered()) {
+        rightStepperSign = 1;
+    }
+    else if (isLimitSwitchXTriggered()) {
+        rightStepperSign = 1;
+        leftStepperSign = 1;
+    }
+    else if (isLimitSwitchYTriggered()) {
+        leftStepperSign = -1;
+        rightStepperSign = 1;
+    }
+
+    _leftStepper.moveTo(leftStepperSign * 1 * STEPS_PER_REVOLUTION);    //move left stepper infinitely in the given direction, including initial acceleration
+    _rightStepper.moveTo(rightStepperSign * 1 * STEPS_PER_REVOLUTION);   //move right stepper infinitely in the given direction, including initial acceleration
+
+    while (_leftStepper.isRunning() || _rightStepper.isRunning()) {
+        _leftStepper.run();
+        _rightStepper.run();
+    }
+
+    delay(1000);
 
     moveUntilTrue(StepperDirection::COUNTERCLOCKWISE, StepperDirection::COUNTERCLOCKWISE, &Gantry::isLimitSwitchXTriggered); //=> gantry moves to the left (along the x-axis is negative direction, where the x limit switch is placed)
 
@@ -65,7 +88,6 @@ void Gantry::home() {
     _rightStepper.setMaxSpeed(MAX_SPEED);
 
     _currentPosition.setPosition(0, 0);
-    _isHomed = true;
 }
 
 void Gantry::update() {
@@ -144,7 +166,6 @@ void Gantry::moveUntilTrue(StepperDirection leftStepperDirection, StepperDirecti
         _leftStepper.run();
         _rightStepper.run();
     }
-
 
     // Set target position to current position to clear any pending moveTo
     _leftStepper.moveTo(_leftStepper.currentPosition());
