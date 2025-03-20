@@ -48,6 +48,10 @@ void Gantry::home() {
     _leftStepper.setAcceleration(ACCELERATION);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
     _rightStepper.setAcceleration(ACCELERATION);
 
+    double initialXMovement = isLimitSwitchXTriggered() ? TILE_SIZE_MM : 0.0;   //move one tile position if the corresponding switch is already pressed before homing to ensure consistency
+    double initialYMovement = isLimitSwitchYTriggered() ? TILE_SIZE_MM : 0.0;
+    moveRelative(initialXMovement, initialYMovement);
+
     moveUntilTrue(StepperDirection::COUNTERCLOCKWISE, StepperDirection::COUNTERCLOCKWISE, &Gantry::isLimitSwitchXTriggered); //=> gantry moves to the left (along the x-axis is negative direction, where the x limit switch is placed)
 
     _leftStepper.setMaxSpeed(HOMING_SPEED);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
