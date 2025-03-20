@@ -1,6 +1,7 @@
+#pragma once
 #include "StepperDirection.h"
 
-enum Direction {
+enum GantryDirection {
     X_POSITIVE,     //Left Clockwise, Right Clockwise
     X_NEGATIVE,     //Left Counterclockwise, Right Counterclockwise
     Y_POSITIVE,     //Left Counterclockwise, Right Clockwise
@@ -11,8 +12,6 @@ enum Direction {
     X_NEGATIVE_Y_POSITIVE   //Left Counterclockwise, Right Idle
 };
 
-namespace DirectionHelper {
-    void setDirectionPins(Direction direction) {
-
-    }
+namespace GantryDirectionUtil {
+    void calculateStepperDirections(GantryDirection direction, StepperDirection* leftStepperDirection, StepperDirection* rightStepperDirection);
 }

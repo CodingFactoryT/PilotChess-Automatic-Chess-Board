@@ -9,17 +9,156 @@ Gantry::Gantry() :
     pinMode(LIMIT_SWITCH_X_PIN, INPUT_PULLUP);
     pinMode(LIMIT_SWITCH_Y_PIN, INPUT_PULLUP);
 
-    _leftStepper.setEnablePin(STEPPER_ENABLE_PIN);
-    _rightStepper.setEnablePin(STEPPER_ENABLE_PIN);
+    setEnablePin(STEPPER_ENABLE_PIN);
 
-    _leftStepper.setMaxSpeed(MAX_SPEED);
-    _rightStepper.setMaxSpeed(MAX_SPEED);
-    _leftStepper.setPinsInverted(true, false, true);
-    _leftStepper.setAcceleration(ACCELERATION);
-    _rightStepper.setAcceleration(ACCELERATION);
-    _rightStepper.setPinsInverted(true, false, true);
+    setMaxSpeed(MAX_SPEED);
+    setAcceleration(ACCELERATION);
+    setPinsInverted(true, false, true);
 
     setSteppersEnabled(true);   //TODO improve by not enabling them all the time?
+}
+
+void Gantry::run() {
+    _leftStepper.run();
+    _rightStepper.run();
+}
+
+void Gantry::runWhileTrueSync(bool (Gantry::* terminateFunction)()) {
+    while ((this->*terminateFunction)()) {
+        run();
+    }
+}
+
+void Gantry::home() {
+    setMaxSpeed(HOMING_SPEED);
+
+    const int MOVE_BACK_MM = 30;
+
+    if (isLimitSwitchXTriggered() && isLimitSwitchYTriggered()) {
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
+        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED, false);
+    }
+    else if (isLimitSwitchXTriggered()) {
+        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED, false);
+    }
+    else if (isLimitSwitchYTriggered()) {
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
+    }
+
+    stepUntilTrueSync(GantryDirection::X_NEGATIVE, &Gantry::isLimitSwitchXTriggered);
+    delay(500);
+
+    if (isLimitSwitchYTriggered()) {
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
+    }
+
+    stepUntilTrueSync(GantryDirection::Y_NEGATIVE, &Gantry::isLimitSwitchYTriggered);
+
+    _currentPosition.setPosition(0, 0);
+    _isHomed = true;
+    setMaxSpeed(MAX_SPEED);
+}
+
+void Gantry::stepUntilTrueSync(GantryDirection direction, bool (Gantry::* fct)()) {
+    StepperDirection leftStepperDirection;
+    StepperDirection rightStepperDirection;
+    GantryDirectionUtil::calculateStepperDirections(direction, &leftStepperDirection, &rightStepperDirection);
+    int leftStepperSign = StepperDirectionUtil::getStepByDirection(leftStepperDirection);
+    int rightStepperSign = StepperDirectionUtil::getStepByDirection(rightStepperDirection);
+
+
+    _leftStepper.moveTo(leftStepperSign * 1000000 * STEPS_PER_REVOLUTION);    //move left stepper infinitely in the given direction, including initial acceleration
+    _rightStepper.moveTo(rightStepperSign * 1000000 * STEPS_PER_REVOLUTION);   //move right stepper infinitely in the given direction, including initial acceleration
+
+    while (!(this->*fct)()) {
+        run();
+    }
+
+    stopInstantly();
+}
+
+
+bool Gantry::moveRelativeSync(Position delta, int speed, bool validateInput) {
+    bool succeeded = moveRelativeAsync(delta, speed, validateInput);
+    runWhileTrueSync(&Gantry::isRunning);
+
+    return succeeded;
+}
+
+bool Gantry::moveRelativeAsync(Position delta, int speed, bool validateInput) {
+    Position positionToMoveTo = _currentPosition.add(delta);
+    if (validateInput && (!_isHomed || !validatePosition(positionToMoveTo))) {
+        return false;
+    }
+
+    double scaledX = delta.getX() * STEPS_PER_MM_X;
+    double scaledY = delta.getY() * STEPS_PER_MM_Y;
+
+    long leftMotorSteps = scaledY - scaledX;
+    long rightMotorSteps = scaledX + scaledY;
+
+    float leftStepperSpeed = speed;
+    float rightStepperSpeed = speed;
+    float leftStepperAcceleration = ACCELERATION;
+    float rightStepperAcceleration = ACCELERATION;
+
+    long absLeftMotorSteps = abs(leftMotorSteps);
+    long absRightMotorSteps = abs(rightMotorSteps);
+
+    if (absLeftMotorSteps > absRightMotorSteps) {
+        rightStepperSpeed = (speed * absRightMotorSteps) / absLeftMotorSteps;
+        rightStepperAcceleration = (ACCELERATION * absRightMotorSteps) / absLeftMotorSteps;
+    }
+    else {
+        leftStepperSpeed = (speed * absLeftMotorSteps) / absRightMotorSteps;
+        leftStepperAcceleration = (ACCELERATION * absLeftMotorSteps) / absRightMotorSteps;
+    }
+
+    _leftStepper.setMaxSpeed(leftStepperSpeed);
+    _rightStepper.setMaxSpeed(rightStepperSpeed);
+    _leftStepper.setAcceleration(leftStepperAcceleration);
+    _rightStepper.setAcceleration(rightStepperAcceleration);
+
+    _leftStepper.move(-leftMotorSteps);
+    _rightStepper.move(rightMotorSteps);
+
+    _currentPosition.setPosition(positionToMoveTo);
+    return true;
+}
+
+bool Gantry::moveToPositionSync(Position position, int speed, bool validateInput) {
+    bool succeeded = moveToPositionAsync(position, speed, validateInput);
+    runWhileTrueSync(&Gantry::isRunning);
+
+    return succeeded;
+}
+
+bool Gantry::moveToPositionAsync(Position position, int speed, bool validateInput) {
+    Position delta = position.subtract(_currentPosition);
+    bool succeeded = moveRelativeAsync(delta, speed, validateInput);
+
+    return succeeded;
+}
+
+bool Gantry::moveToTileSync(char column, int row, int speed, bool validateInput) {
+    bool succeeded = moveToTileAsync(column, row, speed, validateInput);
+    runWhileTrueSync(&Gantry::isRunning);
+
+    return succeeded;
+}
+
+bool Gantry::moveToTileAsync(char column, int row, int speed, bool validateInput) {
+    int columnIndex = column - 'a';
+    int rowIndex = row - 1;
+
+    int x = GANTRY_X_OFFSET_TO_A1 + columnIndex * TILE_SIZE_MM;
+    int y = GANTRY_Y_OFFSET_TO_A1 + rowIndex * TILE_SIZE_MM;
+
+    Position newPosition = Position(x, y);
+
+    bool succeeded = moveToPositionAsync(newPosition, speed, validateInput);
+
+    return succeeded;
 }
 
 void Gantry::initPieceGrabberServo() {
@@ -27,8 +166,47 @@ void Gantry::initPieceGrabberServo() {
     releasePiece();
 }
 
-Position Gantry::getCurrentPosition() {
-    return _currentPosition;
+void Gantry::grabPiece() {
+    _magnetLiftServo.write(MAGNET_SERVO_POSITION_UP);
+}
+
+void Gantry::releasePiece() {
+    _magnetLiftServo.write(MAGNET_SERVO_POSITION_DOWN);
+}
+
+void Gantry::stopInstantly() {
+    _leftStepper.setCurrentPosition(0);
+    _rightStepper.setCurrentPosition(0);
+}
+
+bool Gantry::validatePosition(Position position) {
+    return
+        !isnan(position.getX()) &&
+        !isnan(position.getY()) &&
+        position.getX() >= GANTRY_MIN_POSITION_X &&
+        position.getX() <= GANTRY_MAX_POSITION_X &&
+        position.getY() >= GANTRY_MIN_POSITION_Y &&
+        position.getY() <= GANTRY_MAX_POSITION_Y;
+}
+
+void Gantry::setMaxSpeed(float maxSpeed) {
+    _leftStepper.setMaxSpeed(maxSpeed);
+    _rightStepper.setMaxSpeed(maxSpeed);
+}
+
+void Gantry::setAcceleration(float acceleration) {
+    _leftStepper.setAcceleration(acceleration);
+    _rightStepper.setAcceleration(acceleration);
+}
+
+void Gantry::setPinsInverted(bool directionInvert, bool stepInvert, bool enableInvert) {
+    _leftStepper.setPinsInverted(directionInvert, stepInvert, enableInvert);
+    _rightStepper.setPinsInverted(directionInvert, stepInvert, enableInvert);
+}
+
+void Gantry::setEnablePin(int enablePin) {
+    _leftStepper.setEnablePin(enablePin);
+    _rightStepper.setEnablePin(enablePin);
 }
 
 void Gantry::setSteppersEnabled(bool areEnabled) {
@@ -42,109 +220,12 @@ void Gantry::setSteppersEnabled(bool areEnabled) {
     }
 }
 
-void Gantry::home() {
-    _isHomed = true;
-
-    _leftStepper.setMaxSpeed(HOMING_SPEED);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
-    _rightStepper.setMaxSpeed(HOMING_SPEED);
-    _leftStepper.setAcceleration(ACCELERATION);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
-    _rightStepper.setAcceleration(ACCELERATION);
-
-    int leftStepperSign = 0;
-    int rightStepperSign = 0;
-
-    if (isLimitSwitchXTriggered() && isLimitSwitchYTriggered()) {
-        rightStepperSign = 1;
-    }
-    else if (isLimitSwitchXTriggered()) {
-        rightStepperSign = 1;
-        leftStepperSign = 1;
-    }
-    else if (isLimitSwitchYTriggered()) {
-        leftStepperSign = -1;
-        rightStepperSign = 1;
-    }
-
-    _leftStepper.moveTo(leftStepperSign * 1 * STEPS_PER_REVOLUTION);    //move left stepper infinitely in the given direction, including initial acceleration
-    _rightStepper.moveTo(rightStepperSign * 1 * STEPS_PER_REVOLUTION);   //move right stepper infinitely in the given direction, including initial acceleration
-
-    while (_leftStepper.isRunning() || _rightStepper.isRunning()) {
-        _leftStepper.run();
-        _rightStepper.run();
-    }
-
-    delay(1000);
-
-    moveUntilTrue(StepperDirection::COUNTERCLOCKWISE, StepperDirection::COUNTERCLOCKWISE, &Gantry::isLimitSwitchXTriggered); //=> gantry moves to the left (along the x-axis is negative direction, where the x limit switch is placed)
-
-    _leftStepper.setMaxSpeed(HOMING_SPEED);    //set speed to homing speed, which is slower than normal speed as it bumps into the limit switches
-    _rightStepper.setMaxSpeed(HOMING_SPEED);
-    moveUntilTrue(StepperDirection::CLOCKWISE, StepperDirection::COUNTERCLOCKWISE, &Gantry::isLimitSwitchYTriggered); //=> gantry moves to the front (along the y-axis is negative direction, where the y limit switch is placed)
-
-    _leftStepper.setCurrentPosition(0);     //reset steppers position
-    _rightStepper.setCurrentPosition(0);
-
-    _leftStepper.setMaxSpeed(MAX_SPEED);   //set speed back to normal
-    _rightStepper.setMaxSpeed(MAX_SPEED);
-
-    _currentPosition.setPosition(0, 0);
+bool Gantry::isRunning() {
+    return _leftStepper.isRunning() || _rightStepper.isRunning();
 }
 
-void Gantry::update() {
-    _leftStepper.run();
-    _rightStepper.run();
-}
-
-void Gantry::moveToPosition(double x, double y) {
-    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
-        return;
-    }
-
-    //TODO check if inside bounds
-    int deltaX = x - _currentPosition.getX();
-    int deltaY = y - _currentPosition.getY();
-    moveRelative(deltaX, deltaY);
-}
-
-void Gantry::moveRelative(double deltaX, double deltaY) {
-    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
-        return;
-    }
-    //TODO check if inside bounds
-
-    _currentPosition.setX(_currentPosition.getX() + deltaX);
-    _currentPosition.setY(_currentPosition.getY() + deltaY);
-
-    double scaledX = deltaX * STEPS_PER_MM_X;
-    double scaledY = deltaY * STEPS_PER_MM_Y;
-
-    long leftMotorSteps = scaledY - scaledX;
-    long rightMotorSteps = scaledX + scaledY;
-
-    float leftStepperSpeed = MAX_SPEED;
-    float rightStepperSpeed = MAX_SPEED;
-    float leftStepperAcceleration = ACCELERATION;
-    float rightStepperAcceleration = ACCELERATION;
-
-    long absLeftMotorSteps = abs(leftMotorSteps);
-    long absRightMotorSteps = abs(rightMotorSteps);
-
-    if (absLeftMotorSteps > absRightMotorSteps) {
-        rightStepperSpeed = (MAX_SPEED * absRightMotorSteps) / absLeftMotorSteps;
-        rightStepperAcceleration = (ACCELERATION * absRightMotorSteps) / absLeftMotorSteps;
-    }
-    else {
-        leftStepperSpeed = (MAX_SPEED * absLeftMotorSteps) / absRightMotorSteps;
-        leftStepperAcceleration = (ACCELERATION * absLeftMotorSteps) / absRightMotorSteps;
-    }
-
-    _leftStepper.setMaxSpeed(leftStepperSpeed);
-    _rightStepper.setMaxSpeed(rightStepperSpeed);
-    _leftStepper.setAcceleration(leftStepperAcceleration);
-    _rightStepper.setAcceleration(rightStepperAcceleration);
-
-    _leftStepper.move(-leftMotorSteps);
-    _rightStepper.move(rightMotorSteps);
+Position Gantry::getCurrentPosition() {
+    return _currentPosition;
 }
 
 bool Gantry::isLimitSwitchXTriggered() {
@@ -153,64 +234,4 @@ bool Gantry::isLimitSwitchXTriggered() {
 
 bool Gantry::isLimitSwitchYTriggered() {
     return digitalRead(LIMIT_SWITCH_Y_PIN);
-}
-
-void Gantry::moveUntilTrue(StepperDirection leftStepperDirection, StepperDirection rightStepperDirection, bool (Gantry::* func)()) {
-    int leftStepperSign = leftStepperDirection == StepperDirection::CLOCKWISE ? 1 : -1;
-    int rightStepperSign = rightStepperDirection == StepperDirection::CLOCKWISE ? 1 : -1;
-
-    _leftStepper.moveTo(leftStepperSign * 1000000 * STEPS_PER_REVOLUTION);    //move left stepper infinitely in the given direction, including initial acceleration
-    _rightStepper.moveTo(rightStepperSign * 1000000 * STEPS_PER_REVOLUTION);   //move right stepper infinitely in the given direction, including initial acceleration
-
-    while (!(this->*func)()) {
-        _leftStepper.run();
-        _rightStepper.run();
-    }
-
-    // Set target position to current position to clear any pending moveTo
-    _leftStepper.moveTo(_leftStepper.currentPosition());
-    _rightStepper.moveTo(_rightStepper.currentPosition());
-
-    // Set acceleration to zero temporarily to avoid unwanted movement
-    _leftStepper.setAcceleration(0);
-    _rightStepper.setAcceleration(0);
-
-    // Set speed to zero to ensure no unintended motion occurs
-    _leftStepper.setMaxSpeed(0);
-    _rightStepper.setMaxSpeed(0);
-
-    // Delay to let motors settle
-    delay(1000);
-
-    // After the delay, reset the acceleration and max speed
-    _leftStepper.setAcceleration(ACCELERATION);
-    _rightStepper.setAcceleration(ACCELERATION);
-    _leftStepper.setMaxSpeed(MAX_SPEED);
-    _rightStepper.setMaxSpeed(MAX_SPEED);
-
-    // Ensure the motors are set to the correct target position (which should be the current position)
-    _leftStepper.moveTo(_leftStepper.currentPosition());
-    _rightStepper.moveTo(_rightStepper.currentPosition());
-}
-
-void Gantry::moveToTile(char column, int row) {
-    if (isnan(_currentPosition.getX()) || isnan(_currentPosition.getY())) {
-        return;
-    }
-
-    int columnIndex = column - 'a';
-    int rowIndex = row - 1;
-
-    int x = GANTRY_X_OFFSET_TO_A1 + columnIndex * TILE_SIZE_MM;
-    int y = GANTRY_Y_OFFSET_TO_A1 + rowIndex * TILE_SIZE_MM;
-
-    moveToPosition(x, y);
-}
-
-void Gantry::grabPiece() {
-    _magnetLiftServo.write(MAGNET_SERVO_POSITION_UP);
-}
-
-void Gantry::releasePiece() {
-    _magnetLiftServo.write(MAGNET_SERVO_POSITION_DOWN);
 }
