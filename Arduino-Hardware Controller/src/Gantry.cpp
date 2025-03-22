@@ -31,6 +31,7 @@ void Gantry::runWhileTrueSync(bool (Gantry::* terminateFunction)()) {
 
 void Gantry::home() {
     setMaxSpeed(HOMING_SPEED);
+    setAcceleration(ACCELERATION);
 
     const int MOVE_BACK_MM = 30;
 
@@ -135,30 +136,26 @@ bool Gantry::moveToPositionSync(Position position, int speed, bool validateInput
 
 bool Gantry::moveToPositionAsync(Position position, int speed, bool validateInput) {
     Position delta = position.subtract(_currentPosition);
-    bool succeeded = moveRelativeAsync(delta, speed, validateInput);
-
-    return succeeded;
+    return moveRelativeAsync(delta, speed, validateInput);
 }
 
-bool Gantry::moveToTileSync(char column, int row, int speed, bool validateInput) {
-    bool succeeded = moveToTileAsync(column, row, speed, validateInput);
+bool Gantry::moveToTileSync(char column, int row, TileOffset offset, int speed, bool validateInput) {
+    bool succeeded = moveToTileAsync(column, row, offset, speed, validateInput);
     runWhileTrueSync(&Gantry::isRunning);
 
     return succeeded;
 }
 
-bool Gantry::moveToTileAsync(char column, int row, int speed, bool validateInput) {
+bool Gantry::moveToTileAsync(char column, int row, TileOffset offset, int speed, bool validateInput) {
     int columnIndex = column - 'a';
     int rowIndex = row - 1;
 
     int x = GANTRY_X_OFFSET_TO_A1 + columnIndex * TILE_SIZE_MM;
     int y = GANTRY_Y_OFFSET_TO_A1 + rowIndex * TILE_SIZE_MM;
 
-    Position newPosition = Position(x, y);
+    Position newPosition = TileOffsetUtil::applyOffset(Position(x, y), offset);
 
-    bool succeeded = moveToPositionAsync(newPosition, speed, validateInput);
-
-    return succeeded;
+    return moveToPositionAsync(newPosition, speed, validateInput);
 }
 
 void Gantry::initPieceGrabberServo() {

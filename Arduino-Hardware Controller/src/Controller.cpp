@@ -24,9 +24,19 @@ void Controller::update() {
             _gantry.home();
             succeeded = true;
             break;
-        case RequestedDataType::MOVE:
-            succeeded = _gantry.moveToTileSync(request.getData()[0][0], request.getData()[0][1] - '0');
+        case RequestedDataType::MOVE: {
+            char* positionData = request.getData()[0];
+            char column = request.getData()[0][0];
+            int row = request.getData()[0][1] - '0';
+            if (strlen(positionData) > 2) {  //if theres also an additional offset given
+                TileOffset offset = (TileOffset)(request.getData()[0][2] - '0');
+                succeeded = _gantry.moveToTileSync(column, row, offset);
+            }
+            else {
+                succeeded = _gantry.moveToTileSync(column, row);
+            }
             break;
+        }
         case RequestedDataType::READ:
             _data[1] = _tileMatrixController.readHexString();
             succeeded = true;

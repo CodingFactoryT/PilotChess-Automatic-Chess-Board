@@ -5,6 +5,7 @@
 #include "../config.h"
 #include "./util/StepperDirection.h"
 #include "./util/GantryDirection.h"
+#include "./util/TileOffset.h"
 
 class Gantry {
 private:
@@ -33,8 +34,8 @@ public:
     bool moveToPositionSync(Position position, int speed = MAX_SPEED, bool validateInput = true);
     bool moveToPositionAsync(Position position, int speed = MAX_SPEED, bool validateInput = true);
 
-    bool moveToTileSync(char column, int row, int speed = MAX_SPEED, bool validateInput = true);
-    bool moveToTileAsync(char column, int row, int speed = MAX_SPEED, bool validateInput = true);
+    bool moveToTileSync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED, bool validateInput = true);
+    bool moveToTileAsync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED, bool validateInput = true);
 
     void initPieceGrabberServo();
     void grabPiece();
