@@ -36,21 +36,21 @@ void Gantry::home() {
     const int MOVE_BACK_MM = 30;
 
     if (isLimitSwitchXTriggered() && isLimitSwitchYTriggered()) {
-        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
-        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED, false);
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED);
+        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED);
     }
     else if (isLimitSwitchXTriggered()) {
-        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED, false);
+        moveRelativeSync(Position(MOVE_BACK_MM, 0), HOMING_SPEED);
     }
     else if (isLimitSwitchYTriggered()) {
-        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED);
     }
 
     stepUntilTrueSync(GantryDirection::X_NEGATIVE, &Gantry::isLimitSwitchXTriggered);
     delay(500);
 
     if (isLimitSwitchYTriggered()) {
-        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED, false);
+        moveRelativeSync(Position(0, MOVE_BACK_MM), HOMING_SPEED);
     }
 
     stepUntilTrueSync(GantryDirection::Y_NEGATIVE, &Gantry::isLimitSwitchYTriggered);
@@ -79,16 +79,16 @@ void Gantry::stepUntilTrueSync(GantryDirection direction, bool (Gantry::* fct)()
 }
 
 
-bool Gantry::moveRelativeSync(Position delta, int speed, bool validateInput) {
-    bool succeeded = moveRelativeAsync(delta, speed, validateInput);
+bool Gantry::moveRelativeSync(Position delta, int speed) {
+    bool succeeded = moveRelativeAsync(delta, speed);
     runWhileTrueSync(&Gantry::isRunning);
 
     return succeeded;
 }
 
-bool Gantry::moveRelativeAsync(Position delta, int speed, bool validateInput) {
+bool Gantry::moveRelativeAsync(Position delta, int speed) {
     Position positionToMoveTo = _currentPosition.add(delta);
-    if (validateInput && (!_isHomed || !validatePosition(positionToMoveTo))) {
+    if (!_isHomed || !validatePosition(positionToMoveTo)) {
         return false;
     }
 
@@ -127,26 +127,26 @@ bool Gantry::moveRelativeAsync(Position delta, int speed, bool validateInput) {
     return true;
 }
 
-bool Gantry::moveToPositionSync(Position position, int speed, bool validateInput) {
-    bool succeeded = moveToPositionAsync(position, speed, validateInput);
+bool Gantry::moveToPositionSync(Position position, int speed) {
+    bool succeeded = moveToPositionAsync(position, speed);
     runWhileTrueSync(&Gantry::isRunning);
 
     return succeeded;
 }
 
-bool Gantry::moveToPositionAsync(Position position, int speed, bool validateInput) {
+bool Gantry::moveToPositionAsync(Position position, int speed) {
     Position delta = position.subtract(_currentPosition);
-    return moveRelativeAsync(delta, speed, validateInput);
+    return moveRelativeAsync(delta, speed);
 }
 
-bool Gantry::moveToTileSync(char column, int row, TileOffset offset, int speed, bool validateInput) {
-    bool succeeded = moveToTileAsync(column, row, offset, speed, validateInput);
+bool Gantry::moveToTileSync(char column, int row, TileOffset offset, int speed) {
+    bool succeeded = moveToTileAsync(column, row, offset, speed);
     runWhileTrueSync(&Gantry::isRunning);
 
     return succeeded;
 }
 
-bool Gantry::moveToTileAsync(char column, int row, TileOffset offset, int speed, bool validateInput) {
+bool Gantry::moveToTileAsync(char column, int row, TileOffset offset, int speed) {
     int columnIndex = column - 'a';
     int rowIndex = row - 1;
 
@@ -155,7 +155,7 @@ bool Gantry::moveToTileAsync(char column, int row, TileOffset offset, int speed,
 
     Position newPosition = TileOffsetUtil::applyOffset(Position(x, y), offset);
 
-    return moveToPositionAsync(newPosition, speed, validateInput);
+    return moveToPositionAsync(newPosition, speed);
 }
 
 void Gantry::initPieceGrabberServo() {

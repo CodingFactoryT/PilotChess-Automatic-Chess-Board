@@ -28,14 +28,14 @@ public:
 
     void stepUntilTrueSync(GantryDirection direction, bool (Gantry::* fct)());
 
-    bool moveRelativeSync(Position delta, int speed = MAX_SPEED, bool validateInput = true);
-    bool moveRelativeAsync(Position delta, int speed = MAX_SPEED, bool validateInput = true);
+    bool moveRelativeSync(Position delta, int speed = MAX_SPEED);
+    bool moveRelativeAsync(Position delta, int speed = MAX_SPEED);
 
-    bool moveToPositionSync(Position position, int speed = MAX_SPEED, bool validateInput = true);
-    bool moveToPositionAsync(Position position, int speed = MAX_SPEED, bool validateInput = true);
+    bool moveToPositionSync(Position position, int speed = MAX_SPEED);
+    bool moveToPositionAsync(Position position, int speed = MAX_SPEED);
 
-    bool moveToTileSync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED, bool validateInput = true);
-    bool moveToTileAsync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED, bool validateInput = true);
+    bool moveToTileSync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED);
+    bool moveToTileAsync(char column, int row, TileOffset offset = TileOffset::CENTER, int speed = MAX_SPEED);
 
     void initPieceGrabberServo();
     void grabPiece();
