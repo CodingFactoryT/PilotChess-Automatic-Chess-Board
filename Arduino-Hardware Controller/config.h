@@ -4,6 +4,8 @@
 #define MAX_SPEED 3000.0f   //max 4000.0f, the library can't handle more
 #define ACCELERATION 0.2f * MAX_SPEED
 #define HOMING_SPEED 0.1f * MAX_SPEED
+#define HOMING_ALREADY_TRIGGERED_RETRACTION_MM 30
+#define TILE_MOVING_OVERFLOW 3
 
 #define STEPPER_DRIVER_TYPE 1
 
