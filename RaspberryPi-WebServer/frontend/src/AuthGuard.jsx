@@ -1,9 +1,11 @@
-import { Navigate, Route } from 'react-router-dom'
-import axios from 'axios';
+import { Navigate, Route, useLocation } from 'react-router-dom'
+import { useAuth } from './context/AuthContext';
 
 export default function AuthGuard({ children }) {
-  const isUserLoggedIn = false; //TODO update dynamically
+  const { isAuthenticated } = useAuth();
+  const location = useLocation();
+  
   return(
-    isUserLoggedIn ?  children  : <Navigate to="/login" />
+    isAuthenticated ?  children  : <Navigate to="/login" state={{ from: location }}/>
   )
 }

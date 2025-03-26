@@ -6,26 +6,29 @@ import WifiConfigurationPage from './pages/wifiConfigurationPage';
 import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
 import DebugPage from './pages/debugPage';
+import { AuthProvider } from './context/AuthContext';
 
 function App() {
 	return (
 		<BrowserRouter>
-			<Routes>
-				<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
-				<Route path="/login" element={ <LoginPage/> } />
-				<Route path="/" element={
-					<AuthGuard>
-						<HomePage/>
-					</AuthGuard>
-				} />
-				<Route path="/profile" element={
-					<AuthGuard>
-						<ProfilePage/>
-					</AuthGuard>
-				} />
-				<Route path="/debug" element={ <DebugPage/> }/>
-				<Route path="/*" element={ <NotFoundPage/> } />
-			</Routes>
+			<AuthProvider>
+				<Routes>
+					<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
+					<Route path="/login" element={ <LoginPage/> } />
+					<Route path="/" element={
+						<AuthGuard>
+							<HomePage/>
+						</AuthGuard>
+					} />
+					<Route path="/profile" element={
+						<AuthGuard>
+							<ProfilePage/>
+						</AuthGuard>
+					} />
+					<Route path="/debug" element={ <DebugPage/> }/>
+					<Route path="/*" element={ <NotFoundPage/> } />
+				</Routes>
+			</AuthProvider>
 		</BrowserRouter>
 	);
 }

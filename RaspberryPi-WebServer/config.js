@@ -13,6 +13,7 @@ const config = {
 	base_url: baseURL,
 	node_port: nodePort,
 	vite_port: vitePort,
+	lichess_base_url: "https://lichess.org",
 };
 
 export default config;
