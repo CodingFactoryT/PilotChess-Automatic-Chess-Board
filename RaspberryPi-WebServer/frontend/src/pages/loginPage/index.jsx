@@ -2,6 +2,7 @@ import { useLocation, useNavigate } from "react-router"
 import { useAuth } from "../../context/AuthContext";
 import {Box, Button} from "@mui/material"
 import { useEffect, useState } from "react";
+import { apiGet } from "../../helpers/fetchBackendApi";
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -14,7 +15,11 @@ export default function LoginPage() {
         if(isAuthenticated) {
             console.log("Authenticated!");
             //if(performance.getEntriesByType("navigation").type !== "reload")
-            navigate(redirectedFrom, {replace: true});
+            apiGet("/auth/login").then(res => {
+                navigate(redirectedFrom, {replace: true});
+            }).catch(error => {
+                console.error(error);
+            });
         } else {
             //is also executed at initial page load
             if(isFirstCall) {

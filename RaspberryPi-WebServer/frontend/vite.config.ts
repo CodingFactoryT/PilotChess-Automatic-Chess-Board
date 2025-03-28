@@ -9,6 +9,6 @@ export default defineConfig({
     proxy: config.env === "dev" ? {
       "/api": `${config.base_url}:${config.node_port}` // Proxy API calls to Express
     } : undefined,
-    open: "index.html"
+    open: "/"
   },
 })

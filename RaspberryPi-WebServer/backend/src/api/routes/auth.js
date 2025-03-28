@@ -1,6 +1,7 @@
 import express from "express";
 import axios from "axios";
 import config from "../../../../config.js";
+import { listenStream, stopStream } from "../lichess-communication/Stream.js";
 
 const router = express.Router();
 
@@ -9,6 +10,16 @@ router.get("/check-access-token", (req, res) => {
 		res.status(204).send();
 	} else {
 		res.status(401).send();
+	}
+});
+
+router.get("/login", (req, res) => {
+	try {
+		listenStream(`${config.lichess_base_url}/api/stream/event`, req.accessToken);
+		res.status(204).send();
+	} catch (error) {
+		console.error(error);
+		res.status(500).send();
 	}
 });
 
@@ -33,6 +44,8 @@ router.get("/logout", (req, res) => {
 	} else {
 		res.status(204).send();
 	}
+
+	stopStream();
 });
 
 router.post("/set-access-token-cookie", (req, res) => {
