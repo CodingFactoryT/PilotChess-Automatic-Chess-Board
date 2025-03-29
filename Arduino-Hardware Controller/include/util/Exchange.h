@@ -1,6 +1,7 @@
 #include "RequestedDataType.h"
 #include "CommunicationDirection.h"
 #include "Arduino.h"
+#include "./util/Util.h"
 
 const int dataArraySize = 4;
 
