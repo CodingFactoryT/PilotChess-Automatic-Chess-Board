@@ -45,7 +45,6 @@ export default function fetchArduino(requestString) {
 			};
 
 			port.on("data", handleData);
-			console.log(port.listenerCount("data"));
 		});
 	});
 }

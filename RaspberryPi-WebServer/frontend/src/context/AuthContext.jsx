@@ -61,50 +61,51 @@ export function AuthProvider({ children }) {
 	useEffect(() => {
 			apiGet("/auth/check-access-token")
 			.then(res => {
-				const isTokenStillValid = res.status >= 200 && res.status <= 299;
+				const isTokenStillValid = res.data.authenticated;
 				if(isTokenStillValid) {
 					setIsAuthenticated(true);
 					return;
-				}
-				setIsAuthenticated(false);
-			})
-			.catch(err => {	//user has to login again
-				const code = searchParams["code"];
-				const responseState = searchParams["state"];
-				const error = searchParams["error"];
-		
-				if(error) {
-					setIsAuthenticated(false);
-					console.error(`Authorization error: ${searchParams["error_description"]}`);
-				}
-				
-				if(code && responseState) {	//if a login was requested, proceed with the login
-					if(responseState !== sessionStorage.getItem("state")) {
+				} else {
+					const code = searchParams["code"];
+					const responseState = searchParams["state"];
+					const error = searchParams["error"];
+			
+					if(error) {
 						setIsAuthenticated(false);
-						console.warn("States do not match, aborting login because of possible CSRF attack!");
-						return;
+						console.error(`Authorization error: ${searchParams["error_description"]}`);
 					}
 					
-					const codeVerifier = sessionStorage.getItem("code_verifier");
-					obtainAccessToken(config.lichess_base_url, code, codeVerifier, clientURL, clientId).then(data => {
-							apiPost("/auth/set-access-token-cookie", {
-								expiresIn_seconds: data.expires_in
-							}, {
-								headers: { Authorization: `Bearer ${data.access_token}` }
-							}).then(res => {
-								setIsAuthenticated(true);
-							}).catch(error => {
-								setIsAuthenticated(false);
-								console.error(error);
-							})
-					})
-					.catch(error => {
+					if(code && responseState) {	//if a login was requested, proceed with the login
+						if(responseState !== sessionStorage.getItem("state")) {
+							setIsAuthenticated(false);
+							console.warn("States do not match, aborting login because of possible CSRF attack!");
+							return;
+						}
+						
+						const codeVerifier = sessionStorage.getItem("code_verifier");
+						obtainAccessToken(config.lichess_base_url, code, codeVerifier, clientURL, clientId).then(data => {
+								apiPost("/auth/set-access-token-cookie", {
+									expiresIn_seconds: data.expires_in
+								}, {
+									headers: { Authorization: `Bearer ${data.access_token}` }
+								}).then(res => {
+									setIsAuthenticated(true);
+								}).catch(error => {
+									setIsAuthenticated(false);
+									console.error(error);
+								})
+						})
+						.catch(error => {
+							setIsAuthenticated(false);
+							console.error(error);
+						});
+					} else {
 						setIsAuthenticated(false);
-						console.error(error);
-					});
-				} else {
-					setIsAuthenticated(false);
-				} 
+					} 
+				}
+			})
+			.catch(error => {
+				console.error(error)
 			});
 	}, []);
 

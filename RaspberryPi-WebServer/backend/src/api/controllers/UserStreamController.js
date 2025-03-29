@@ -11,7 +11,7 @@ export function handleIncomingData(data) {
 		case "challengeDeclined":
 			return handleChallengeDeclined(data);
 		default:
-			return console.log(`Unknown user stream data type: ${data.type}`);
+			return console.error(`Unknown user stream data type: ${data.type}`);
 	}
 }
 

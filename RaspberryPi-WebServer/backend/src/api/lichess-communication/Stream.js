@@ -10,7 +10,7 @@ export async function listenStream(streamingURL, lichessAccessToken) {
 	});
 
 	stream = response.data;
-	console.log("Stream started!");
+	console.logConnectionStatus("Stream started!");
 
 	stream.on("data", (data) => {
 		//if the data is not the keep-alive empty request that is sent every few seconds
@@ -27,6 +27,7 @@ export async function listenStream(streamingURL, lichessAccessToken) {
 export function stopStream() {
 	if (stream) {
 		stream.destroy();
-		console.log("Stream stopped!");
+		stream = null;
+		console.logConnectionStatus("Stream stopped!");
 	}
 }

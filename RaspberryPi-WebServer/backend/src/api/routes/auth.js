@@ -6,11 +6,8 @@ import { listenStream, stopStream } from "../lichess-communication/Stream.js";
 const router = express.Router();
 
 router.get("/check-access-token", (req, res) => {
-	if (req.accessToken) {
-		res.status(204).send();
-	} else {
-		res.status(401).send();
-	}
+	const isAuthenticated = !!req.accessToken;
+	res.status(200).json({ authenticated: isAuthenticated });
 });
 
 router.get("/login", (req, res) => {
@@ -54,7 +51,6 @@ router.post("/set-access-token-cookie", (req, res) => {
 	if (!token || !expiresIn_seconds) {
 		res.status(401).send();
 	}
-
 	res.cookie("lichess-access-token", token, {
 		//raspberry pi uses http instead of https, thats why secure is not set
 		httpOnly: true,

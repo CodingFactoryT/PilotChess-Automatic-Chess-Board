@@ -8,6 +8,7 @@ import { getAccessTokenFromHeaderOrCookie } from "./api/middleware/getAccessToke
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
 import "../helpers/consoleExtensions.js";
+import { stopStream } from "./api/lichess-communication/Stream.js";
 
 const app = express();
 
@@ -36,6 +37,10 @@ wss.on("connection", (ws) => {
 	console.logConnectionStatus("Frontend connected to WebSocket!");
 	ws.onmessage = (event) => {
 		console.log(event.data);
+	};
+
+	ws.onclose = (event) => {
+		stopStream();
 	};
 });
 
