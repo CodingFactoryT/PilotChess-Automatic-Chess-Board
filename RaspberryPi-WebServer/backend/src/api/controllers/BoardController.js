@@ -4,15 +4,19 @@ export async function waitForPieceMovement() {
 	const fromPosition = null;
 	//while (!(fromPosition = await hasTileGridChanged()));
 	while (true) {
-		hasTileGridChanged();
+		await hasTileGridChanged();
 	}
 	console.log(fromPosition);
 }
 
 let lastReadPositioning = null;
 async function hasTileGridChanged() {
-	const response = await fetchArduino("REQ:READ:");
-	const boardPositioning = response.split(",")[1];
-	console.log(boardPositioning);
-	lastReadPositioning = boardPositioning;
+	try {
+		const response = await fetchArduino("REQ:READ:");
+		const boardPositioning = response.split(",")[1];
+		console.log(boardPositioning);
+		lastReadPositioning = boardPositioning;
+	} catch (error) {
+		console.log(error);
+	}
 }
