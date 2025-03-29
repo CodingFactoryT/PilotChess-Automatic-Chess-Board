@@ -1,4 +1,4 @@
-import fetchArduino from "../services/ArduinoCommunicator";
+import fetchArduino from "../services/ArduinoCommunicator.js";
 
 export async function waitForPieceMovement() {
 	const fromPosition = null;
