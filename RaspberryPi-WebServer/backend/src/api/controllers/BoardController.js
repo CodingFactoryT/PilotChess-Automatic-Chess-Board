@@ -11,7 +11,7 @@ export async function waitForPieceMovement() {
 
 let lastReadPositioning = null;
 async function hasTileGridChanged() {
-	const response = fetchArduino("REQ:READ:");
+	const response = await fetchArduino("REQ:READ:");
 	const boardPositioning = response.split(",")[1];
 	console.log(boardPositioning);
 	lastReadPositioning = boardPositioning;
