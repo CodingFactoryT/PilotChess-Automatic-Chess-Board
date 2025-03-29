@@ -49,4 +49,4 @@ server.listen(config.node_port, () => {
 	console.status(`Server listening on ${config.base_url}:${config.node_port}`);
 });
 
-waitForPieceMovement();
+//waitForPieceMovement();
