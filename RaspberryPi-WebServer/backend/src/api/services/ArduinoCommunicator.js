@@ -39,6 +39,7 @@ export default function fetchArduino(requestString) {
 
 			const handleData = (data) => {
 				const response = data.toString().replaceAll("\n", "");
+				console.log(response);
 				port.removeListener("data", handleData);
 				if (response.includes("ERRO")) {
 					isBusy = false;
