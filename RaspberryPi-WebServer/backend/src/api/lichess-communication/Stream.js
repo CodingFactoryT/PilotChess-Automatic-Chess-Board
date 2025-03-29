@@ -1,4 +1,5 @@
 import axios from "axios";
+import { handleIncomingData } from "../controllers/UserStreamController.js";
 
 let stream = null;
 
@@ -12,7 +13,10 @@ export async function listenStream(streamingURL, lichessAccessToken) {
 	console.log("Stream started!");
 
 	stream.on("data", (data) => {
-		console.log(data);
+		//if the data is not the keep-alive empty request that is sent every few seconds
+		if (data.length > 1) {
+			handleIncomingData(JSON.parse(data));
+		}
 	});
 
 	stream.on("error", (err) => {

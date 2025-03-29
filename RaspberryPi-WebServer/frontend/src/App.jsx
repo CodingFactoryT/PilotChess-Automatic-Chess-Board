@@ -7,8 +7,18 @@ import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
 import DebugPage from './pages/debugPage';
 import { AuthProvider } from './context/AuthContext';
+import config from '../../config';
 
 function App() {
+	const socket = new WebSocket(`ws://localhost:${config.node_port}`);
+	socket.addEventListener("open", event => {
+		socket.send("Hello World!");
+	})
+
+	socket.addEventListener("message", event => {
+		console.log("Message received via ws: ", event.data);
+	})
+
 	return (
 		<BrowserRouter>
 			<AuthProvider>

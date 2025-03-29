@@ -5,6 +5,9 @@ import apiRouter from "./routes/api.js";
 import frontendRouter from "./routes/frontend.js";
 import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeaderOrCookie } from "./api/middleware/getAccessTokenFromHeaderOrCookie.js";
+import { WebSocketServer } from "ws";
+import { createServer } from "http";
+import "../helpers/consoleExtensions.js";
 
 const app = express();
 
@@ -26,6 +29,16 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-app.listen(config.node_port, () => {
-	console.log(`Server listening on ${config.base_url}:${config.node_port}`);
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
+
+wss.on("connection", (ws) => {
+	console.logConnectionStatus("Frontend connected to WebSocket!");
+	ws.onmessage = (event) => {
+		console.log(event.data);
+	};
+});
+
+server.listen(config.node_port, () => {
+	console.status(`Server listening on ${config.base_url}:${config.node_port}`);
 });
