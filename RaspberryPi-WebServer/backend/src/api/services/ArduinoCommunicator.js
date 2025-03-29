@@ -10,8 +10,11 @@ const port = new SerialPort({
 });
 
 port.on("error", (error) => {
-	waitForPieceMovement();
 	console.error("Error with serial port: " + error);
+});
+
+port.on("open", () => {
+	waitForPieceMovement();
 });
 
 let isBusy = false;
