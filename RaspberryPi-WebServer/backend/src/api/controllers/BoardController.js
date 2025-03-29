@@ -2,7 +2,10 @@ import fetchArduino from "../services/ArduinoCommunicator";
 
 export async function waitForPieceMovement() {
 	const fromPosition = null;
-	while (!(fromPosition = await hasTileGridChanged()));
+	//while (!(fromPosition = await hasTileGridChanged()));
+	while (true) {
+		hasTileGridChanged();
+	}
 	console.log(fromPosition);
 }
 
