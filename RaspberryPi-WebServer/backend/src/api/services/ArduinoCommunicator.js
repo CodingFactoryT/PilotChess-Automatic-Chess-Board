@@ -1,4 +1,5 @@
 import { SerialPort } from "serialport";
+import { waitForPieceMovement } from "../controllers/BoardController.js";
 
 const portPath = "/dev/ttyACM0"; //TODO move to config
 const baudRate = 115200; //TODO move to config
@@ -9,6 +10,7 @@ const port = new SerialPort({
 });
 
 port.on("error", (error) => {
+	waitForPieceMovement();
 	console.error("Error with serial port: " + error);
 });
 

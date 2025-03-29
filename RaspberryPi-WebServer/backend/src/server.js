@@ -9,7 +9,6 @@ import { WebSocketServer } from "ws";
 import { createServer } from "http";
 import "../helpers/consoleExtensions.js";
 import { stopStream } from "./api/lichess-communication/Stream.js";
-import { waitForPieceMovement } from "./api/controllers/BoardController.js";
 
 const app = express();
 
@@ -48,5 +47,3 @@ wss.on("connection", (ws) => {
 server.listen(config.node_port, () => {
 	console.status(`Server listening on ${config.base_url}:${config.node_port}`);
 });
-
-//waitForPieceMovement();
