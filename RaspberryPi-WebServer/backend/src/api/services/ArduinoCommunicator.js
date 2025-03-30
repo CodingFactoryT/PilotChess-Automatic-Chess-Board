@@ -1,6 +1,8 @@
 import { SerialPort } from "serialport";
+import { ReadlineParser } from "@serialport/parser-readline";
 
-const portPath = "/dev/ttyACM0"; //TODO move to config
+//const portPath = "/dev/ttyACM0"; //TODO move to config
+const portPath = "COM6";
 const baudRate = 115200; //TODO move to config
 
 const port = new SerialPort({
@@ -12,6 +14,8 @@ port.on("error", (error) => {
 	console.error("Error with serial port: " + error);
 });
 
+const lineStream = port.pipe(new ReadlineParser({ delimiter: "\n" }));
+
 let isBusy = false;
 
 export default function fetchArduino(requestString) {
@@ -22,7 +26,6 @@ export default function fetchArduino(requestString) {
 	if (isBusy) {
 		return Promise.reject("Arduino is busy");
 	}
-
 	isBusy = true;
 
 	return new Promise((resolve, reject) => {
@@ -34,17 +37,18 @@ export default function fetchArduino(requestString) {
 
 			const handleData = (data) => {
 				const response = data.toString().replaceAll("\n", "");
-				port.removeListener("data", handleData);
+
+				lineStream.removeListener("data", handleData);
 				if (response.includes("ERRO")) {
 					isBusy = false;
 					reject("Error from Arduino: " + response); //TODO still invalid char in http response code
 				}
 
 				isBusy = false;
-				resolve(response);
+				resolve({ data: response });
 			};
 
-			port.on("data", handleData);
+			lineStream.on("data", handleData);
 		});
 	});
 }

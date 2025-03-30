@@ -10,6 +10,7 @@ const typeOptions = [
 const methodOptions = [
   "HOME",
   "MOVE",
+  "READ",
   "GRAB",
   "RELS",
   "ERRO",

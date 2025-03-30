@@ -5,6 +5,7 @@ Exchange::Exchange(CommunicationDirection direction, RequestedDataType type, cha
     _type(type),
     _data(data) {
 }
+
 CommunicationDirection Exchange::getDirection() {
     return _direction;
 }

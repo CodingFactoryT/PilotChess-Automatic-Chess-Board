@@ -5,10 +5,17 @@ bool SerialCommunicationController::isRequestPresent() {
 }
 
 char* SerialCommunicationController::readRequestFromSerial() {
-    char* buffer = new char[SERIAL_RX_BUFFER_SIZE]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
+    char* buffer = new char[SERIAL_RX_BUFFER_SIZE + 1]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
     int index = 0;
     char currentChar;
+<<<<<<< Updated upstream:Arduino-Hardware Controller/src/SerialCommunicationController.cpp
     while ((currentChar = Serial.read()) != '\n' && index < SERIAL_RX_BUFFER_SIZE - 1) {
+=======
+    while ((currentChar = Serial.read()) != '\n') {
+        if (index > SERIAL_RX_BUFFER_SIZE - 1) {
+            break;
+        }
+>>>>>>> Stashed changes:Arduino-PilotChess-Automatic-Chess-Board/src/SerialCommunicationController.cpp
         buffer[index] = currentChar;
         index++;
         delayMicroseconds(SERIAL_READ_DELAY_MICROS);   //wait for next character to be able to arrive via Serial
@@ -18,6 +25,19 @@ char* SerialCommunicationController::readRequestFromSerial() {
     return buffer;
 }
 
+<<<<<<< Updated upstream:Arduino-Hardware Controller/src/SerialCommunicationController.cpp
+=======
+void SerialCommunicationController::handleRequest(char* rawRequest) {
+    Exchange request = parseRequest(rawRequest);
+    Exchange response = calculateResponse(request);
+
+    respond(response);
+
+    Util::delete2DArray(response.getData(), 5);
+    delete[] rawRequest;
+}
+
+>>>>>>> Stashed changes:Arduino-PilotChess-Automatic-Chess-Board/src/SerialCommunicationController.cpp
 /**
  * Request is of type XXX:YYYY:______
  * where
@@ -41,8 +61,13 @@ Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
     }
     rawData[index - 9] = '\0';
 
+<<<<<<< Updated upstream:Arduino-Hardware Controller/src/SerialCommunicationController.cpp
     char** splittedData = Util::splitCharArray(rawData, ',', 4);
     delete[] rawData;
+=======
+    char** splittedData = Util::splitCharArray(data, ',', 5);
+    delete[] data;
+>>>>>>> Stashed changes:Arduino-PilotChess-Automatic-Chess-Board/src/SerialCommunicationController.cpp
     return Exchange(direction, requestDataType, splittedData);
 }
 
@@ -70,6 +95,7 @@ char* SerialCommunicationController::buildMessage(String responseType, String re
     }
 
     message[messageIndex++] = ':';
+<<<<<<< Updated upstream:Arduino-Hardware Controller/src/SerialCommunicationController.cpp
     for (int i = 0; i < 4; i++) {
         if (data[i][0] == '\0') {
             break;
@@ -88,7 +114,25 @@ char* SerialCommunicationController::buildMessage(String responseType, String re
     }
 
     message[messageIndex] = '\0';
+=======
+>>>>>>> Stashed changes:Arduino-PilotChess-Automatic-Chess-Board/src/SerialCommunicationController.cpp
 
+    int i = 0;
+    char* currentArray;
+    while ((currentArray = data[i]) != nullptr) {
+        int j = 0;
+        char currentChar;
+        while ((currentChar = currentArray[j]) != '\0') {
+            message[messageIndex++] = currentChar;
+            j++;
+        }
+        if (data[i + 1] != '\0') {
+            message[messageIndex++] = ',';
+        }
+        i++;
+    }
+
+    message[messageIndex] = '\0';
     return message;
 }
 

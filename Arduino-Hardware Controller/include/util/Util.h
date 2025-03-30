@@ -1,12 +1,13 @@
 #pragma once
 #include "Arduino.h"
+#pragma once
 
 class Util {
 public:
     static char** splitCharArray(char* input, char delimiter, int size) {
         char** output = new char* [size];
 
-        for (int i = 0; i < size; i++) {
+        for (int i = 0; i < size - 1; i++) {
             output[i] = new char[SERIAL_RX_BUFFER_SIZE];
         }
 
@@ -29,6 +30,11 @@ public:
         }
 
         output[outputArrayIndex][outputSingleArrayIndex] = '\0';
+
+        for (int i = outputArrayIndex + 1; i < size; i++) {
+            Serial.println("NULL");
+            output[i] = nullptr;
+        }
 
         return output;
     }
