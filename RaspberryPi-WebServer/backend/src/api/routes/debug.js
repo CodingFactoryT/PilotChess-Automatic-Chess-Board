@@ -1,5 +1,6 @@
 import express from "express";
 import fetchArduino from "../services/ArduinoCommunicator.js";
+import { waitForPieceMovement } from "../controllers/BoardController.js";
 
 const router = express.Router();
 
