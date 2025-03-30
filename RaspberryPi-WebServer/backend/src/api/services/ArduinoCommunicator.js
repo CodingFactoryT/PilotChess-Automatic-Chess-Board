@@ -1,8 +1,8 @@
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
+import config from "../../../../config";
 
-//const portPath = "/dev/ttyACM0"; //TODO move to config
-const portPath = "COM6";
+const portPath = config.arduino_com_port;
 const baudRate = 115200; //TODO move to config
 
 const port = new SerialPort({
