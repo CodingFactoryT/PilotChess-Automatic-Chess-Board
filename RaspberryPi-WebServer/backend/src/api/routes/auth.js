@@ -1,7 +1,7 @@
 import express from "express";
 import axios from "axios";
 import config from "../../../../config.js";
-import { listenStream, stopStream } from "../lichess-communication/Stream.js";
+import { listenMainEventStream, stopMainEventStream } from "../lichess-communication/Stream.js";
 
 const router = express.Router();
 
@@ -12,7 +12,7 @@ router.get("/check-access-token", (req, res) => {
 
 router.get("/login", (req, res) => {
 	try {
-		listenStream(`${config.lichess_base_url}/api/stream/event`, req.accessToken);
+		listenMainEventStream(req.accessToken);
 		res.status(204).send();
 	} catch (error) {
 		console.error(error);
@@ -42,7 +42,7 @@ router.get("/logout", (req, res) => {
 		res.status(204).send();
 	}
 
-	stopStream();
+	stopMainEventStream();
 });
 
 router.post("/set-access-token-cookie", (req, res) => {
