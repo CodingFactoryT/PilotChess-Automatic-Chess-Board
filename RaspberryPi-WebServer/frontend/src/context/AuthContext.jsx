@@ -13,13 +13,13 @@ const clientURL = (() => {	//prevents from displaying the query parameters in th
   const url = new URL(location.href);
   
 	searchParams = {};
-	url.searchParams.forEach((value, key) => {
+	url.searchParams.forEach((value, key) => {	//store the search params to be accessed later
 		searchParams[key] = value;
 	});
 
   url.search = ''; // remove query string
   
-  history.replaceState({}, '', url.href); //update browsers url
+  history.replaceState({}, '', url.href); //update browser url that is visible to the user
 
   return url.href;
 })();
@@ -59,55 +59,47 @@ export function AuthProvider({ children }) {
 	const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 	useEffect(() => {
-			apiGet("/auth/check-access-token")
-			.then(res => {
-				const isTokenStillValid = res.data.authenticated;
+		const handlePageLoad = async () => {
+			try {
+				const response = await apiGet("/auth/check-access-token");
+				const isTokenStillValid = response.data.authenticated;
 				if(isTokenStillValid) {
 					setIsAuthenticated(true);
 					return;
-				} else {
-					const code = searchParams["code"];
-					const responseState = searchParams["state"];
-					const error = searchParams["error"];
-			
-					if(error) {
-						setIsAuthenticated(false);
-						console.error(`Authorization error: ${searchParams["error_description"]}`);
-					}
-					
-					if(code && responseState) {	//if a login was requested, proceed with the login
-						if(responseState !== sessionStorage.getItem("state")) {
-							setIsAuthenticated(false);
-							console.warn("States do not match, aborting login because of possible CSRF attack!");
-							return;
-						}
-						
-						const codeVerifier = sessionStorage.getItem("code_verifier");
-						obtainAccessToken(config.lichess_base_url, code, codeVerifier, clientURL, clientId).then(data => {
-								apiPost("/auth/set-access-token-cookie", {
-									expiresIn_seconds: data.expires_in
-								}, {
-									headers: { Authorization: `Bearer ${data.access_token}` }
-								}).then(res => {
-									setIsAuthenticated(true);
-								}).catch(error => {
-									setIsAuthenticated(false);
-									console.error(error);
-								})
-						})
-						.catch(error => {
-							setIsAuthenticated(false);
-							console.error(error);
-						});
-					} else {
-						setIsAuthenticated(false);
-					} 
 				}
-			})
-			.catch(error => {
+				const code = searchParams["code"];
+				const responseState = searchParams["state"];
+
+				//if these searchParameters are set, theres an ongoing login active
+				if(code && responseState) {
+					handleOngoingLogin(code, responseState);
+				}
+			} catch(error) {
 				console.error(error)
-			});
+			}
+		}
+
+		handlePageLoad();
 	}, []);
+
+	const handleOngoingLogin = async (code, responseState) => {
+		const error = searchParams["error"];
+
+		if(error) {
+			console.error(`Authorization error: ${searchParams["error_description"]}`);
+			return;
+		}
+
+		if(responseState !== sessionStorage.getItem("state")) {
+			console.warn("States do not match, aborting login because of possible CSRF attack!");
+			return;
+		}
+		
+		const codeVerifier = sessionStorage.getItem("code_verifier");
+		const data = await obtainAccessToken(config.lichess_base_url, code, codeVerifier, clientURL, clientId);
+		await apiPost("/auth/set-access-token-cookie", { expiresIn_seconds: data.expires_in }, {headers: { Authorization: `Bearer ${data.access_token}` }});
+		setIsAuthenticated(true);
+	}
 
 	const login = () => {
 		requestAuthorizationCode(clientId, clientURL, scope);
@@ -115,7 +107,7 @@ export function AuthProvider({ children }) {
 
 	const logout = () => {
 		setIsAuthenticated(false);
-		apiGet("/auth/logout").then(res => {
+		apiGet("/auth/logout").then(() => {
 			navigate("/login", { replace: true });
 		})
 	};
