@@ -31,7 +31,7 @@ router.get("/logout", (req, res) => {
 			.delete(`${config.lichess_base_url}/api/token`, {
 				headers: { Authorization: `Bearer ${req.accessToken}` },
 			})
-			.then((response) => {
+			.then(() => {
 				res.status(204).send();
 			})
 			.catch((error) => {

@@ -7,7 +7,7 @@ import { apiGet } from "../../helpers/fetchBackendApi";
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
-    const { login, logout, isAuthenticated } = useAuth();
+    const { login, isAuthenticated } = useAuth();
     const redirectedFrom = location.state?.from?.pathname || "/";
 
     const [isFirstCall, setIsFirstCall] = useState(true);

@@ -5,10 +5,8 @@ import apiRouter from "./routes/api.js";
 import frontendRouter from "./routes/frontend.js";
 import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeaderOrCookie } from "./api/middleware/getAccessTokenFromHeaderOrCookie.js";
-import { WebSocketServer } from "ws";
-import { createServer } from "http";
 import "../helpers/consoleExtensions.js";
-import { stopMainEventStream } from "./api/lichess-communication/Stream.js";
+import WebSocketController from "./api/controllers/WebSocketController.js";
 
 const app = express();
 
@@ -30,20 +28,8 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-const server = createServer(app);
-const wss = new WebSocketServer({ server });
-
-wss.on("connection", (ws) => {
-	console.logConnectionStatus("Frontend connected to WebSocket!");
-	ws.onmessage = (event) => {
-		console.log(event.data);
-	};
-
-	ws.onclose = (event) => {
-		stopMainEventStream();
-	};
-});
-
-server.listen(config.node_port, () => {
-	console.status(`Server listening on ${config.base_url}:${config.node_port}`);
-});
+WebSocketController.get(app)
+	.getServer()
+	.listen(config.node_port, () => {
+		console.status(`Server listening on ${config.base_url}:${config.node_port}`);
+	});
