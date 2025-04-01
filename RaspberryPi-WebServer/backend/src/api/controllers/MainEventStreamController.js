@@ -8,7 +8,7 @@ export function handleIncomingData(data) {
 			return handleGameFinish(data);
 		case "challenge":
 			return handleChallenge(data);
-		case "challengeCancelled":
+		case "challengeCanceled":
 			return handleChallengeCancelled(data);
 		case "challengeDeclined":
 			return handleChallengeDeclined(data);
@@ -22,7 +22,6 @@ function handleGameStart(data) {}
 function handleGameFinish(data) {}
 
 function handleChallenge(data) {
-	console.log("Challenge received!");
 	WebSocketController.get().send({
 		type: "challenge",
 		data: {
@@ -37,7 +36,12 @@ function handleChallenge(data) {
 }
 
 function handleChallengeCancelled(data) {
-	console.log("Challenge cancelled!");
+	WebSocketController.get().send({
+		type: "challengeCanceled",
+		data: {
+			id: data.challenge.id,
+		},
+	});
 }
 
 function handleChallengeDeclined(data) {

@@ -12,7 +12,7 @@ import { useEffect } from 'react';
 import { useWebsocketNotification } from './context/WebsocketNotificationContext';
 
 function App() {
-	const handleWebsocketMessage = useWebsocketNotification();
+	const { handleWebsocketMessage } = useWebsocketNotification();
 
 	useEffect(() => {
 		const socket = new WebSocket(`ws://localhost:${config.node_port}`);
