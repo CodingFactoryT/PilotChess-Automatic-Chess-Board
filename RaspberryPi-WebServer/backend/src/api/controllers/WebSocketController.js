@@ -43,7 +43,7 @@ export default class WebSocketController {
 
 	send(data) {
 		this.clients.forEach((client) => {
-			client.send(data);
+			client.send(JSON.stringify(data));
 		});
 	}
 

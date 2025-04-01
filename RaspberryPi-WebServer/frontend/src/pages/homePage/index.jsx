@@ -6,10 +6,10 @@ export default function HomePage() {
     
     return (
         <>
-        <Button variant="contained" color="primary" onClick={logout}>
-        Logout from Lichess
-        </Button>
-        <p>HomePage</p>
+            <Button variant="contained" color="primary" onClick={logout}>
+            Logout from Lichess
+            </Button>
+            <p>HomePage</p>
         </>
     )
 }

@@ -41,8 +41,9 @@ export async function listenStream(streamingURL, lichessAccessToken, streamName)
 
 		streamObj.stream.on("data", (data) => {
 			//if the data is not the empty keep-alive request that is sent every few seconds
-			if (data.length > 1) {
-				streamObject.handleStreamData(JSON.parse(data));
+			data = data.toString().trim();
+			if (data.length > 0) {
+				streamObj.handleStreamData(JSON.parse(data));
 			}
 		});
 

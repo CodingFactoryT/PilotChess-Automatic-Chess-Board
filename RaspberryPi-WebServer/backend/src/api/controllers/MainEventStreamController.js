@@ -1,3 +1,5 @@
+import WebSocketController from "./WebSocketController.js";
+
 export function handleIncomingData(data) {
 	switch (data.type) {
 		case "gameStart":
@@ -19,8 +21,25 @@ function handleGameStart(data) {}
 
 function handleGameFinish(data) {}
 
-function handleChallenge(data) {}
+function handleChallenge(data) {
+	console.log("Challenge received!");
+	WebSocketController.get().send({
+		type: "challenge",
+		data: {
+			id: data.challenge.id,
+			challenger: data.challenge.challenger.name,
+			variant: data.challenge.variant.name,
+			rated: data.challenge.rated,
+			speed: data.challenge.speed,
+			timeControl: data.timeControl,
+		},
+	});
+}
 
-function handleChallengeCancelled(data) {}
+function handleChallengeCancelled(data) {
+	console.log("Challenge cancelled!");
+}
 
-function handleChallengeDeclined(data) {}
+function handleChallengeDeclined(data) {
+	console.log("Challenge declined!");
+}
