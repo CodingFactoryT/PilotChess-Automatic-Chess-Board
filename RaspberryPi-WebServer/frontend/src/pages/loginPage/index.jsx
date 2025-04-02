@@ -13,7 +13,6 @@ export default function LoginPage() {
     const [isFirstCall, setIsFirstCall] = useState(true);
     useEffect(() => {
         if(isAuthenticated) {
-            console.log("Authenticated!");
             //if(performance.getEntriesByType("navigation").type !== "reload")
             apiGet("/auth/login").then(() => {
                 navigate(redirectedFrom, {replace: true});

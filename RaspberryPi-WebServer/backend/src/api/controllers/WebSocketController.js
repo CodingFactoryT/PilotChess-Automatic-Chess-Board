@@ -1,15 +1,15 @@
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
-import { stopMainEventStream } from "../lichess-communication/Stream.js";
-
-const PRIVATE_CONSTRUCTOR_TOKEN = "kshdfkg3hsa56kdzgfa2w4sbdfiwuqze894odzig";
+import MainEventStream from "./MainEventStream.js";
 
 export default class WebSocketController {
-	constructor(token, app) {
+	static #instance = null;
+
+	constructor(app) {
 		this.app = app;
 
-		if (token !== PRIVATE_CONSTRUCTOR_TOKEN) {
-			throw new Error("Cannot instantiate directly. Use WebSocketController.get()");
+		if (WebSocketController.#instance) {
+			throw new Error("Use WebSocketController.getInstance() instead of new.");
 		}
 
 		this.server = createServer(this.app);
@@ -25,16 +25,18 @@ export default class WebSocketController {
 			ws.onclose = () => {
 				console.logConnectionStatus("Frontend disconnected from WebSocket!");
 				this.clients.delete(ws);
-				stopMainEventStream();
+				MainEventStream.getInstance().stop();
 			};
 		});
+
+		WebSocketController.#instance = this;
 	}
 
-	static get(app) {
-		if (!WebSocketController.instance) {
-			WebSocketController.instance = new WebSocketController(PRIVATE_CONSTRUCTOR_TOKEN, app);
+	static getInstance(app) {
+		if (!WebSocketController.#instance) {
+			WebSocketController.#instance = new WebSocketController(app);
 		}
-		return WebSocketController.instance;
+		return WebSocketController.#instance;
 	}
 
 	getServer() {
