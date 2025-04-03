@@ -4,7 +4,7 @@ import config from "../../config.js";
 import apiRouter from "./routes/api.js";
 import frontendRouter from "./routes/frontend.js";
 import cookieParser from "cookie-parser";
-import { getAccessTokenFromHeaderOrCookie } from "./api/middleware/getAccessTokenFromHeaderOrCookie.js";
+import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
 import "../helpers/consoleExtensions.js";
 import WebSocketController from "./api/controllers/WebSocketController.js";
 
@@ -18,7 +18,7 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
-app.use(getAccessTokenFromHeaderOrCookie);
+app.use(getAccessTokenFromHeader);
 
 app.use("/api", apiRouter);
 

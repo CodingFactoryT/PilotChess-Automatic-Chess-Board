@@ -7,18 +7,15 @@ import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
 import DebugPage from './pages/debugPage';
 import { AuthProvider } from './context/AuthContext';
-import config from '../../config';
 import { useEffect } from 'react';
 import { useWebsocketNotification } from './context/WebsocketNotificationContext';
+import WebsocketController from './controller/WebSocketController';
 
-function App() {
+export default function App() {
 	const { handleWebsocketMessage } = useWebsocketNotification();
 
 	useEffect(() => {
-		const socket = new WebSocket(`ws://localhost:${config.node_port}`);
-		socket.addEventListener("message", event => {
-			handleWebsocketMessage(JSON.parse(event.data));
-		});
+		WebsocketController.initConnection(handleWebsocketMessage);
 	}, []);
 
 	return (
@@ -44,5 +41,3 @@ function App() {
 			</BrowserRouter>
 	);
 }
-
-export default App;

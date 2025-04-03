@@ -1,4 +1,5 @@
 import axios from "axios";
+import LichessTokenVault from "./LichessTokenVault.js";
 
 export default class Stream {
 	constructor(name, url, dataFunction, errorFunction) {
@@ -11,10 +12,10 @@ export default class Stream {
 		this.events = null;
 	}
 
-	async listen(accessToken) {
+	async listen() {
 		try {
 			const response = await axios.get(this.url, {
-				headers: { Authorization: `Bearer ${accessToken}` },
+				headers: { Authorization: `Bearer ${LichessTokenVault.getAccessToken()}` },
 				responseType: "stream",
 			});
 
@@ -30,11 +31,11 @@ export default class Stream {
 			});
 
 			this.streamObject.on("error", (error) => {
-				console.error(`Error in stream "${streamName}": ${error}`);
+				console.error(`Error in stream "${this.name}": ${error}`);
 				this.errorFunction(error);
 			});
 		} catch (error) {
-			console.error(`Error while trying to listen to stream "${streamName}" with url ${streamingURL}: ${error}`);
+			console.error(`Error while trying to listen to stream "${this.name}" with url ${this.url}: ${error}`);
 		}
 	}
 

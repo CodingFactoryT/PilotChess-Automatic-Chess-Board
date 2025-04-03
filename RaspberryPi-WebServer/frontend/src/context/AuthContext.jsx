@@ -97,7 +97,7 @@ export function AuthProvider({ children }) {
 		
 		const codeVerifier = sessionStorage.getItem("code_verifier");
 		const data = await obtainAccessToken(config.lichess_base_url, code, codeVerifier, clientURL, clientId);
-		await apiPost("/auth/set-access-token-cookie", { expiresIn_seconds: data.expires_in }, {headers: { Authorization: `Bearer ${data.access_token}` }});
+		await apiPost("/auth/set-access-token", { expiresIn_seconds: data.expires_in }, {headers: { Authorization: `Bearer ${data.access_token}` }});
 		setIsAuthenticated(true);
 	}
 

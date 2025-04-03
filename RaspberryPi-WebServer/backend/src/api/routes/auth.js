@@ -2,17 +2,18 @@ import express from "express";
 import axios from "axios";
 import config from "../../../../config.js";
 import MainEventStream from "../controllers/MainEventStream.js";
+import LichessTokenVault from "../controllers/LichessTokenVault.js";
 
 const router = express.Router();
 
 router.get("/check-access-token", (req, res) => {
-	const isAuthenticated = !!req.accessToken;
+	const isAuthenticated = LichessTokenVault.isTokenValid();
 	res.status(200).json({ authenticated: isAuthenticated });
 });
 
 router.get("/login", (req, res) => {
 	try {
-		MainEventStream.getInstance().listen(req.accessToken);
+		MainEventStream.getInstance().listen();
 		res.status(204).send();
 	} catch (error) {
 		console.error(error);
@@ -45,18 +46,13 @@ router.get("/logout", (req, res) => {
 	MainEventStream.getInstance().stop();
 });
 
-router.post("/set-access-token-cookie", (req, res) => {
+router.post("/set-access-token", (req, res) => {
 	const token = req.accessToken;
 	const expiresIn_seconds = req.body.expiresIn_seconds;
 	if (!token || !expiresIn_seconds) {
 		res.status(401).send();
 	}
-	res.cookie("lichess-access-token", token, {
-		//raspberry pi uses http instead of https, thats why secure is not set
-		httpOnly: true,
-		maxAge: expiresIn_seconds * 1000,
-		sameSite: "Strict",
-	});
+	LichessTokenVault.setAccessToken(token, expiresIn_seconds);
 
 	res.status(204).send();
 });
