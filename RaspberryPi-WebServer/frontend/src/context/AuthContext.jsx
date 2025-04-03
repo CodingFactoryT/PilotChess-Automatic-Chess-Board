@@ -46,7 +46,7 @@ const scope = [
 	"follow:write" ,			//Follow and unfollow other players
 	//"msg:write",				//Send private messages to other players
 	"board:play",					//Play with the Board API
-	//"bot:play",					//Play with the Bot API. Only for Bot accounts
+	//"bot:play",				 	//Play with the Bot API. Only for Bot accounts
 	//"web:mod",					//Use moderator tools (within the bounds of your permissions)
 ].reduce((acc, current) => acc + current + " ", "");	//reduce them to one string with the scopes being separated by a space (=the format the lichess oauth needs)
 

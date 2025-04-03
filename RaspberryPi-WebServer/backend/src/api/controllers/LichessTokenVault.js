@@ -9,8 +9,7 @@ export default class LichessTokenVault {
 
 	static getAccessToken() {
 		if (!this.isTokenValid) {
-			this.accessToken = null;
-			this.accessTokenExpirationDate = null;
+			this.deleteAccessToken();
 			return null;
 		}
 
@@ -23,5 +22,14 @@ export default class LichessTokenVault {
 
 	static isTokenValid() {
 		return this.accessToken && !this.#isAccessTokenExpired();
+	}
+
+	static getAuthorizationHeaderObject() {
+		return { headers: { Authorization: `Bearer ${LichessTokenVault.getAccessToken()}` } };
+	}
+
+	static deleteAccessToken() {
+		this.accessToken = null;
+		this.accessTokenExpirationDate = null;
 	}
 }

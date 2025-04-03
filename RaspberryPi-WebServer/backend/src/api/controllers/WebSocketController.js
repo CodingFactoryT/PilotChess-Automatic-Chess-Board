@@ -1,6 +1,7 @@
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
 import MainEventStream from "./MainEventStream.js";
+import LichessChallengeController from "./LichessControllers/LichessChallengeController.js";
 
 export default class WebSocketController {
 	static #instance = null;
@@ -20,7 +21,7 @@ export default class WebSocketController {
 			this.clients.add(ws);
 			console.logConnectionStatus("Frontend connected to WebSocket!");
 
-			ws.onmessage = (event) => this.#handleIncomingData(event);
+			ws.onmessage = (event) => this.#handleIncomingData(JSON.parse(event.data));
 
 			ws.onclose = () => {
 				console.logConnectionStatus("Frontend disconnected from WebSocket!");
@@ -49,7 +50,14 @@ export default class WebSocketController {
 		});
 	}
 
-	#handleIncomingData(event) {
-		console.log(event.data);
+	#handleIncomingData(data) {
+		switch (data.type) {
+			case "challengeAccepted":
+				return LichessChallengeController.acceptChallenge(data.data.id);
+			case "challengeDeclined":
+				return LichessChallengeController.declineChallenge(data.data.id);
+			default:
+				return console.error(`Unknown incoming websocket message type from frontend: ${data.type}`);
+		}
 	}
 }

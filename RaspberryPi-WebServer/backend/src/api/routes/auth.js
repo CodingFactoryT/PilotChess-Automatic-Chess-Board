@@ -27,12 +27,13 @@ router.get("/logout", (req, res) => {
 		sameSite: "Strict",
 	});
 
-	if (req.accessToken) {
+	if (LichessTokenVault.getAccessToken()) {
 		axios
 			.delete(`${config.lichess_base_url}/api/token`, {
-				headers: { Authorization: `Bearer ${req.accessToken}` },
+				headers: { Authorization: `Bearer ${LichessTokenVault.getAccessToken()}` },
 			})
 			.then(() => {
+				LichessTokenVault.deleteAccessToken();
 				res.status(204).send();
 			})
 			.catch((error) => {
