@@ -1,6 +1,7 @@
 import WebSocketController from "./WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "../../../../config.js";
+import GameStream from "./GameStream.js";
 
 export default class MainEventStream extends Stream {
 	static #instance = null;
@@ -57,13 +58,31 @@ export default class MainEventStream extends Stream {
 		}
 	}
 
-	#handleGameStart(data) {}
+	#handleGameStart(data) {
+		GameStream.getInstance(data.game.gameId).listen();
+		const game = data.game;
+		WebSocketController.getInstance().send({
+			type: this.Events.GAME_START,
+			data: {
+				id: game.gameId,
+				color: game.color,
+				fen: game.fen,
+				opponent: {
+					username: game.opponent.username,
+					rating: game.opponent.rating,
+				},
+				secondsLeft: data.game.secondsLeft,
+			},
+		});
+	}
 
-	#handleGameFinish(data) {}
+	#handleGameFinish(data) {
+		GameStream.getInstance(data.game.gameId).stop();
+	}
 
 	#handleChallenge(data) {
 		WebSocketController.getInstance().send({
-			type: "challenge",
+			type: this.Events.CHALLENGE,
 			data: {
 				id: data.challenge.id,
 				challenger: data.challenge.challenger.name,
@@ -77,7 +96,7 @@ export default class MainEventStream extends Stream {
 
 	#handleChallengeCanceled(data) {
 		WebSocketController.getInstance().send({
-			type: "challengeCanceled",
+			type: this.Events.CHALLENGE_CANCELED,
 			data: {
 				id: data.challenge.id,
 			},

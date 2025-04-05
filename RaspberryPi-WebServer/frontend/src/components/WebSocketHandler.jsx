@@ -1,16 +1,19 @@
+import { useEffect } from "react";
+import WebSocketController from "../controller/WebSocketController"
 import { useSnackbar } from "notistack";
-import React, { createContext, useContext } from 'react';
+import React from 'react';
 import { acceptChallenge, declineChallenge } from "../helpers/WebsocketResponses/challenge";
+import { useNavigate } from "react-router";
 
-const WebsocketNotificationContext = createContext();
 const openSnackbarMessages = new Map();
 
-export function useWebsocketNotification() {
-	return useContext(WebsocketNotificationContext);
-}
+export default function WebSocketHandler() {
+  const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  const navigate = useNavigate();
 
-export function WebsocketNotificationProvider({children}) {
-	const { enqueueSnackbar, closeSnackbar } = useSnackbar();
+  useEffect(() => {
+		WebSocketController.initConnection(handleWebsocketMessage);
+	}, []);
 
   function handleWebsocketMessage(data) {
     switch (data.type) {
@@ -19,6 +22,10 @@ export function WebsocketNotificationProvider({children}) {
         break;
       case "challengeCanceled":
         handleChallengeDeclinedMessage(data.data.id);
+        break;
+      case "gameStart":
+        handleGameStartMessage(data.data);
+        break;
       default:
         console.error("Frontend cannot handle this type of message:", data.type);
     }
@@ -49,9 +56,9 @@ export function WebsocketNotificationProvider({children}) {
     openSnackbarMessages.delete(challengeId);
   }
 
-  return (
-    <WebsocketNotificationContext.Provider value={{handleWebsocketMessage, handleChallengeDeclinedMessage}}>
-      {children}
-    </WebsocketNotificationContext.Provider>
-  );
+  function handleGameStartMessage(data) {
+    navigate("/game", {state: data});
+  }
+  
+  return null;  //doesn't render anything
 }

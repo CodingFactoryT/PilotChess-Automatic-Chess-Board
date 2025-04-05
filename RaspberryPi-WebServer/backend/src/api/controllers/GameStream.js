@@ -30,9 +30,9 @@ export default class GameStream extends Stream {
 		GameStream.#instance = this;
 	}
 
-	static getInstance() {
+	static getInstance(gameId) {
 		if (!GameStream.#instance) {
-			GameStream.#instance = new GameStream();
+			GameStream.#instance = new GameStream(gameId);
 		}
 
 		return GameStream.#instance;
@@ -43,25 +43,35 @@ export default class GameStream extends Stream {
 
 		switch (data.type) {
 			case Events.GAME_FULL:
-				return this.#handleGameFull();
+				return this.#handleGameFull(data);
 			case Events.GAME_STATE:
-				return this.#handleGameState();
+				return this.#handleGameState(data);
 			case Events.CHAT_LINE:
-				return this.#handleChatLine();
+				return this.#handleChatLine(data);
 			case Events.OPPONENT_GONE:
-				return this.#handleOpponentGone();
+				return this.#handleOpponentGone(data);
 			default:
 				return console.error(`Stream "${this.name}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
-	#handleGameFull(data) {}
+	#handleGameFull(data) {
+		console.log(data);
+	}
 
-	#handleGameState(data) {}
+	#handleGameState(data) {
+		console.log(data);
+	}
 
-	#handleChatLine(data) {}
+	#handleChatLine(data) {
+		console.log(data);
+	}
 
-	#handleOpponentGone(data) {}
+	#handleOpponentGone(data) {
+		console.log(data);
+	}
 
-	#handleError(error) {}
+	#handleError(error) {
+		console.error(error);
+	}
 }

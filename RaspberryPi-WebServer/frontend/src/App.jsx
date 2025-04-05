@@ -7,19 +7,13 @@ import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
 import DebugPage from './pages/debugPage';
 import { AuthProvider } from './context/AuthContext';
-import { useEffect } from 'react';
-import { useWebsocketNotification } from './context/WebsocketNotificationContext';
-import WebsocketController from './controller/WebSocketController';
+import WebSocketHandler from './components/WebSocketHandler';
+import GamePage from './pages/gamePage';
 
 export default function App() {
-	const { handleWebsocketMessage } = useWebsocketNotification();
-
-	useEffect(() => {
-		WebsocketController.initConnection(handleWebsocketMessage);
-	}, []);
-
 	return (
 			<BrowserRouter>
+				<WebSocketHandler/>
 				<AuthProvider>
 					<Routes>
 						<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
@@ -32,6 +26,11 @@ export default function App() {
 						<Route path="/profile" element={
 							<AuthGuard>
 								<ProfilePage/>
+							</AuthGuard>
+						} />
+						<Route path="/game" element={
+							<AuthGuard>
+								<GamePage/>
 							</AuthGuard>
 						} />
 						<Route path="/debug" element={ <DebugPage/> }/>
