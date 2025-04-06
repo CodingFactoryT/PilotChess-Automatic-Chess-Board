@@ -1,12 +1,13 @@
 import WebSocketController from "./WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "../../../../config.js";
+import { Chess } from "chess.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
 	static name = "GameStream";
 
-	constructor(gameId) {
+	constructor(gameId, initialFen) {
 		const url = `${config.lichess_base_url}/api/board/game/stream/${gameId}`;
 
 		if (GameStream.#instance) {
@@ -20,6 +21,10 @@ export default class GameStream extends Stream {
 			(error) => this.#handleError(error)
 		);
 
+		this.gameId = gameId;
+		this.fen = initialFen;
+		this.initialFen = initialFen;
+
 		this.Events = {
 			GAME_FULL: "gameFull",
 			GAME_STATE: "gameState",
@@ -30,8 +35,14 @@ export default class GameStream extends Stream {
 		GameStream.#instance = this;
 	}
 
-	static getInstance(gameId) {
+	stop() {
+		super.stop();
+		GameStream.#instance = null;
+	}
+
+	static getInstance(gameId, initialFen) {
 		if (!GameStream.#instance) {
+			this.fen = initialFen;
 			GameStream.#instance = new GameStream(gameId);
 		}
 
@@ -55,12 +66,29 @@ export default class GameStream extends Stream {
 		}
 	}
 
-	#handleGameFull(data) {
-		console.log(data);
-	}
+	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
 	#handleGameState(data) {
-		console.log(data);
+		const board = new Chess();
+		if (this.initialFen) {
+			board.load(this.initialFen);
+		}
+		const moves = data?.moves?.split(" ");
+		moves.forEach((move) => {
+			board.move(move);
+		});
+
+		const lastMove = moves.at(-1);
+		const newFen = board.fen();
+
+		WebSocketController.getInstance().send({
+			type: "pieceMoved",
+			data: {
+				id: this.gameId,
+				move: lastMove,
+				fen: newFen,
+			},
+		});
 	}
 
 	#handleChatLine(data) {

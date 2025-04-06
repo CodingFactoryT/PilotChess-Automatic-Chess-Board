@@ -59,8 +59,8 @@ export default class MainEventStream extends Stream {
 	}
 
 	#handleGameStart(data) {
-		GameStream.getInstance(data.game.gameId).listen();
 		const game = data.game;
+		GameStream.getInstance(game.gameId, game.fen).listen();
 		WebSocketController.getInstance().send({
 			type: this.Events.GAME_START,
 			data: {

@@ -4,12 +4,14 @@ import { useSnackbar } from "notistack";
 import React from 'react';
 import { acceptChallenge, declineChallenge } from "../helpers/WebsocketResponses/challenge";
 import { useNavigate } from "react-router";
+import { useGameBoard } from "../context/GameBoardContext";
 
 const openSnackbarMessages = new Map();
 
 export default function WebSocketHandler() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
+  const {setFenPosition} = useGameBoard();
 
   useEffect(() => {
 		WebSocketController.initConnection(handleWebsocketMessage);
@@ -25,6 +27,9 @@ export default function WebSocketHandler() {
         break;
       case "gameStart":
         handleGameStartMessage(data.data);
+        break;
+      case "pieceMoved":
+        handlePieceMoved(data.data);
         break;
       default:
         console.error("Frontend cannot handle this type of message:", data.type);
@@ -57,7 +62,12 @@ export default function WebSocketHandler() {
   }
 
   function handleGameStartMessage(data) {
+    setFenPosition(data.fen);
     navigate("/game", {state: data});
+  }
+
+  function handlePieceMoved(data) {
+    setFenPosition(data.fen);
   }
   
   return null;  //doesn't render anything
