@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router"
 import { Chessboard } from "react-chessboard";
 import { Box } from "@mui/material"
 import { useGameBoard } from "../../context/GameBoardContext";
+import MakeMoveComponent from "./components/MakeMoveComponent"
 
 export default function GamePage() {
     const navigate = useNavigate();
@@ -28,6 +29,8 @@ export default function GamePage() {
             boardOrientation={setupData.color}
             position={fenPosition}
             />
+
+            <MakeMoveComponent/>
         </Box>
     )
 }
