@@ -144,7 +144,7 @@ export default class BoardController {
 			await fetchArduino(`REQ:RELS:`);
 			await fetchArduino(`REQ:MOVE:${fromPosition}`);
 			await fetchArduino(`REQ:GRAB:`);
-			for (stopOverPosition in stopOverPositions) {
+			for (const stopOverPosition of stopOverPositions) {
 				await fetchArduino(`REQ:MOVE:${stopOverPosition}`);
 			}
 			await fetchArduino(`REQ:MOVE:${toPosition}`);
