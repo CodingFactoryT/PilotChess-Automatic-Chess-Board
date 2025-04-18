@@ -15,6 +15,9 @@ if (typeof process !== "undefined") {
 	const platform = os.platform();
 	const cpu = os.cpus()[0]?.model?.toLowerCase() || "";
 	isRaspberryPi = platform === "linux" && cpu.includes("arm");
+	console.log(isRaspberryPi);
+	console.log(platform);
+	console.log(cpu);
 }
 
 const baseURLWithoutProtocol = isProdEnv || isRaspberryPi ? "pilotchess.local" : "localhost";
