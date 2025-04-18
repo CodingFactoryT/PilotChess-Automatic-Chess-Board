@@ -44,7 +44,6 @@ export default class GameStream extends Stream {
 
 	static getInstance(gameId, initialFen) {
 		if (!GameStream.#instance) {
-			this.fen = initialFen;
 			GameStream.#instance = new GameStream(gameId, initialFen);
 		}
 
@@ -72,9 +71,6 @@ export default class GameStream extends Stream {
 
 	#handleGameState(data) {
 		const board = new Chess();
-		if (this.initialFen) {
-			board.load(this.initialFen);
-		}
 		const moves = data?.moves?.split(" ");
 		moves.forEach((move) => {
 			board.move(move);

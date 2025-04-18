@@ -37,20 +37,28 @@ export default class BoardController {
 		const pieceToMove = this.board.get(fromPosition);
 		switch (pieceToMove.type) {
 			case PAWN:
-				return await this.#movePawn(fromPosition, toPosition);
+				await this.#movePawn(fromPosition, toPosition);
+				break;
 			case KNIGHT:
-				return await this.#moveKnight(fromPosition, toPosition);
+				await this.#moveKnight(fromPosition, toPosition);
+				break;
 			case BISHOP:
-				return await this.#moveBishop(fromPosition, toPosition);
+				await this.#moveBishop(fromPosition, toPosition);
+				break;
 			case ROOK:
-				return await this.#moveRook(fromPosition, toPosition);
+				await this.#moveRook(fromPosition, toPosition);
+				break;
 			case QUEEN:
-				return await this.#moveQueen(fromPosition, toPosition);
+				await this.#moveQueen(fromPosition, toPosition);
+				break;
 			case KING:
-				return await this.#moveKing(fromPosition, toPosition);
+				await this.#moveKing(fromPosition, toPosition);
+				break;
 			default:
-				return console.error("The tile from which the piece is to be moved is empty! The piece movement detection algorithm made a mistake!");
+				console.error("The tile from which the piece is to be moved is empty! The piece movement detection algorithm made a mistake!");
+				break;
 		}
+		this.board.move({ from: fromPosition, to: toPosition });
 	}
 
 	async #movePawn(fromPosition, toPosition) {
@@ -132,15 +140,18 @@ export default class BoardController {
 	}
 
 	async #moveWithStopovers(fromPosition, stopOverPositions, toPosition) {
-		await fetchArduino(`REQ:RELS:`);
-		await fetchArduino(`REQ:MOVE:${fromPosition}`);
-		await fetchArduino(`REQ:GRAB:`);
-		for (stopOverPosition in stopOverPositions) {
-			await fetchArduino(`REQ:MOVE:${stopOverPosition}`);
+		try {
+			await fetchArduino(`REQ:RELS:`);
+			await fetchArduino(`REQ:MOVE:${fromPosition}`);
+			await fetchArduino(`REQ:GRAB:`);
+			for (stopOverPosition in stopOverPositions) {
+				await fetchArduino(`REQ:MOVE:${stopOverPosition}`);
+			}
+			await fetchArduino(`REQ:MOVE:${toPosition}`);
+			await fetchArduino(`REQ:RELS:`);
+		} catch (error) {
+			console.error("Couldn't physically move the piece: " + error);
 		}
-		await fetchArduino(`REQ:MOVE:${toPosition}`);
-		await fetchArduino(`REQ:RELS:`);
-		this.board.move(fromPosition, toPosition);
 	}
 
 	async waitForPieceMovement() {
