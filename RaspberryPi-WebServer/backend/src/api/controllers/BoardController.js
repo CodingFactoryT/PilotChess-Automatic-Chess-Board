@@ -35,7 +35,7 @@ export default class BoardController {
 		const fromPosition = move.substring(0, 2);
 		const toPosition = move.substring(2, 4);
 		const pieceToMove = this.board.get(fromPosition);
-		switch (pieceToMove) {
+		switch (pieceToMove.type) {
 			case PAWN:
 				return await this.#movePawn(fromPosition, toPosition);
 			case KNIGHT:
