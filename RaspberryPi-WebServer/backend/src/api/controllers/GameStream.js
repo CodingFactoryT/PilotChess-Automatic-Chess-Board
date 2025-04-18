@@ -92,7 +92,7 @@ export default class GameStream extends Stream {
 		});
 
 		BoardController.setFen(newFen);
-		BoardController.getInstance().moveOpponentsPiece(latMove);
+		BoardController.getInstance().moveOpponentsPiece(lastMove);
 	}
 
 	#handleChatLine(data) {
