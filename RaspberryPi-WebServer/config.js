@@ -20,7 +20,7 @@ if (typeof process !== "undefined") {
 const baseURLWithoutProtocol = isProdEnv || isRaspberryPi ? "pilotchess.local" : "localhost";
 const baseURL = `http://${baseURLWithoutProtocol}`;
 
-const arduinoComPort = isProdEnv ? "/dev/ttyACM0" : "COM6";
+const arduinoComPort = isRaspberryPi ? "/dev/ttyACM0" : "COM6";
 
 const config = {
 	env: env,
