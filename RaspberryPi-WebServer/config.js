@@ -14,7 +14,7 @@ if (typeof process !== "undefined") {
 	const os = await import("os");
 	const platform = os.platform();
 	const cpu = os.cpus()[0]?.model?.toLowerCase() || "";
-	isRaspberryPi = platform === "linux" && cpu.includes("arm");
+	isRaspberryPi = platform === "linux" && cpu.includes("cortex");
 	console.log(isRaspberryPi);
 	console.log(platform);
 	console.log(cpu);
