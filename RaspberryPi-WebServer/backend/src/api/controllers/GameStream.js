@@ -2,6 +2,7 @@ import WebSocketController from "./WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "../../../../config.js";
 import { Chess } from "chess.js";
+import BoardController from "./BoardController.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
@@ -89,6 +90,9 @@ export default class GameStream extends Stream {
 				fen: newFen,
 			},
 		});
+
+		BoardController.setFen(newFen);
+		BoardController.getInstance().moveOpponentsPiece(latMove);
 	}
 
 	#handleChatLine(data) {

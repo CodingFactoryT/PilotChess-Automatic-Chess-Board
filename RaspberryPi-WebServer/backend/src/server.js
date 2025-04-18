@@ -28,7 +28,8 @@ if (config.env === "prod") {
 	app.use("/", frontendRouter);
 }
 
-WebSocketController.getInstance(app)
+WebSocketController.setApp(app);
+WebSocketController.getInstance()
 	.getServer()
 	.listen(config.node_port, () => {
 		console.status(`Server listening on ${config.base_url}:${config.node_port}`);

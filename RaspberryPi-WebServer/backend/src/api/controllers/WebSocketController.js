@@ -33,11 +33,15 @@ export default class WebSocketController {
 		WebSocketController.#instance = this;
 	}
 
-	static getInstance(app) {
+	static getInstance() {
 		if (!WebSocketController.#instance) {
-			WebSocketController.#instance = new WebSocketController(app);
+			WebSocketController.#instance = new WebSocketController(this.app);
 		}
 		return WebSocketController.#instance;
+	}
+
+	static setApp(app) {
+		this.app = app;
 	}
 
 	getServer() {
