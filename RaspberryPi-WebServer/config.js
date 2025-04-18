@@ -10,7 +10,7 @@ const vitePort = 5173;
 const baseURLWithoutProtocol = isProdEnv ? "pilotchess.local" : "localhost";
 const baseURL = `http://${baseURLWithoutProtocol}`;
 
-const arduinoComPort = isRaspberryPi ? "/dev/ttyACM0" : "COM6";
+const arduinoComPort = isProdEnv ? "/dev/ttyACM0" : "COM6";
 
 const config = {
 	env: env,
