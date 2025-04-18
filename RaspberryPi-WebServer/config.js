@@ -7,20 +7,7 @@ const env = isProdEnv ? "prod" : "dev";
 const nodePort = isProdEnv ? 80 : 5000;
 const vitePort = 5173;
 
-//only works when config is accessed via node.js
-let isRaspberryPi = false;
-if (typeof process !== "undefined") {
-	// Only import 'os' in Node
-	const os = await import("os");
-	const platform = os.platform();
-	const cpu = os.cpus()[0]?.model?.toLowerCase() || "";
-	isRaspberryPi = platform === "linux" && cpu.includes("cortex");
-	console.log(isRaspberryPi);
-	console.log(platform);
-	console.log(cpu);
-}
-
-const baseURLWithoutProtocol = isProdEnv || isRaspberryPi ? "pilotchess.local" : "localhost";
+const baseURLWithoutProtocol = isProdEnv ? "pilotchess.local" : "localhost";
 const baseURL = `http://${baseURLWithoutProtocol}`;
 
 const arduinoComPort = isRaspberryPi ? "/dev/ttyACM0" : "COM6";

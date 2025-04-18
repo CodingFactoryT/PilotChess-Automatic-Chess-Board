@@ -5,7 +5,6 @@ import config from '../config.js'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: config.base_url_without_protocol,
     port: config.vite_port,
     proxy: config.env === "dev" ? {
       "/api": `${config.base_url}:${config.node_port}` // Proxy API calls to Express
