@@ -4,6 +4,7 @@ import { BISHOP, Chess, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 
 export default class BoardController {
 	static #instance = null;
+	static #fen = null;
 
 	constructor(fen) {
 		if (BoardController.#instance) {
@@ -17,14 +18,14 @@ export default class BoardController {
 
 	static getInstance() {
 		if (!BoardController.#instance) {
-			BoardController.#instance = new BoardController(this.fen);
+			BoardController.#instance = new BoardController(BoardController.#fen);
 		}
 
 		return BoardController.#instance;
 	}
 
 	static setFen(fen) {
-		this.fen = fen;
+		BoardController.#fen = fen;
 	}
 
 	/**
