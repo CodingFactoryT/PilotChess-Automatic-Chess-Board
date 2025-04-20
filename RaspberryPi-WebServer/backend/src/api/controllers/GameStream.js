@@ -34,6 +34,7 @@ export default class GameStream extends Stream {
 		};
 
 		GameStream.#instance = this;
+		BoardController.setFen(initialFen);
 	}
 
 	stop() {
@@ -43,8 +44,7 @@ export default class GameStream extends Stream {
 
 	static getInstance(gameId, initialFen) {
 		if (!GameStream.#instance) {
-			this.fen = initialFen;
-			GameStream.#instance = new GameStream(gameId);
+			GameStream.#instance = new GameStream(gameId, initialFen);
 		}
 
 		return GameStream.#instance;
@@ -71,9 +71,6 @@ export default class GameStream extends Stream {
 
 	#handleGameState(data) {
 		const board = new Chess();
-		if (this.initialFen) {
-			board.load(this.initialFen);
-		}
 		const moves = data?.moves?.split(" ");
 		moves.forEach((move) => {
 			board.move(move);
@@ -91,8 +88,7 @@ export default class GameStream extends Stream {
 			},
 		});
 
-		BoardController.setFen(newFen);
-		BoardController.getInstance().moveOpponentsPiece(latMove);
+		BoardController.getInstance().moveOpponentsPiece(lastMove);
 	}
 
 	#handleChatLine(data) {

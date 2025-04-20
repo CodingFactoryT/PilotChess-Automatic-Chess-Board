@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
 import "../helpers/consoleExtensions.js";
 import WebSocketController from "./api/controllers/WebSocketController.js";
+import fetchArduino from "./api/services/ArduinoCommunicator.js";
 
 const app = express();
 

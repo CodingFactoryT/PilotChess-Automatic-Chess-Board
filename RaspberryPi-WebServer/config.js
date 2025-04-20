@@ -6,6 +6,7 @@ const env = isProdEnv ? "prod" : "dev";
 
 const nodePort = isProdEnv ? 80 : 5000;
 const vitePort = 5173;
+
 const baseURLWithoutProtocol = isProdEnv ? "pilotchess.local" : "localhost";
 const baseURL = `http://${baseURLWithoutProtocol}`;
 

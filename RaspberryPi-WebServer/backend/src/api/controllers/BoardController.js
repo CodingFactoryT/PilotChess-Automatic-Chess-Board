@@ -4,6 +4,7 @@ import { BISHOP, Chess, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 
 export default class BoardController {
 	static #instance = null;
+	static #fen = null;
 
 	constructor(fen) {
 		if (BoardController.#instance) {
@@ -17,14 +18,14 @@ export default class BoardController {
 
 	static getInstance() {
 		if (!BoardController.#instance) {
-			BoardController.#instance = new BoardController(this.fen);
+			BoardController.#instance = new BoardController(BoardController.#fen);
 		}
 
 		return BoardController.#instance;
 	}
 
 	static setFen(fen) {
-		this.fen = fen;
+		BoardController.#fen = fen;
 	}
 
 	/**
@@ -34,22 +35,30 @@ export default class BoardController {
 		const fromPosition = move.substring(0, 2);
 		const toPosition = move.substring(2, 4);
 		const pieceToMove = this.board.get(fromPosition);
-		switch (pieceToMove) {
+		switch (pieceToMove.type) {
 			case PAWN:
-				return await this.#movePawn(fromPosition, toPosition);
+				await this.#movePawn(fromPosition, toPosition);
+				break;
 			case KNIGHT:
-				return await this.#moveKnight(fromPosition, toPosition);
+				await this.#moveKnight(fromPosition, toPosition);
+				break;
 			case BISHOP:
-				return await this.#moveBishop(fromPosition, toPosition);
+				await this.#moveBishop(fromPosition, toPosition);
+				break;
 			case ROOK:
-				return await this.#moveRook(fromPosition, toPosition);
+				await this.#moveRook(fromPosition, toPosition);
+				break;
 			case QUEEN:
-				return await this.#moveQueen(fromPosition, toPosition);
+				await this.#moveQueen(fromPosition, toPosition);
+				break;
 			case KING:
-				return await this.#moveKing(fromPosition, toPosition);
+				await this.#moveKing(fromPosition, toPosition);
+				break;
 			default:
-				return console.error("The tile from which the piece is to be moved is empty! The piece movement detection algorithm made a mistake!");
+				console.error("The tile from which the piece is to be moved is empty! The piece movement detection algorithm made a mistake!");
+				break;
 		}
+		this.board.move({ from: fromPosition, to: toPosition });
 	}
 
 	async #movePawn(fromPosition, toPosition) {
@@ -61,53 +70,30 @@ export default class BoardController {
 	 * If thats's not possible, it moves a helper piece to a corner, moves the knight, and the moves the helper piece back
 	 */
 	async #moveKnight(fromPosition, toPosition) {
-		const delta = this.getPositionDelta(fromPosition, toPosition);
-		const firstTryDeltaX = Math.abs(delta.x) == 2 ? Math.sign(delta.x) : 0;
-		const firstTryDeltaY = Math.abs(delta.y) == 2 ? Math.sign(delta.y) : 0;
-		const firstTryPosition = this.#addPositionRelative(fromPosition, firstTryDeltaX, firstTryDeltaY);
+		const helperPiecePositions = this.calculateKnightHelperPiecePositions(fromPosition, toPosition);
 
-		//if the tile at the first guessed location is empty, move the knight by first moving orthogonal and then diagonal
-		if (!this.board.get(firstTryPosition)) {
-			return await this.#moveWithStopovers(fromPosition, [firstTryPosition], toPosition);
+		//if the tile near the from-position is empty
+		if (!this.board.get(helperPiecePositions.nearFromPositionFrom)) {
+			return await this.#moveWithStopovers(fromPosition, [helperPiecePositions.nearFromPositionFrom], toPosition);
 		}
 
-		//else: first move diagonal, then orthogonal
-
-		const secondTryDeltaX = Math.sign(delta.x);
-		const secondTryDeltaY = Math.sign(delta.y);
-		const secondTryPosition = this.#addPositionRelative(fromPosition, secondTryDeltaX, secondTryDeltaY);
-		if (!this.board.get(firstTryPosition)) {
-			return await this.#moveWithStopovers(fromPosition, [secondTryPosition], toPosition);
+		//if the tile near the to-position is empty
+		if (!this.board.get(helperPiecePositions.nearToPositionFrom)) {
+			return await this.#moveWithStopovers(fromPosition, [helperPiecePositions.nearToPositionFrom], toPosition);
 		}
 
-		//if none of the available tiles is empty, a helper piece (the one on the second tries position) has to be moved in order to move the knight to its destination
-		const helperPieceFromPosition = secondTryPosition;
-		const deltaStr = delta.x + "|" + delta.y;
-		let positionAppendix = "";
-
-		switch (deltaStr) {
-			case "-2|1":
-			case "1|-2":
-				positionAppendix = 1;
-				break;
-			case "2|1":
-			case "-1|-2":
-				positionAppendix = 3;
-				break;
-			case "1|2":
-			case "-2|-1":
-				positionAppendix = 7;
-				break;
-			case "2|-1":
-			case "-1|2":
-				positionAppendix = 9;
-				break;
+		//if none of the tiles is empty, a helper piece has to be moved
+		//one position (near from or near to) is always valid
+		let helperFromPositionToUse = helperPiecePositions.nearFromPositionFrom;
+		let helperToPositionToUse = helperPiecePositions.nearFromPositionTo;
+		if (!this.validatePiecePosition(helperToPositionToUse)) {
+			helperFromPositionToUse = helperPiecePositions.nearToPositionFrom;
+			helperToPositionToUse = helperPiecePositions.nearToPositionTo;
 		}
-		const helperPieceToPosition = helperPieceFromPosition + positionAppendix;
 
-		await this.#moveWithoutFurtherLogic(helperPieceFromPosition, helperPieceToPosition); //move the helper piece out of the way
-		await this.#moveWithStopovers(fromPosition, [helperPieceFromPosition], toPosition); //move the knight
-		await this.#moveWithoutFurtherLogic(helperPieceToPosition, helperPieceFromPosition); //move the helper piece back to its original position
+		await this.#moveWithoutFurtherLogic(helperFromPositionToUse, helperToPositionToUse);
+		await this.#moveWithStopovers(fromPosition, [helperFromPositionToUse], toPosition);
+		await this.#moveWithoutFurtherLogic(helperToPositionToUse, helperFromPositionToUse);
 	}
 
 	async #moveBishop(fromPosition, toPosition) {
@@ -131,15 +117,18 @@ export default class BoardController {
 	}
 
 	async #moveWithStopovers(fromPosition, stopOverPositions, toPosition) {
-		await fetchArduino(`REQ:RELS:`);
-		await fetchArduino(`REQ:MOVE:${fromPosition}`);
-		await fetchArduino(`REQ:GRAB:`);
-		for (stopOverPosition in stopOverPositions) {
-			await fetchArduino(`REQ:MOVE:${stopOverPosition}`);
+		try {
+			await fetchArduino(`REQ:RELS:`);
+			await fetchArduino(`REQ:MOVE:${fromPosition}`);
+			await fetchArduino(`REQ:GRAB:`);
+			for (const stopOverPosition of stopOverPositions) {
+				await fetchArduino(`REQ:MOVE:${stopOverPosition}`);
+			}
+			await fetchArduino(`REQ:MOVE:${toPosition}`);
+			await fetchArduino(`REQ:RELS:`);
+		} catch (error) {
+			console.error("Couldn't physically move the piece: " + error);
 		}
-		await fetchArduino(`REQ:MOVE:${toPosition}`);
-		await fetchArduino(`REQ:RELS:`);
-		this.board.move(fromPosition, toPosition);
 	}
 
 	async waitForPieceMovement() {
@@ -194,11 +183,79 @@ export default class BoardController {
 		return { x: deltaX, y: deltaY };
 	}
 
-	#addPositionRelative(pos, relX, relY) {
+	#addPositionRelative(pos, delta) {
 		const posX = pos.charCodeAt(0);
 		const posY = pos.charCodeAt(1);
-		const newPosX = String.fromCharCode(posX + relX);
-		const newPosY = String.fromCharCode(posY + relY);
+		const newPosX = String.fromCharCode(posX + delta.x);
+		const newPosY = String.fromCharCode(posY + delta.y);
 		return newPosX + newPosY;
+	}
+
+	validatePiecePosition(position) {
+		if (!(position.length === 2 || position.length === 3)) return false;
+
+		const x = position.charCodeAt(0);
+		const y = Number(position.charAt(1));
+		if (!y) return false;
+		const isXYValid = x >= "a".charCodeAt(0) && x <= "h".charCodeAt(0) && y >= 1 && y <= 8;
+
+		if (position.length === 2) return isXYValid;
+
+		//else the position is on the edge of two or four tiles
+
+		const edgeAppendix = Number(position.charAt(2));
+		if (!edgeAppendix) return false;
+		return !((y === 1 && edgeAppendix <= 3) || (y === 8 && edgeAppendix >= 7));
+	}
+
+	calculateKnightHelperPiecePositions(knightFromPosition, knightToPosition) {
+		const delta = this.getPositionDelta(knightFromPosition, knightToPosition);
+		let nearFromDelta = { x: Math.ceil(delta.x / 2), y: Math.ceil(delta.y / 2) };
+		let nearToDelta = { x: Math.floor(delta.x / 2), y: Math.floor(delta.y / 2) };
+
+		if (delta.x === 1 || delta.y === 1) {
+			const tmpDelta = nearFromDelta;
+			nearFromDelta = nearToDelta;
+			nearToDelta = tmpDelta;
+		}
+
+		const nearFromPositionFrom = this.#addPositionRelative(knightFromPosition, nearFromDelta);
+		const nearToPositionFrom = this.#addPositionRelative(knightFromPosition, nearToDelta);
+
+		let nearFromPositionTo = nearFromPositionFrom;
+		let nearToPositionTo = nearToPositionFrom;
+
+		switch (delta.x + "|" + delta.y) {
+			case "1|-2": //fallthrough
+			case "-2|1":
+				nearFromPositionTo += "1";
+				nearToPositionTo += "9";
+				break;
+			case "-1|2": //fallthrough
+			case "2|-1":
+				nearFromPositionTo += "9";
+				nearToPositionTo += "1";
+				break;
+			case "-1|-2": //fallthrough
+			case "2|1":
+				nearFromPositionTo += "3";
+				nearToPositionTo += "7";
+				break;
+			case "1|2": //fallthrough
+			case "-2|-1":
+				nearFromPositionTo += "7";
+				nearToPositionTo += "3";
+				break;
+			default:
+				console.error(`No matching delta found (delta: (${delta.x}|${delta.y}))! The algorithm made a mistake!`);
+				break;
+		}
+
+		return {
+			nearFromPositionFrom,
+			nearFromPositionTo,
+			nearToPositionFrom,
+			nearToPositionTo,
+		};
 	}
 }
