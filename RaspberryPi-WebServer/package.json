@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "type": "module",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "dependencies": {
     "@emotion/styled": "^11.14.0",
     "ansi-regex": "^5.0.1",
@@ -34,11 +38,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "cross-env VITE_APP_ENV=dev NODE_ENV=dev concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
-    "dev:frontend": "cd frontend && npm run dev",
-    "dev:backend": "cd backend && cross-env npm run dev",
+    "dev:frontend": "npm --workspace frontend run dev",
+    "dev:backend": "cross-env npm --workspace backend run dev",
     "prod": "npm run prod:build && npm run prod:execute",
-    "prod:build": "npm install && cd frontend && npm install && npm run build && cd ../backend && npm install",
-    "prod:execute": "cd backend && npm run start"
+    "prod:build": "npm install && npm --workspace frontend run build",
+    "prod:execute": "npm --workspace backend run start"
   },
   "keywords": [],
   "author": "",

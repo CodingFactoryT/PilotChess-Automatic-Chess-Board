@@ -1,12 +1,13 @@
 import express from "express";
-import LichessBoardController from "../controllers/LichessControllers/LichessBoardController.js";
+import LichessGameController from "../controllers/LichessControllers/LichessGameController.js";
 
 const router = express.Router();
 
 router.post("/move", (req, res) => {
 	const data = req.body;
 	const move = data.move;
-	LichessBoardController.makeMove(move);
+	const gameId = GameStream.getInstance().gameId;
+	LichessGameController.makeMove(gameId, move);
 });
 
 export default router;
