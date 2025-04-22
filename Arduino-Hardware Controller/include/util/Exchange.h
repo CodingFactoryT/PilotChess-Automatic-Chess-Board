@@ -3,8 +3,6 @@
 #include "Arduino.h"
 #include "./util/Util.h"
 
-const int dataArraySize = 4;
-
 class Exchange {
 private:
     CommunicationDirection _direction;
@@ -12,7 +10,6 @@ private:
     char** _data;
 
 public:
-    static const int DATA_ARRAY_SIZE = dataArraySize;
     Exchange(CommunicationDirection direction, RequestedDataType type, char** data);
     CommunicationDirection getDirection();
     RequestedDataType getType();

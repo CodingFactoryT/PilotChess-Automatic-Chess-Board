@@ -1,9 +1,6 @@
 #include "TileMatrixController.h"
 
 TileMatrixController::TileMatrixController() {
-    _data = new byte[ROWS];
-    _dataHexString = new char[ROWS * 2 + 1]; //+1 for null terminator
-
     pinMode(TILE_MATRIX_COL_SELECT_A_PIN, OUTPUT);
     pinMode(TILE_MATRIX_COL_SELECT_B_PIN, OUTPUT);
     pinMode(TILE_MATRIX_COL_SELECT_C_PIN, OUTPUT);
@@ -14,13 +11,10 @@ TileMatrixController::TileMatrixController() {
     pinMode(TILE_MATRIX_DATA_PIN, INPUT_PULLUP);
 }
 
-TileMatrixController::~TileMatrixController() {
-    delete[] _dataHexString;
-    delete[] _data;
-}
-
 byte* TileMatrixController::read() {
-    memset(_data, 0, ROWS); //reset _data to all zeros
+    byte* data = new byte[ROWS];
+
+    memset(data, 0, ROWS); //reset _data to all zeros
 
     setMatrixActivated(true);
 
@@ -41,18 +35,20 @@ byte* TileMatrixController::read() {
           delayMicroseconds(100); //IMPORTANT, otherwise there are wrong readings
     
           boolean isTriggered = !digitalRead(TILE_MATRIX_DATA_PIN);  //inverted because it uses a pull-up resistor
-          _data[row] |= (isTriggered << (7 - col)); //set the bit at the corresponding byte position
+          data[row] |= (isTriggered << (7 - col)); //set the bit at the corresponding byte position
         }
     }
 
     setMatrixActivated(false);
 
-    return _data;
+    return data;
 }
 
-char* TileMatrixController::readHexString() {
-    Util::bytesToHexString(read(), ROWS, _dataHexString, ROWS * 2 + 1);
-    return _dataHexString;
+String TileMatrixController::readHexString() { 
+    byte* readBytes = read();
+    String hexString = Util::bytesToHexString(readBytes, ROWS);
+    delete[] readBytes;
+    return hexString;
 }
 
 void TileMatrixController::setMatrixActivated(bool isActivated) {

@@ -1,23 +1,12 @@
 #include "Controller.h"
 
-Controller::Controller() {
-    _data = new char* [4];
-    for (int i = 0; i < 4; i++) {
-        _data[i] = new char[SERIAL_TX_BUFFER_SIZE];
-        _data[i][0] = '\0';
-    }
-}
-
-Controller::~Controller() {
-    Util::delete2DArray(_data, 4);
-}
-
 void Controller::update() {
     if (_communicationController.isRequestPresent()) {
-        clearData();
+        String data[4];
         char* rawRequest = _communicationController.readRequestFromSerial();
         Exchange request = _communicationController.parseRequest(rawRequest);
         bool succeeded = false;
+        char** requestData = request.getData();
 
         switch (request.getType()) {
         case RequestedDataType::HOME:
@@ -25,11 +14,11 @@ void Controller::update() {
             succeeded = true;
             break;
         case RequestedDataType::MOVE: {
-            char* positionData = request.getData()[0];
-            char column = request.getData()[0][0];
-            int row = request.getData()[0][1] - '0';
+            char* positionData = requestData[0];
+            char column = requestData[0][0];
+            int row = requestData[0][1] - '0';
             if (strlen(positionData) > 2) {  //if theres also an additional offset given
-                TileOffset offset = (TileOffset)(request.getData()[0][2] - '0');
+                TileOffset offset = (TileOffset)(requestData[0][2] - '0');
                 succeeded = _gantry.moveToTileSync(column, row, offset);
             }
             else {
@@ -38,7 +27,7 @@ void Controller::update() {
             break;
         }
         case RequestedDataType::READ:
-            _data[1] = _tileMatrixController.readHexString();
+            data[1] = _tileMatrixController.readHexString();
             succeeded = true;
             break;
         case RequestedDataType::GRAB:
@@ -55,22 +44,16 @@ void Controller::update() {
         }
 
         if (succeeded) {
-            Util::toCharArray("OK", _data[0]);
+            data[0] = "OK";
         }
         else {
-            Util::toCharArray("ERROR", _data[0]);
+            data[0] = "ERROR";
         }
 
-        _communicationController.respond(request.getType(), _data);
-        Util::delete2DArray(request.getData(), 4);
+        _communicationController.respond(request.getType(), data);
+        Util::delete2DArray(requestData, DATA_ARRAY_SIZE);
         delete[] rawRequest;
     }
 
     _gantry.run();
-}
-
-void Controller::clearData() {
-    for (int i = 0; i < 4; i++) {
-        _data[i][0] = '\0';
-    }
 }

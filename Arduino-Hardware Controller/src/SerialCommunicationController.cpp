@@ -5,13 +5,10 @@ bool SerialCommunicationController::isRequestPresent() {
 }
 
 char* SerialCommunicationController::readRequestFromSerial() {
-    char* buffer = new char[SERIAL_RX_BUFFER_SIZE + 1]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
+    char* buffer = new char[SERIAL_RX_BUFFER_SIZE]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
     int index = 0;
     char currentChar;
     while ((currentChar = Serial.read()) != '\n' && index < SERIAL_RX_BUFFER_SIZE - 1) {
-        if (index > SERIAL_RX_BUFFER_SIZE - 1) {
-            break;
-        }
         buffer[index] = currentChar;
         index++;
         delayMicroseconds(SERIAL_READ_DELAY_MICROS);   //wait for next character to be able to arrive via Serial
@@ -44,58 +41,31 @@ Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
     }
     rawData[index - 9] = '\0';
 
-    char** splittedData = Util::splitCharArray(data, ',', 5);
-    delete[] data;
+    char** splittedData = Util::splitCharArray(rawData, ',', DATA_ARRAY_SIZE);
+    delete[] rawData;
     return Exchange(direction, requestDataType, splittedData);
 }
 
-void SerialCommunicationController::respond(RequestedDataType dataType, char** data) {
-    Exchange response = Exchange(CommunicationDirection::RESPONSE, dataType, data);
-    String responseDataType = getResponseDataTypeAsString(response.getType());
-    char* message = buildMessage("RES", responseDataType, response.getData());
-
-    sendMessage(message);
-
-    delete[] message;
+void SerialCommunicationController::respond(RequestedDataType dataType, String data[]) {
+    String responseDataType = getResponseDataTypeAsString(dataType);
+    buildAndSendMessage("RES", responseDataType, data);
 }
 
-char* SerialCommunicationController::buildMessage(String responseType, String responseDataType, char** data) {
-    char* message = new char[SERIAL_TX_BUFFER_SIZE];
-    int messageIndex = 0;
-    for (unsigned int i = 0; i < responseType.length(); i++) {
-        message[messageIndex++] = responseType[i];
-    }
+void SerialCommunicationController::buildAndSendMessage(String responseType, String responseDataType, String data[]) {
+    char message[SERIAL_TX_BUFFER_SIZE];
 
-    message[messageIndex++] = ':';
+    snprintf(message, sizeof(message), "%s:%s:", responseType.c_str(), responseDataType.c_str());
 
-    for (unsigned int i = 0; i < responseDataType.length(); i++) {
-        message[messageIndex++] = responseDataType[i];
-    }
+    for (unsigned int i = 0; i < data->length(); i++) {
+        if (data[i].length() > 0) {
+            strncat(message, data[i].c_str(), sizeof(message) - strlen(message) - 1);  //append data to message
 
-    message[messageIndex++] = ':';
-    for (int i = 0; i < 4; i++) {
-        if (data[i][0] == '\0') {
-            break;
-        }
-        for (int j = 0; j < SERIAL_TX_BUFFER_SIZE; j++) {
-            if (data[i][j] == '\0') {
-                break;
+            if (i != data->length() - 1 && data[i + 1].length() > 0) {
+                strncat(message, ",", sizeof(message) - strlen(message) - 1);
             }
-
-            message[messageIndex++] = data[i][j];
-        }
-
-        if (i != 3 && data[i + 1][0] != '\0') {
-            message[messageIndex++] = ',';
         }
     }
 
-    message[messageIndex] = '\0';
-
-    return message;
-}
-
-void SerialCommunicationController::sendMessage(char* message) {
     Serial.println(message);
 }
 
@@ -124,28 +94,20 @@ RequestedDataType SerialCommunicationController::getRequestedDataTypeFromPointer
 }
 
 String SerialCommunicationController::getResponseDataTypeAsString(RequestedDataType dataType) {
-    String responseDataType;
-
     switch (dataType) {
     case RequestedDataType::HOME:
-        responseDataType = "HOME";
-        break;
+        return "HOME";
     case RequestedDataType::MOVE:
-        responseDataType = "MOVE";
-        break;
+        return "MOVE";
     case RequestedDataType::READ:
-        responseDataType = "READ";
-        break;
+        return "READ";
     case RequestedDataType::GRAB:
-        responseDataType = "GRAB";
-        break;
+        return "GRAB";
     case RequestedDataType::RELS:
-        responseDataType = "RELS";
-        break;
+        return "RELS";
     default:
-        responseDataType = "ERRO";
+        return "ERRO";
     }
 
-    return responseDataType;
 }
 

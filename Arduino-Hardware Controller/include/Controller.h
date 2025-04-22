@@ -2,15 +2,12 @@
 #include "TileMatrixController.h"
 #include "SerialCommunicationController.h"
 
+#define DATA_ARRAY_SIZE 5
+
 class Controller {
-private:
-    void clearData();
-    char** _data;
 public:
     Gantry _gantry;
     SerialCommunicationController _communicationController;
     TileMatrixController _tileMatrixController;
-    Controller();
-    ~Controller();
     void update();
 };

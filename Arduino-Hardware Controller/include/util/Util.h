@@ -7,7 +7,7 @@ public:
     static char** splitCharArray(char* input, char delimiter, int size) {
         char** output = new char* [size];
 
-        for (int i = 0; i < size - 1; i++) {
+        for (int i = 0; i < size; i++) {
             output[i] = new char[SERIAL_RX_BUFFER_SIZE];
         }
 
@@ -32,7 +32,6 @@ public:
         output[outputArrayIndex][outputSingleArrayIndex] = '\0';
 
         for (int i = outputArrayIndex + 1; i < size; i++) {
-            Serial.println("NULL");
             output[i] = nullptr;
         }
 
@@ -46,23 +45,18 @@ public:
         delete[] arr;
     }
 
-    static void bytesToHexString(byte* input, int inputSize, char* output, int outputSize) {
+    static String bytesToHexString(byte* input, int inputSize) {
+        String hexString = "";
         for (int i = 0; i < inputSize; i++) {
-            sprintf(output + (i * 2), "%02X", input[i]);
+            byte currentByte = input[i];
+
+            if (currentByte < 0x10) {    //add leading zero if hex is only one digit long
+                hexString += "0";
+            }
+
+            hexString += String(currentByte, HEX);
         }
 
-        output[outputSize - 1] = '\0';
-    }
-
-    static char* toCharArray(String input, char* output) {
-        int size = input.length();
-
-        for (int i = 0; i < size; i++) {
-            output[i] = input[i];
-        }
-
-        output[size] = '\0';
-
-        return output;
+        return hexString;
     }
 };
