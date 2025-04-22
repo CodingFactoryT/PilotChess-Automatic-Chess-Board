@@ -23,8 +23,6 @@ export default class GameStream extends Stream {
 		);
 
 		this.gameId = gameId;
-		this.fen = initialFen;
-		this.initialFen = initialFen;
 
 		this.Events = {
 			GAME_FULL: "gameFull",

@@ -8,7 +8,7 @@ export default class LichessChallengeController {
 		try {
 			await axios.post(`${challengeBaseURL}/${challengeId}/accept`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
-			console.error(`Error while accepting challenge: ${error}`);
+			console.error(`Error while accepting challenge with id ${challengeId}: ${error}`);
 		}
 	}
 
@@ -16,7 +16,7 @@ export default class LichessChallengeController {
 		try {
 			await axios.post(`${challengeBaseURL}/${challengeId}/decline`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
-			console.error(`Error while accepting challenge: ${error}`);
+			console.error(`Error while declining challenge with id ${challengeId}: ${error}`);
 		}
 	}
 }
