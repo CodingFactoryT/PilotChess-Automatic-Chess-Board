@@ -33,13 +33,13 @@ export default class BoardController {
 	 * move: e.g. "a2a3"
 	 */
 	async moveOpponentsPiece(move) {
-		const fromPosition = new BoardPosition(move[0], move[1]);
-		const toPosition = new BoardPosition(move[2], move[3]);
+		const fromPosition = new BoardPosition(move[0], Number(move[1]));
+		const toPosition = new BoardPosition(move[2], Number(move[3]));
 		const fromPositionString = fromPosition.toChessNotationString();
 		const toPositionString = toPosition.toChessNotationString();
 
 		const pieceToMove = this.board.get(fromPositionString);
-		const move = this.board.move({ from: fromPositionString, to: toPositionString });
+		const moveInformation = this.board.move({ from: fromPositionString, to: toPositionString });
 
 		//TODO: handle special moves, like castling (information if the move is a special move is contained in the move variable)
 
