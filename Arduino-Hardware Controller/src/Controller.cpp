@@ -2,8 +2,13 @@
 
 void Controller::update() {
     if (_communicationController.isRequestPresent()) {
-        String data[4];
-        char* rawRequest = _communicationController.readRequestFromSerial();
+        char data[DATA_ARRAY_SIZE][SERIAL_RX_BUFFER_SIZE - 9];    //-9 for RES:TYPE:, 5: 4 for data, 1 for terminating nullptr
+        for (int i = 0; i < DATA_ARRAY_SIZE; i++) {
+            memset(data[i], 0, SERIAL_RX_BUFFER_SIZE - 9);  // zero out each row
+        }
+
+        char rawRequest[SERIAL_RX_BUFFER_SIZE];
+        _communicationController.readRequestFromSerial(rawRequest);
         Exchange request = _communicationController.parseRequest(rawRequest);
         bool succeeded = false;
         char** requestData = request.getData();
@@ -27,7 +32,7 @@ void Controller::update() {
             break;
         }
         case RequestedDataType::READ:
-            data[1] = _tileMatrixController.readHexString();
+            _tileMatrixController.readHex(data[1]);
             succeeded = true;
             break;
         case RequestedDataType::GRAB:
@@ -44,15 +49,19 @@ void Controller::update() {
         }
 
         if (succeeded) {
-            data[0] = "OK";
+            strcpy(data[0], "OK");
         }
         else {
-            data[0] = "ERROR";
+            strcpy(data[0], "ERROR");
         }
 
-        _communicationController.respond(request.getType(), data);
-        Util::delete2DArray(requestData, DATA_ARRAY_SIZE);
-        delete[] rawRequest;
+
+        char* responseData[DATA_ARRAY_SIZE];
+        for (int i = 0; i < DATA_ARRAY_SIZE; i++) {
+            responseData[i] = data[i];
+        }
+
+        _communicationController.respond(request.getType(), responseData);
     }
 
     _gantry.run();

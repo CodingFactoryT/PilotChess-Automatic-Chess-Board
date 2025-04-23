@@ -11,9 +11,7 @@ TileMatrixController::TileMatrixController() {
     pinMode(TILE_MATRIX_DATA_PIN, INPUT_PULLUP);
 }
 
-byte* TileMatrixController::read() {
-    byte* data = new byte[ROWS];
-
+void TileMatrixController::read(byte* data) {
     memset(data, 0, ROWS); //reset _data to all zeros
 
     setMatrixActivated(true);
@@ -40,15 +38,12 @@ byte* TileMatrixController::read() {
     }
 
     setMatrixActivated(false);
-
-    return data;
 }
 
-String TileMatrixController::readHexString() { 
-    byte* readBytes = read();
-    String hexString = Util::bytesToHexString(readBytes, ROWS);
-    delete[] readBytes;
-    return hexString;
+void TileMatrixController::readHex(char* out) { 
+    byte readBytes[ROWS];
+    read(readBytes);
+    Util::bytesToHex(readBytes, ROWS, out);
 }
 
 void TileMatrixController::setMatrixActivated(bool isActivated) {

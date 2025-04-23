@@ -4,13 +4,7 @@
 
 class Util {
 public:
-    static char** splitCharArray(char* input, char delimiter, int size) {
-        char** output = new char* [size];
-
-        for (int i = 0; i < size; i++) {
-            output[i] = new char[SERIAL_RX_BUFFER_SIZE];
-        }
-
+    static char** splitCharArray(char* input, char delimiter, int size, char** output) {
         int inputIterationIndex = 0;
         int outputSingleArrayIndex = 0;
         int outputArrayIndex = 0;
@@ -38,25 +32,16 @@ public:
         return output;
     }
 
-    static void delete2DArray(char** arr, int rows) {
-        for (int i = 0; i < rows; i++) {
-            delete[] arr[i];
-        }
-        delete[] arr;
-    }
-
-    static String bytesToHexString(byte* input, int inputSize) {
-        String hexString = "";
+    static void bytesToHex(const byte* input, int inputSize, char* out) {
+        out[0] = '\0';
         for (int i = 0; i < inputSize; i++) {
             byte currentByte = input[i];
 
             if (currentByte < 0x10) {    //add leading zero if hex is only one digit long
-                hexString += "0";
+                strcat(out, "0");
             }
 
-            hexString += String(currentByte, HEX);
+            strcat(out, String(currentByte, HEX).c_str());
         }
-
-        return hexString;
     }
 };

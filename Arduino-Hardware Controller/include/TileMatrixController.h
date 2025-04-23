@@ -6,11 +6,10 @@ const int ROWS = 8;
 
 class TileMatrixController {
 private:
-    String _dataHexString;
     void setMatrixActivated(bool isActivated);
-    byte* read();
+    void read(byte* data);
 
 public:
     TileMatrixController();
-    String readHexString();
+    void readHex(char* out);
 };

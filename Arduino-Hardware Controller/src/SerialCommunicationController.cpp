@@ -4,8 +4,7 @@ bool SerialCommunicationController::isRequestPresent() {
     return Serial.available();
 }
 
-char* SerialCommunicationController::readRequestFromSerial() {
-    char* buffer = new char[SERIAL_RX_BUFFER_SIZE]; //allocate on the heap, otherwise buffer is local and its address is resulting in undefined behaviour
+void SerialCommunicationController::readRequestFromSerial(char* buffer) {
     int index = 0;
     char currentChar;
     while ((currentChar = Serial.read()) != '\n' && index < SERIAL_RX_BUFFER_SIZE - 1) {
@@ -15,7 +14,6 @@ char* SerialCommunicationController::readRequestFromSerial() {
     }
 
     buffer[index] = '\0';
-    return buffer;
 }
 
 /**
@@ -31,7 +29,7 @@ Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
     char requestDataTypeString[5]{ rawRequest[4], rawRequest[5], rawRequest[6], rawRequest[7], '\0' }; //4 more characters after the first colon
     RequestedDataType requestDataType = getRequestedDataTypeFromPointer(requestDataTypeString);
 
-    char* rawData = new char[SERIAL_RX_BUFFER_SIZE];
+    char rawData[SERIAL_RX_BUFFER_SIZE];
     int index = 9;  //starting index of the data characters
 
     char currentChar;
@@ -41,31 +39,43 @@ Exchange SerialCommunicationController::parseRequest(char* rawRequest) {
     }
     rawData[index - 9] = '\0';
 
-    char** splittedData = Util::splitCharArray(rawData, ',', DATA_ARRAY_SIZE);
-    delete[] rawData;
-    return Exchange(direction, requestDataType, splittedData);
+    char splittedData[DATA_ARRAY_SIZE][SERIAL_RX_BUFFER_SIZE];
+    char* data[DATA_ARRAY_SIZE];
+
+    for (int i = 0; i < DATA_ARRAY_SIZE; i++) {
+        data[i] = splittedData[i];
+    }
+
+    Util::splitCharArray(rawData, ',', DATA_ARRAY_SIZE, data);
+    return Exchange(direction, requestDataType, data);
 }
 
-void SerialCommunicationController::respond(RequestedDataType dataType, String data[]) {
-    String responseDataType = getResponseDataTypeAsString(dataType);
-    buildAndSendMessage("RES", responseDataType, data);
-}
-
-void SerialCommunicationController::buildAndSendMessage(String responseType, String responseDataType, String data[]) {
+void SerialCommunicationController::respond(RequestedDataType dataType, char** data) {
+    const char* responseDataType = getResponseDataTypeAsCharPointer(dataType);
     char message[SERIAL_TX_BUFFER_SIZE];
 
-    snprintf(message, sizeof(message), "%s:%s:", responseType.c_str(), responseDataType.c_str());
+    buildMessage("RES", responseDataType, data, message);
+    sendMessage(message);
+}
 
-    for (unsigned int i = 0; i < data->length(); i++) {
-        if (data[i].length() > 0) {
-            strncat(message, data[i].c_str(), sizeof(message) - strlen(message) - 1);  //append data to message
+void SerialCommunicationController::buildMessage(const char* responseType, const char* responseDataType, char** data, char* message) {
+    message[0] = '\0';  //initialize array with empty string
 
-            if (i != data->length() - 1 && data[i + 1].length() > 0) {
-                strncat(message, ",", sizeof(message) - strlen(message) - 1);
+    sprintf(message, "%s:%s:", responseType, responseDataType);
+
+
+    for (unsigned int i = 0; i < DATA_ARRAY_SIZE; i++) {
+        if (data[i][0] != '\0') {   //if the data is not empty
+            strcat(message, data[i]);  //append data to message
+
+            if (i != DATA_ARRAY_SIZE - 1 && data[i + 1][0] != '\0') {  //if there is a next element in the data array
+                strcat(message, ",");
             }
         }
     }
+}
 
+void SerialCommunicationController::sendMessage(char* message) {
     Serial.println(message);
 }
 
@@ -93,7 +103,7 @@ RequestedDataType SerialCommunicationController::getRequestedDataTypeFromPointer
     return RequestedDataType::ERRO;
 }
 
-String SerialCommunicationController::getResponseDataTypeAsString(RequestedDataType dataType) {
+const char* SerialCommunicationController::getResponseDataTypeAsCharPointer(RequestedDataType dataType) {
     switch (dataType) {
     case RequestedDataType::HOME:
         return "HOME";
