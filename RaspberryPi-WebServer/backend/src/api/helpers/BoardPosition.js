@@ -67,7 +67,7 @@ export default class BoardPosition {
 	 * @param {number} appendix
 	 * @returns {boolean} true if all components are valid, false otherwise
 	 */
-	static isValid(x, y, appendix) {
+	static isValid(x, y, appendix = 5) {
 		return BoardPosition.#validateX(x) && BoardPosition.#validateY(y) && BoardPosition.#validateAppendix(appendix);
 	}
 

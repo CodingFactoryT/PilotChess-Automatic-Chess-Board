@@ -1,12 +1,19 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
 import { apiPost } from "../../../helpers/fetchBackendApi";
+import BoardPosition from "../../../../../backend/src/api/helpers/BoardPosition";
 
 export default function SendCommandToArduinoComponent() {
   const [formData, setFormData] = useState({ move: "" });
+  const [isButtonEnabled, setButtonEnabled] = useState(false);
+
+  const validateMove = (move) => {
+    return move.length === 4 && BoardPosition.isValid(move.charAt(0), Number(move.charAt(1))) && BoardPosition.isValid(move.charAt(2), Number(move.charAt(3)));
+  }
 
   const handleChange = e => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    setButtonEnabled(validateMove(e.target.value));
   };
 
   const handleSubmit = e => {
@@ -42,7 +49,7 @@ export default function SendCommandToArduinoComponent() {
           />
         </FormControl>
       </Box>
-      <Button type="submit" variant="contained" color="primary" fullWidth>
+      <Button type="submit" variant="contained" color="primary" fullWidth disabled={!isButtonEnabled}>
         Send
       </Button>
     </Box>
