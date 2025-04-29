@@ -37,6 +37,7 @@ export default function SendCommandToArduinoComponent() {
             label="Move"
             name="move"
             value={formData.move}
+            autoComplete="off"
             onChange={handleChange}
           />
         </FormControl>

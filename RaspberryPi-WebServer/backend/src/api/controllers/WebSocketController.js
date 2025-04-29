@@ -2,6 +2,8 @@ import { WebSocketServer } from "ws";
 import { createServer } from "http";
 import MainEventStream from "./MainEventStream.js";
 import LichessChallengeController from "./LichessControllers/LichessChallengeController.js";
+import GameStream from "./GameStream.js";
+import LichessChatController from "./LichessControllers/LichessChatController.js";
 
 export default class WebSocketController {
 	static #instance = null;
@@ -54,14 +56,17 @@ export default class WebSocketController {
 		});
 	}
 
-	#handleIncomingData(data) {
-		switch (data.type) {
+	#handleIncomingData(message) {
+		switch (message.type) {
 			case "challengeAccepted":
-				return LichessChallengeController.acceptChallenge(data.data.id);
+				return LichessChallengeController.acceptChallenge(message.data.id);
 			case "challengeDeclined":
-				return LichessChallengeController.declineChallenge(data.data.id);
+				return LichessChallengeController.declineChallenge(message.data.id);
+			case "chat":
+				const gameId = GameStream.getInstance().getGameId();
+				LichessChatController.sendMessage(gameId, message.data.message);
 			default:
-				return console.error(`Unknown incoming websocket message type from frontend: ${data.type}`);
+				return console.error(`Unknown incoming websocket message type from frontend: ${message.type}`);
 		}
 	}
 }

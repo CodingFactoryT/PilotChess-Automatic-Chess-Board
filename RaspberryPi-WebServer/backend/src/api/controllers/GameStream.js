@@ -3,6 +3,7 @@ import Stream from "./Stream.js";
 import config from "../../../../config.js";
 import { Chess } from "chess.js";
 import BoardController from "./BoardController.js";
+import LichessUserController from "./LichessControllers/LichessUserController.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
@@ -48,6 +49,10 @@ export default class GameStream extends Stream {
 		return GameStream.#instance;
 	}
 
+	getGameId() {
+		return this.gameId;
+	}
+
 	#handleData(data) {
 		const Events = this.Events;
 
@@ -90,7 +95,23 @@ export default class GameStream extends Stream {
 	}
 
 	#handleChatLine(data) {
-		console.log(data);
+		if (data.room === "player") {
+			const dataUsername = data.username;
+			LichessUserController.fetchLoggedInUsername()
+				.then((loggedInUsername) => {
+					WebSocketController.getInstance().send({
+						type: "chat",
+						data: {
+							username: dataUsername,
+							isMe: dataUsername === loggedInUsername,
+							message: data.text,
+						},
+					});
+				})
+				.catch((error) => {
+					console.error(`Error while handling chat message from ${dataUsername}: ${error}`);
+				});
+		}
 	}
 
 	#handleOpponentGone(data) {

@@ -22,4 +22,8 @@ export default class LichessUserController {
 			console.error(`Error fetching information from logged in user: ${error}`);
 		}
 	}
+
+	static async fetchLoggedInUsername() {
+		return await this.fetchLoggedInUserInformation().username;
+	}
 }
