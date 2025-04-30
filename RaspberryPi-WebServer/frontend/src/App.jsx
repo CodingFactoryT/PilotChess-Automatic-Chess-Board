@@ -1,7 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import HomePage from './pages/homePage';
 import LoginPage from './pages/loginPage';
-import ProfilePage from './pages/profilePage';
 import WifiConfigurationPage from './pages/wifiConfigurationPage';
 import NotFoundPage from './pages/notFoundPage';
 import AuthGuard from './AuthGuard';
@@ -10,6 +9,7 @@ import { AuthProvider } from './context/AuthContext';
 import WebSocketHandler from './components/WebSocketHandler';
 import GamePage from './pages/gamePage';
 import { ChatProvider } from './context/ChatContext';
+import MenuHeader from './components/MenuHeader';
 
 export default function App() {
 	return (
@@ -22,17 +22,16 @@ export default function App() {
 							<Route path="/login" element={ <LoginPage/> } />
 							<Route path="/" element={
 								<AuthGuard>
-									<HomePage/>
-								</AuthGuard>
-							} />
-							<Route path="/profile" element={
-								<AuthGuard>
-									<ProfilePage/>
+									<MenuHeader>
+										<HomePage/>
+									</MenuHeader>
 								</AuthGuard>
 							} />
 							<Route path="/game" element={
 								<AuthGuard>
-									<GamePage/>
+									<MenuHeader>
+										<GamePage/>
+									</MenuHeader>
 								</AuthGuard>
 							} />
 							<Route path="/debug" element={ <DebugPage/> }/>
