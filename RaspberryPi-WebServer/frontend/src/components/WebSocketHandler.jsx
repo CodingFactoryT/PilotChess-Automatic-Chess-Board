@@ -5,6 +5,7 @@ import React from 'react';
 import { acceptChallenge, declineChallenge } from "../helpers/WebsocketResponses/challenge";
 import { useNavigate } from "react-router";
 import { useGameBoard } from "../context/GameBoardContext";
+import { useChat } from "../context/ChatContext";
 
 const openSnackbarMessages = new Map();
 
@@ -12,27 +13,31 @@ export default function WebSocketHandler() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const {setFenPosition} = useGameBoard();
+  const {addEntry, clearEntries} = useChat();
 
   useEffect(() => {
 		WebSocketController.initConnection(handleWebsocketMessage);
 	}, []);
 
-  function handleWebsocketMessage(data) {
-    switch (data.type) {
+  function handleWebsocketMessage(message) {
+    switch (message.type) {
       case "challenge":
-        handleChallengeMessage(data.data); // Pass the function to enqueueSnackbar
+        handleChallengeMessage(message.data); // Pass the function to enqueueSnackbar
         break;
       case "challengeCanceled":
-        handleChallengeDeclinedMessage(data.data.id);
+        handleChallengeDeclinedMessage(message.data.id);
         break;
       case "gameStart":
-        handleGameStartMessage(data.data);
+        handleGameStartMessage(message.data);
         break;
       case "pieceMoved":
-        handlePieceMoved(data.data);
+        handlePieceMoved(message.data);
+        break;
+      case "chat":
+        addEntry(message.data.username, message.data.isMe, message.data.message);
         break;
       default:
-        console.error("Frontend cannot handle this type of message:", data.type);
+        console.error("Frontend cannot handle this type of message:", message.type);
     }
   }
 

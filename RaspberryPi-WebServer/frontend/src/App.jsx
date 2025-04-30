@@ -9,34 +9,37 @@ import DebugPage from './pages/debugPage';
 import { AuthProvider } from './context/AuthContext';
 import WebSocketHandler from './components/WebSocketHandler';
 import GamePage from './pages/gamePage';
+import { ChatProvider } from './context/ChatContext';
 
 export default function App() {
 	return (
 			<BrowserRouter>
-				<WebSocketHandler/>
-				<AuthProvider>
-					<Routes>
-						<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
-						<Route path="/login" element={ <LoginPage/> } />
-						<Route path="/" element={
-							<AuthGuard>
-								<HomePage/>
-							</AuthGuard>
-						} />
-						<Route path="/profile" element={
-							<AuthGuard>
-								<ProfilePage/>
-							</AuthGuard>
-						} />
-						<Route path="/game" element={
-							<AuthGuard>
-								<GamePage/>
-							</AuthGuard>
-						} />
-						<Route path="/debug" element={ <DebugPage/> }/>
-						<Route path="/*" element={ <NotFoundPage/> } />
-					</Routes>
-				</AuthProvider>
+				<ChatProvider>
+					<WebSocketHandler/>
+					<AuthProvider>
+						<Routes>
+							<Route path="/wifi-configuration" element={ <WifiConfigurationPage/> } />
+							<Route path="/login" element={ <LoginPage/> } />
+							<Route path="/" element={
+								<AuthGuard>
+									<HomePage/>
+								</AuthGuard>
+							} />
+							<Route path="/profile" element={
+								<AuthGuard>
+									<ProfilePage/>
+								</AuthGuard>
+							} />
+							<Route path="/game" element={
+								<AuthGuard>
+									<GamePage/>
+								</AuthGuard>
+							} />
+							<Route path="/debug" element={ <DebugPage/> }/>
+							<Route path="/*" element={ <NotFoundPage/> } />
+						</Routes>
+					</AuthProvider>
+				</ChatProvider>
 			</BrowserRouter>
 	);
 }

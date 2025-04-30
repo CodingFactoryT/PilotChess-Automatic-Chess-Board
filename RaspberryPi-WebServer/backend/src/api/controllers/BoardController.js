@@ -32,7 +32,7 @@ export default class BoardController {
 	/**
 	 * move: e.g. "a2a3"
 	 */
-	async moveOpponentsPiece(move) {
+	async movePiecePhysically(move) {
 		const fromPosition = new BoardPosition(move[0], Number(move[1]));
 		const toPosition = new BoardPosition(move[2], Number(move[3]));
 		const fromPositionString = fromPosition.toChessNotationString();

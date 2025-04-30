@@ -26,7 +26,9 @@ export default class Stream {
 				//if the data is not the empty keep-alive request that is sent every few seconds
 				data = data.toString().trim();
 				if (data.length > 0) {
-					this.dataFunction(JSON.parse(data));
+					data.split("\n").forEach((element) => {
+						this.dataFunction(JSON.parse(element));
+					});
 				}
 			});
 

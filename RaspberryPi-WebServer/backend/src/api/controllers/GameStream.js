@@ -24,6 +24,7 @@ export default class GameStream extends Stream {
 		);
 
 		this.gameId = gameId;
+		this.board = new Chess(initialFen);
 
 		this.Events = {
 			GAME_FULL: "gameFull",
@@ -73,14 +74,17 @@ export default class GameStream extends Stream {
 	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
 	#handleGameState(data) {
-		const board = new Chess();
+		const prevFen = this.board.fen();
+		this.board = new Chess();
 		const moves = data?.moves?.split(" ");
 		moves.forEach((move) => {
-			board.move(move);
+			this.board.move(move);
 		});
 
+		const newFen = this.board.fen();
+		if (prevFen === newFen) return;
+
 		const lastMove = moves.at(-1);
-		const newFen = board.fen();
 
 		WebSocketController.getInstance().send({
 			type: "pieceMoved",
@@ -91,7 +95,7 @@ export default class GameStream extends Stream {
 			},
 		});
 
-		BoardController.getInstance().moveOpponentsPiece(lastMove);
+		BoardController.getInstance().movePiecePhysically(lastMove);
 	}
 
 	#handleChatLine(data) {
