@@ -1,16 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router"
 import { Chessboard } from "react-chessboard";
 import { Box } from "@mui/material"
 import { useGameBoard } from "../../context/GameBoardContext";
 import MakeMoveComponent from "./components/MakeMoveComponent"
 import ChatComponent from "./components/ChatComponent";
+import { useCurrentMove } from "../../context/CurrentMoveContext";
 
 export default function GamePage() {
     const navigate = useNavigate();
     const location = useLocation();
     const setupData = location.state;
     const {fenPosition} = useGameBoard();
+    const {fromPosition, toPosition} = useCurrentMove();
     
     useEffect(() => {
         if(!setupData) {
@@ -39,6 +41,20 @@ export default function GamePage() {
                 autoPromoteToQueen={true} 
                 boardOrientation={setupData.color}
                 position={fenPosition}
+                customBoardStyle={{
+                    borderRadius: "8px"
+                }}
+                customArrows={fromPosition !== "" && toPosition !== "" ? [
+                    [fromPosition, toPosition, "darkred"]
+                ] : []}
+                customSquareStyles={{
+                    [fromPosition]: {
+                        background: "#82AD65",
+                    },
+                    [toPosition]: {
+                        background: "#5D5F71",
+                    }
+                }}  
                 />
             </Box>
             <Box sx={{

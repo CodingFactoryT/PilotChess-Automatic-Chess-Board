@@ -10,6 +10,7 @@ import WebSocketHandler from './components/WebSocketHandler';
 import GamePage from './pages/gamePage';
 import { ChatProvider } from './context/ChatContext';
 import MenuHeader from './components/MenuHeader';
+import { CurrentMoveProvider } from './context/CurrentMoveContext';
 
 export default function App() {
 	return (
@@ -30,7 +31,9 @@ export default function App() {
 							<Route path="/game" element={
 								<AuthGuard>
 									<MenuHeader>
-										<GamePage/>
+										<CurrentMoveProvider>
+											<GamePage/>
+										</CurrentMoveProvider>
 									</MenuHeader>
 								</AuthGuard>
 							} />
