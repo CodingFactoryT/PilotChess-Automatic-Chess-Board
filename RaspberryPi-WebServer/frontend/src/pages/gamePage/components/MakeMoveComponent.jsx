@@ -33,6 +33,8 @@ export default function MakeMoveComponent() {
 
   const handleSubmit = e => {
     e.preventDefault();
+    setFromPosition("");
+    setToPosition("");
     apiPost("/game/move", JSON.stringify(formData))
     .then((response) => {
 			console.log("Success: " + response.data);
