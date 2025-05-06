@@ -1,48 +1,38 @@
 import fetchArduino from "@src/services/ArduinoCommunicator.js";
-import { BISHOP, Chess, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
+import { BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 import BoardPosition from "@src/helpers/BoardPosition.js";
+import VirtualBoardController from "./VirtualBoardController.js";
 
-export default class BoardController {
+export default class PhysicalBoardController {
 	static #instance = null;
-	static #fen = null;
 
-	constructor(fen) {
-		if (BoardController.#instance) {
-			throw new Error("Use BoardController.getInstance() instead of new.");
+	constructor() {
+		if (PhysicalBoardController.#instance) {
+			throw new Error("Use PhysicalBoardController.getInstance() instead of new.");
 		}
 
 		//this.lastReadPositioning = null;
-		this.board = new Chess(fen);
-		BoardController.#instance = this;
+		PhysicalBoardController.#instance = this;
 	}
 
 	static getInstance() {
-		if (!BoardController.#instance) {
-			BoardController.#instance = new BoardController(BoardController.#fen);
+		if (!PhysicalBoardController.#instance) {
+			PhysicalBoardController.#instance = new PhysicalBoardController();
 		}
 
-		return BoardController.#instance;
-	}
-
-	static setFen(fen) {
-		BoardController.#fen = fen;
+		return PhysicalBoardController.#instance;
 	}
 
 	/**
 	 * move: e.g. "a2a3"
 	 */
-	async movePiecePhysically(move) {
+	async movePiece(move, pieceType, moveInformation) {
 		const fromPosition = new BoardPosition(move[0], Number(move[1]));
 		const toPosition = new BoardPosition(move[2], Number(move[3]));
-		const fromPositionString = fromPosition.toChessNotationString();
-		const toPositionString = toPosition.toChessNotationString();
-
-		const pieceToMove = this.board.get(fromPositionString);
-		const moveInformation = this.board.move({ from: fromPositionString, to: toPositionString });
 
 		//TODO: handle special moves, like castling (information if the move is a special move is contained in the move variable)
 
-		switch (pieceToMove.type) {
+		switch (pieceType) {
 			case PAWN:
 				await this.#movePawn(fromPosition, toPosition);
 				break;
@@ -79,12 +69,12 @@ export default class BoardController {
 		const helperPiecePositions = this.calculateKnightHelperPiecePositions(fromPosition, toPosition);
 
 		//if the tile near the from-position is empty
-		if (!this.board.get(helperPiecePositions.nearFromPositionFrom?.toChessNotationString())) {
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toChessNotationString())) {
 			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearFromPositionFrom, toPosition);
 		}
 
 		//if the tile near the to-position is empty
-		if (!this.board.get(helperPiecePositions.nearToPositionFrom?.toChessNotationString())) {
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearToPositionFrom?.toChessNotationString())) {
 			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearToPositionFrom, toPosition);
 		}
 
@@ -142,44 +132,44 @@ export default class BoardController {
 	}
 
 	/* async waitForPieceMovement() {
-		let fromPosition = null;
-		let toPosition = null;
+    let fromPosition = null;
+    let toPosition = null;
 
-		while (fromPosition === toPosition) {
-			while (!(fromPosition = await this.hasTileGridChanged()));
-			while (!(toPosition = await this.hasTileGridChanged()));
-		}
+    while (fromPosition === toPosition) {
+      while (!(fromPosition = await this.hasTileGridChanged()));
+      while (!(toPosition = await this.hasTileGridChanged()));
+    }
 
-		return { from: fromPosition, to: toPosition };
-	}
+    return { from: fromPosition, to: toPosition };
+  }
 
-	async #hasTileGridChanged() {
-		try {
-			const response = await fetchArduino("REQ:READ:");
-			const boardPositioning = hexToBinary64(response.data.split(",")[1]);
-			if (lastReadPositioning !== null && lastReadPositioning !== boardPositioning) {
-				const changedPosition = getChangedPosition(lastReadPositioning, boardPositioning);
-				lastReadPositioning = null; //reset for next call
-				return changedPosition;
-			}
-			lastReadPositioning = boardPositioning;
-			return null;
-		} catch (error) {
-			console.log(error);
-			return null;
-		}
-	}
+  async #hasTileGridChanged() {
+    try {
+      const response = await fetchArduino("REQ:READ:");
+      const boardPositioning = hexToBinary64(response.data.split(",")[1]);
+      if (lastReadPositioning !== null && lastReadPositioning !== boardPositioning) {
+        const changedPosition = getChangedPosition(lastReadPositioning, boardPositioning);
+        lastReadPositioning = null; //reset for next call
+        return changedPosition;
+      }
+      lastReadPositioning = boardPositioning;
+      return null;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }
 
-	#getChangedPosition(pos1, pos2) {
-		const num1 = BigInt("0b" + pos1);
-		const num2 = BigInt("0b" + pos2);
+  #getChangedPosition(pos1, pos2) {
+    const num1 = BigInt("0b" + pos1);
+    const num2 = BigInt("0b" + pos2);
 
-		const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf(1); //because of the xor, theres a 1 only at the changed position
-		const xPositionStr = String.fromCharCode("a".charCodeAt(0) + (position_int % 8));
-		const yPositionStr = parseInt(position_int / 8) + 1;
-		const positionInChessNotation = xPositionStr + yPositionStr;
-		return positionInChessNotation;
-	} */
+    const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf(1); //because of the xor, theres a 1 only at the changed position
+    const xPositionStr = String.fromCharCode("a".charCodeAt(0) + (position_int % 8));
+    const yPositionStr = parseInt(position_int / 8) + 1;
+    const positionInChessNotation = xPositionStr + yPositionStr;
+    return positionInChessNotation;
+  } */
 
 	/**
 	 *

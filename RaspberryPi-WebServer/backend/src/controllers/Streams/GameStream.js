@@ -2,8 +2,9 @@ import WebSocketController from "@src/controllers/WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "@shared/config.js";
 import { Chess } from "chess.js";
-import BoardController from "@src/controllers/BoardController.js";
+import VirtualBoardController from "@src/controllers/VirtualBoardController.js";
 import LichessUserController from "@src/controllers/LichessControllers/LichessUserController.js";
+import PhysicalBoardController from "../PhysicalBoardController.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
@@ -24,7 +25,6 @@ export default class GameStream extends Stream {
 		);
 
 		this.gameId = gameId;
-		this.board = new Chess(initialFen);
 
 		this.Events = {
 			GAME_FULL: "gameFull",
@@ -34,7 +34,7 @@ export default class GameStream extends Stream {
 		};
 
 		GameStream.#instance = this;
-		BoardController.setFen(initialFen);
+		VirtualBoardController.setFen(initialFen);
 	}
 
 	stop() {
@@ -74,28 +74,27 @@ export default class GameStream extends Stream {
 	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
 	#handleGameState(data) {
-		const prevFen = this.board.fen();
-		this.board = new Chess();
+		const tmpboard = new Chess();
 		const moves = data?.moves?.split(" ");
 		moves.forEach((move) => {
-			this.board.move(move);
+			tmpboard.move(move);
 		});
 
-		const newFen = this.board.fen();
-		if (prevFen === newFen) return;
-
+		const newFen = tmpboard.fen();
 		const lastMove = moves.at(-1);
+		if (VirtualBoardController.getInstance().compareFen(newFen)) return;
 
 		WebSocketController.getInstance().send({
 			type: "pieceMoved",
 			data: {
 				id: this.gameId,
-				move: lastMove,
 				fen: newFen,
 			},
 		});
 
-		BoardController.getInstance().movePiecePhysically(lastMove);
+		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
+		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
+		PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
 	}
 
 	#handleChatLine(data) {
