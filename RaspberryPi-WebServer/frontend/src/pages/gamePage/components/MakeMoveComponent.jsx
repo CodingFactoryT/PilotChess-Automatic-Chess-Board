@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
 import { apiPost } from "../../../helpers/fetchBackendApi";
-import BoardPosition from "../../../../../backend/src/api/helpers/BoardPosition";
+import BoardPosition from "../../../../../backend/src/helpers/BoardPosition";
 import { useCurrentMove } from "../../../context/CurrentMoveContext";
 
 export default function MakeMoveComponent() {

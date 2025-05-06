@@ -1,9 +1,9 @@
-import WebSocketController from "./WebSocketController.js";
+import WebSocketController from "../WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "../../../../config.js";
 import { Chess } from "chess.js";
-import BoardController from "./BoardController.js";
-import LichessUserController from "./LichessControllers/LichessUserController.js";
+import BoardController from "../BoardController.js";
+import LichessUserController from "../LichessControllers/LichessUserController.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;

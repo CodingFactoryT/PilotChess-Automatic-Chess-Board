@@ -1,6 +1,6 @@
 import axios from "axios";
-import config from "../../../../../config.js";
-import LichessTokenVault from "../LichessTokenVault.js";
+import config from "../../../../config.js";
+import LichessTokenVault from "./LichessTokenVault.js";
 
 const gameBaseURL = `${config.lichess_base_url}/api/board/game`;
 

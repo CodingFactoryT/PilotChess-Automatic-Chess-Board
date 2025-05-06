@@ -1,4 +1,4 @@
-import WebSocketController from "./WebSocketController.js";
+import WebSocketController from "../WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "../../../../config.js";
 import GameStream from "./GameStream.js";

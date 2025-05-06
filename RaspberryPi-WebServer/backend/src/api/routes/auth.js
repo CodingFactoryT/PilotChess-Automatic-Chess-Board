@@ -1,8 +1,8 @@
 import express from "express";
 import axios from "axios";
 import config from "../../../../config.js";
-import MainEventStream from "../controllers/MainEventStream.js";
-import LichessTokenVault from "../controllers/LichessTokenVault.js";
+import MainEventStream from "../../controllers/Streams/MainEventStream.js";
+import LichessTokenVault from "../../controllers/LichessControllers/LichessTokenVault.js";
 
 const router = express.Router();
 

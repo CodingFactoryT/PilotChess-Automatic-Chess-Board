@@ -1,8 +1,8 @@
 import { WebSocketServer } from "ws";
 import { createServer } from "http";
-import MainEventStream from "./MainEventStream.js";
+import MainEventStream from "./Streams/MainEventStream.js";
 import LichessChallengeController from "./LichessControllers/LichessChallengeController.js";
-import GameStream from "./GameStream.js";
+import GameStream from "./Streams/GameStream.js";
 import LichessChatController from "./LichessControllers/LichessChatController.js";
 
 export default class WebSocketController {
