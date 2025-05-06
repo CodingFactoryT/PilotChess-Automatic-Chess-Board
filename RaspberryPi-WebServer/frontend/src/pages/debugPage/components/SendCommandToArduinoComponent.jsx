@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
-import { apiPost } from "../../../helpers/fetchBackendApi";
+import { apiPost } from "@src/helpers/fetchBackendApi";
 
 const typeOptions = [
   "REQ",

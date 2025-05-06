@@ -1,9 +1,9 @@
 import { useState, useContext, createContext, useEffect } from "react";
 import { useNavigate } from "react-router";
-import { requestAuthorizationCode, obtainAccessToken } from "../helpers/AuthHelper";
+import { requestAuthorizationCode, obtainAccessToken } from "@src/helpers/AuthHelper";
 
-import { apiGet, apiPost } from "../helpers/fetchBackendApi"
-import config from "../../../config";
+import { apiGet, apiPost } from "@src/helpers/fetchBackendApi"
+import config from "@shared/config.js";
 const AuthContext = createContext();
 
 const clientId = "pilotchess-codingfactoryt";

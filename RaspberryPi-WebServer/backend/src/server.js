@@ -1,13 +1,12 @@
 import express from "express";
 import cors from "cors";
-import config from "../../config.js";
+import config from "@shared/config.js";
 import apiRouter from "./routes/api.js";
 import frontendRouter from "./routes/frontend.js";
 import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
-import "../helpers/consoleExtensions.js";
-import WebSocketController from "./controllers/WebSocketController.js";
-import fetchArduino from "./services/ArduinoCommunicator.js";
+import "@root/helpers/consoleExtensions.js";
+import WebSocketController from "@src/controllers/WebSocketController.js";
 
 const app = express();
 

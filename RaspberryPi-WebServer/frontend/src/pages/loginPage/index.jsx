@@ -1,8 +1,8 @@
 import { useLocation, useNavigate } from "react-router"
-import { useAuth } from "../../context/AuthContext";
+import { useAuth } from "@src/context/AuthContext";
 import { Box, Button } from "@mui/material"
 import { useEffect, useState } from "react";
-import { apiGet } from "../../helpers/fetchBackendApi";
+import { apiGet } from "@src/helpers/fetchBackendApi";
 
 export default function LoginPage() {
     const navigate = useNavigate();

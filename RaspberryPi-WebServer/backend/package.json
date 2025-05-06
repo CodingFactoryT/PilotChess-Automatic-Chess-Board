@@ -3,10 +3,14 @@
   "version": "1.0.0",
   "main": "./src/server.js",
   "type": "module",
+  "_moduleAliases": {
+    "@root": ".",
+    "@src": "./src"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node ./src/server.js",
-    "dev": "nodemon ./src/server.js"
+    "start": "node --loader ./custom-loader.js ./src/server.js",
+    "dev": "nodemon"
   },
   "author": "",
   "license": "ISC",

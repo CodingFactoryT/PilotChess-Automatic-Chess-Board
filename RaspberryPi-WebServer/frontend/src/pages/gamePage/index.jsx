@@ -2,10 +2,10 @@ import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router"
 import { Chessboard } from "react-chessboard";
 import { Box } from "@mui/material"
-import { useGameBoard } from "../../context/GameBoardContext";
+import { useGameBoard } from "@src/context/GameBoardContext";
 import MakeMoveComponent from "./components/MakeMoveComponent"
 import ChatComponent from "./components/ChatComponent";
-import { useCurrentMove } from "../../context/CurrentMoveContext";
+import { useCurrentMove } from "@src/context/CurrentMoveContext";
 
 export default function GamePage() {
     const navigate = useNavigate();

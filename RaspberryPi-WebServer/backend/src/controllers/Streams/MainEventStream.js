@@ -1,6 +1,6 @@
-import WebSocketController from "../WebSocketController.js";
+import WebSocketController from "@src/controllers/WebSocketController.js";
 import Stream from "./Stream.js";
-import config from "../../../../config.js";
+import config from "@shared/config.js";
 import GameStream from "./GameStream.js";
 
 export default class MainEventStream extends Stream {

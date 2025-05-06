@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
-import { apiPost } from "../../../helpers/fetchBackendApi";
-import BoardPosition from "../../../../../backend/src/helpers/BoardPosition";
-import { useCurrentMove } from "../../../context/CurrentMoveContext";
+import { apiPost } from "@src/helpers/fetchBackendApi";
+import BoardPosition from "@shared/backend/src/helpers/BoardPosition";
+import { useCurrentMove } from "@src/context/CurrentMoveContext";
 
 export default function MakeMoveComponent() {
   const [formData, setFormData] = useState({ move: "" });

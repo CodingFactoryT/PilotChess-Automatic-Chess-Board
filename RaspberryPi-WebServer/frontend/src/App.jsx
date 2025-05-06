@@ -1,16 +1,16 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import HomePage from './pages/homePage';
-import LoginPage from './pages/loginPage';
-import WifiConfigurationPage from './pages/wifiConfigurationPage';
-import NotFoundPage from './pages/notFoundPage';
-import AuthGuard from './AuthGuard';
-import DebugPage from './pages/debugPage';
-import { AuthProvider } from './context/AuthContext';
-import WebSocketHandler from './components/WebSocketHandler';
+import HomePage from '@src/pages/homePage';
+import LoginPage from '@src/pages/loginPage';
+import WifiConfigurationPage from '@src/pages/wifiConfigurationPage';
+import NotFoundPage from '@src/pages/notFoundPage';
+import AuthGuard from '@src/AuthGuard';
+import DebugPage from '@src/pages/debugPage';
+import { AuthProvider } from '@src/context/AuthContext';
+import WebSocketHandler from '@src/components/WebSocketHandler';
 import GamePage from './pages/gamePage';
-import { ChatProvider } from './context/ChatContext';
-import MenuHeader from './components/MenuHeader';
-import { CurrentMoveProvider } from './context/CurrentMoveContext';
+import { ChatProvider } from '@src/context/ChatContext';
+import MenuHeader from '@src/components/MenuHeader';
+import { CurrentMoveProvider } from '@src/context/CurrentMoveContext';
 
 export default function App() {
 	return (

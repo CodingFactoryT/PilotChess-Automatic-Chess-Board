@@ -1,5 +1,5 @@
 import express from "express";
-import fetchArduino from "../../services/ArduinoCommunicator.js";
+import fetchArduino from "@src/services/ArduinoCommunicator.js";
 
 const router = express.Router();
 

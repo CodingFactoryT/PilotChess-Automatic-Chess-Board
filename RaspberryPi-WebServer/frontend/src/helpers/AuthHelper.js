@@ -2,7 +2,7 @@ import sha256 from "crypto-js/sha256";
 import Base64 from "crypto-js/enc-base64";
 import CryptoJS from "crypto-js";
 import axios from "axios";
-import config from "../../../config";
+import config from "@shared/config.js";
 
 export function requestAuthorizationCode(clientId, redirectURI, scope) {
 	const LENGTH = 32;

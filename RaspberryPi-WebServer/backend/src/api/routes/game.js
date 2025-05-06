@@ -1,6 +1,6 @@
 import express from "express";
-import LichessGameController from "../../controllers/LichessControllers/LichessGameController.js";
-import GameStream from "../../controllers/Streams/GameStream.js";
+import LichessGameController from "@src/controllers/LichessControllers/LichessGameController.js";
+import GameStream from "@src/controllers/Streams/GameStream.js";
 const router = express.Router();
 
 router.post("/move", (req, res) => {

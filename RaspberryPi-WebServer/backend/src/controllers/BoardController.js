@@ -1,7 +1,6 @@
-import fetchArduino from "../services/ArduinoCommunicator.js";
-import { hexToBinary64, concatZeroesUntilSizeMatches } from "../helpers/util.js";
+import fetchArduino from "@src/services/ArduinoCommunicator.js";
 import { BISHOP, Chess, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
-import BoardPosition from "../helpers/BoardPosition.js";
+import BoardPosition from "@src/helpers/BoardPosition.js";
 
 export default class BoardController {
 	static #instance = null;

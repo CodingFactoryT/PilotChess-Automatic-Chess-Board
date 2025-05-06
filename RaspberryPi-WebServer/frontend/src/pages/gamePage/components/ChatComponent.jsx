@@ -1,5 +1,5 @@
 import {Stack, Divider, ListItem, Box} from "@mui/material"
-import { useChat } from "../../../context/ChatContext";
+import { useChat } from "@src/context/ChatContext";
 import { useEffect } from "react";
 
 export default function ChatComponent() {

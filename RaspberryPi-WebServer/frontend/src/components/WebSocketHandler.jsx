@@ -1,11 +1,11 @@
 import { useEffect } from "react";
-import WebSocketController from "../controller/WebSocketController"
+import WebSocketController from "@src/controller/WebSocketController"
 import { useSnackbar } from "notistack";
 import React from 'react';
-import { acceptChallenge, declineChallenge } from "../helpers/WebsocketResponses/challenge";
+import { acceptChallenge, declineChallenge } from "@src/helpers/WebsocketResponses/challenge";
 import { useNavigate } from "react-router";
-import { useGameBoard } from "../context/GameBoardContext";
-import { useChat } from "../context/ChatContext";
+import { useGameBoard } from "@src/context/GameBoardContext";
+import { useChat } from "@src/context/ChatContext";
 
 const openSnackbarMessages = new Map();
 

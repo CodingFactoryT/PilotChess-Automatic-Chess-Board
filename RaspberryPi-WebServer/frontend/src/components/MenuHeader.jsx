@@ -3,7 +3,7 @@ import {AppBar, Toolbar, Typography, Button, IconButton, Menu, MenuItem, Divider
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import { useNavigate } from 'react-router';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '@src/context/AuthContext';
 
 export default function MenuHeader({children}) {
   const username = "TestUser123";  //TODO Actual Username

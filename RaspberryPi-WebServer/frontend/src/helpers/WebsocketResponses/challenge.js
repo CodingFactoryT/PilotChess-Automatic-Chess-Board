@@ -1,4 +1,4 @@
-import WebSocketController from "../../controller/WebSocketController";
+import WebSocketController from "@src/controller/WebSocketController";
 
 export function acceptChallenge(challengeId) {
 	WebSocketController.send({
