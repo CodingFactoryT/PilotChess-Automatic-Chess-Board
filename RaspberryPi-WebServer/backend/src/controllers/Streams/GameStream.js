@@ -93,8 +93,12 @@ export default class GameStream extends Stream {
 		});
 
 		const wasOpponentsTurn = !VirtualBoardController.getInstance().isMyTurn();
+		console.log(`Was opponents turn: ${wasOpponentsTurn}`);
 		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
+		console.log(`PieceType: ${pieceType}`);
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
+		console.log(`Move: ${lastMove}`);
+		console.log(moveInformation);
 
 		if (wasOpponentsTurn) {
 			console.log("Was opponents turn!");

@@ -1,4 +1,4 @@
-import fetchArduino, { setIsBusy } from "@src/services/ArduinoCommunicator.js";
+import fetchArduino from "@src/services/ArduinoCommunicator.js";
 import { BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 import BoardPosition from "@src/helpers/BoardPosition.js";
 import VirtualBoardController from "./VirtualBoardController.js";
@@ -141,7 +141,6 @@ export default class PhysicalBoardController {
 			console.log(`Final Move: ${move}`);
 			const gameId = GameStream.getInstance().getGameId();
 			LichessGameController.makeMove(gameId, move);
-			setIsBusy(false); //TODO shouldn't be necessary if the other code works correct (which it doesn't at the moment)
 		});
 	}
 
