@@ -92,13 +92,15 @@ export default class GameStream extends Stream {
 			},
 		});
 
+		const wasOpponentsTurn = !VirtualBoardController.getInstance().isMyTurn();
 		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
 
-		//actually checks the opposite, because we want to know the state before the movement but need the moveInformation from chess.js
-		if (VirtualBoardController.getInstance().isMyTurn()) {
+		if (wasOpponentsTurn) {
 			PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
-		} else {
+		}
+
+		if (VirtualBoardController.getInstance().isMyTurn()) {
 			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 		}
 	}

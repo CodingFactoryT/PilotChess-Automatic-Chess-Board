@@ -164,7 +164,6 @@ export default class PhysicalBoardController {
 		try {
 			const response = await fetchArduino("REQ:READ:");
 			const boardPositioning = hexToBinary64(response.data.split(",")[1]);
-			console.log(response.data);
 			if (this.lastReadPositioning !== null && this.lastReadPositioning !== boardPositioning) {
 				const changedPosition = this.#getChangedPosition(this.lastReadPositioning, boardPositioning);
 				this.lastReadPositioning = null; //reset for next call
