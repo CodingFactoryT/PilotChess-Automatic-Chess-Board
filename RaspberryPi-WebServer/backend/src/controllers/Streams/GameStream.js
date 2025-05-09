@@ -102,6 +102,7 @@ export default class GameStream extends Stream {
 		console.log(moveInformation);
 
 		if (wasOpponentsTurn) {
+			while (isArduinoBusy()); //wait for Arduino to complete what it's doing
 			PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
 		}
 
