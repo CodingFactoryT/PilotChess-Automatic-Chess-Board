@@ -119,7 +119,6 @@ export default class PhysicalBoardController {
 	 * @param {BoardPosition} moves
 	 */
 	async #executePhysicalMovesInOrder(...moves) {
-		console.log(moves[0].toString());
 		if (moves.length < 2) return;
 
 		try {
@@ -136,6 +135,7 @@ export default class PhysicalBoardController {
 	}
 
 	waitForPieceMovementAndSendToLichess() {
+		console.log("Started waiting for change...");
 		//TODO: endless loop in dev mode
 		this.#waitForPieceMovement().then((data) => {
 			const move = data.from + data.to;
