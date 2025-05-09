@@ -79,6 +79,7 @@ export default class MainEventStream extends Stream {
 		});
 
 		if (VirtualBoardController.doIBegin()) {
+			//TODO not completely correct: if I am black and I jump into a running game where it's my turn, this won't trigger
 			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 		}
 	}

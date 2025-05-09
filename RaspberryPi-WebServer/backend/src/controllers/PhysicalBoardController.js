@@ -135,7 +135,6 @@ export default class PhysicalBoardController {
 	}
 
 	waitForPieceMovementAndSendToLichess() {
-		console.log("Started waiting for change...");
 		//TODO: endless loop in dev mode
 		this.#waitForPieceMovement().then((data) => {
 			const move = data.from + data.to;

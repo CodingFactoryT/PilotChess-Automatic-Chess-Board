@@ -97,10 +97,12 @@ export default class GameStream extends Stream {
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
 
 		if (wasOpponentsTurn) {
+			console.log("Was opponents turn!");
 			PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
 		}
 
 		if (VirtualBoardController.getInstance().isMyTurn()) {
+			console.log("Is my turn!");
 			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 		}
 	}
