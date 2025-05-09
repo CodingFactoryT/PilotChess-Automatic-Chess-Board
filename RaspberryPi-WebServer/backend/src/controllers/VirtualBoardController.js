@@ -36,7 +36,7 @@ export default class VirtualBoardController {
 		return VirtualBoardController.#myColor === "w";
 	}
 
-	static isMyTurn() {
+	isMyTurn() {
 		return this.board.turn() === VirtualBoardController.#myColor;
 	}
 
