@@ -138,7 +138,7 @@ export default class PhysicalBoardController {
 		//TODO: endless loop in dev mode
 		this.#waitForPieceMovement().then((data) => {
 			const move = data.from + data.to;
-			console.log(move);
+			console.log(`Final Move: ${move}`);
 			const gameId = GameStream.getInstance().getGameId();
 			LichessGameController.makeMove(gameId, move);
 		});
@@ -147,10 +147,14 @@ export default class PhysicalBoardController {
 	async #waitForPieceMovement() {
 		let fromPosition = null;
 		let toPosition = null;
+		const response = await fetchArduino("REQ:READ:");
+		this.lastReadPositioning = hexToBinary64(response.data.split(",")[1]);
 
 		while (fromPosition === toPosition) {
 			while (!(fromPosition = await this.#hasTileGridChanged()));
+			console.log(`From: ${fromPosition}`);
 			while (!(toPosition = await this.#hasTileGridChanged()));
+			console.log(`To: ${toPosition}`);
 		}
 
 		return { from: fromPosition, to: toPosition };
