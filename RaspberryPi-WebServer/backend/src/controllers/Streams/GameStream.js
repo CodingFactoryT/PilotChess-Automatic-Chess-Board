@@ -5,6 +5,7 @@ import { Chess } from "chess.js";
 import VirtualBoardController from "@src/controllers/VirtualBoardController.js";
 import LichessUserController from "@src/controllers/LichessControllers/LichessUserController.js";
 import PhysicalBoardController from "../PhysicalBoardController.js";
+import { isArduinoBusy } from "@src/services/ArduinoCommunicator.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
@@ -101,12 +102,12 @@ export default class GameStream extends Stream {
 		console.log(moveInformation);
 
 		if (wasOpponentsTurn) {
-			console.log("Was opponents turn!");
 			PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
 		}
 
-		if (VirtualBoardController.getInstance().isMyTurn()) {
-			console.log("Is my turn!");
+		if (!wasOpponentsTurn) {
+			//it`s my turn
+			while (isArduinoBusy()); //wait for Arduino to complete the move of the opponent first, then handle my turn
 			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 		}
 	}

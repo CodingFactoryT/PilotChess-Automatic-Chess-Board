@@ -18,13 +18,17 @@ const lineStream = port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
 let isBusy = false;
 
+export function isArduinoBusy() {
+	return isBusy;
+}
+
 export default function fetchArduino(requestString) {
 	if (!port.isOpen) {
 		return Promise.reject("The serial port is not open");
 	}
 
 	if (isBusy) {
-		return Promise.reject("Arduino is busy");
+		return Promise.reject("Arduino is busy, this can lead to unexpected behaviour on the Arduino side. Your best option is to restart the program.");
 	}
 	isBusy = true;
 

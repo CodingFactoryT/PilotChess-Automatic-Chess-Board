@@ -171,7 +171,7 @@ export default class PhysicalBoardController {
 			this.lastReadPositioning = boardPositioning;
 			return null;
 		} catch (error) {
-			//console.log(error);
+			console.log(`Error while checking for change in the TileGrid: ${error}`);
 			return null;
 		}
 	}
