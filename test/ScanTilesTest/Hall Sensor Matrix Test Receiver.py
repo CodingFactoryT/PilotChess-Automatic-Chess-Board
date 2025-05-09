@@ -6,13 +6,14 @@ import time
 
 def read_chessboard(ser):
     """Reads a line (16 Hex characters) from the serial interface and returns an 8x8 array."""
-    if ser.in_waiting > 0:
-        data = ser.readline().decode('utf-8').strip()  # Read line by line
-        print(f"Received raw data (Hex): {data}")  # Debug output
-        
-        if len(data) == 16 and all(c in '0123456789ABCDEFabcdef' for c in data):  # Ensure data is valid
-            binary_data = bin(int(data, 16))[2:].zfill(64)  # Convert hex to 64-bit binary
-            return [[int(binary_data[(7-row) * 8 + col]) for col in range(8)] for row in range(8)]
+    while ser.in_waiting == 0:
+        pass
+    data = ser.readline().decode('utf-8').strip().split(",")[1]  # Read line by line
+    print(f"Received raw data (Hex): {data}")  # Debug output
+    
+    if len(data) == 16 and all(c in '0123456789ABCDEFabcdef' for c in data):  # Ensure data is valid
+        binary_data = bin(int(data, 16))[2:].zfill(64)  # Convert hex to 64-bit binary
+        return [[int(binary_data[(7-row) * 8 + col]) for col in range(8)] for row in range(8)]
     return None
 
 def draw_board(screen, board):
@@ -33,7 +34,7 @@ screen = pygame.display.set_mode((480, 480))
 pygame.display.set_caption("Chessboard Sensor Visualization")
 
 # Establish serial connection (adjust port!)
-ser = serial.Serial('COM6', 9600, timeout=1)  # Example for Windows, on Linux: '/dev/ttyUSB0'
+ser = serial.Serial('COM6', 115200, timeout=1)  # Example for Windows, on Linux: '/dev/ttyUSB0'
 time.sleep(2)  # Wait for initialization
 
 last_valid_board = [[0] * 8 for _ in range(8)]  # Initially empty chessboard
@@ -44,6 +45,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
     
+    ser.write(bytearray('REQ:READ:\n','ascii'))
     new_board = read_chessboard(ser)  # Read data only when available
     if new_board:
         last_valid_board = new_board  # Save the last valid board
