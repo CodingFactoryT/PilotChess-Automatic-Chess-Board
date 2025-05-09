@@ -4,6 +4,7 @@ import BoardPosition from "@src/helpers/BoardPosition.js";
 import VirtualBoardController from "./VirtualBoardController.js";
 import LichessGameController from "./LichessControllers/LichessGameController.js";
 import GameStream from "./Streams/GameStream.js";
+import { concatZeroesUntilSizeMatches, hexToBinary64 } from "@src/helpers/util.js";
 
 export default class PhysicalBoardController {
 	static #instance = null;
