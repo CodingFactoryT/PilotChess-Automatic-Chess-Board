@@ -150,6 +150,7 @@ export default class PhysicalBoardController {
 	async #waitForRemainingRequestsToBeFulfilled() {
 		const communicator = ArduinoCommunicator.getInstance();
 		while (communicator.isArduinoBusy()) {
+			console.log(`Waiting for ${communicator.getAmountOfTasksToBeFulfilled()} tasks to be fulfilled...`);
 			await new Promise((resolve) => setTimeout(resolve, 20)); //check every 20ms if all requests to the Arduino were fulfilled
 		}
 	}
