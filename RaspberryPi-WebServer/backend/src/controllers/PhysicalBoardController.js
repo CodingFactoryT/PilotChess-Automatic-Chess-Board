@@ -155,14 +155,11 @@ export default class PhysicalBoardController {
 	async #waitForPieceMovement() {
 		let fromPosition = null;
 		let toPosition = null;
-		const response = await ArduinoCommunicator.getInstance().fetchArduino("REQ:READ:");
-		this.lastReadPositioning = hexToBinary64(response.data.split(",")[1]);
+		this.lastReadPositioning = null; //reset
 
 		while (fromPosition === toPosition) {
 			while (!(fromPosition = await this.#hasTileGridChanged()));
-			console.log("---------------------------------------");
 			console.log(`From: ${fromPosition}`);
-			console.log("---------------------------------------");
 			while (!(toPosition = await this.#hasTileGridChanged()));
 			console.log(`To: ${toPosition}`);
 		}

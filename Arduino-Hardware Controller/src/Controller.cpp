@@ -37,10 +37,12 @@ void Controller::update() {
             break;
         case RequestedDataType::GRAB:
             _gantry.grabPiece();
+            delay(500);    //wait for the servo to reach it's destination before responding to the request
             succeeded = true;
             break;
         case RequestedDataType::RELS:
             _gantry.releasePiece();
+            delay(500);    //wait for the servo to reach it's destination before responding to the request
             succeeded = true;
             break;
         case RequestedDataType::ERRO:
