@@ -101,12 +101,14 @@ export default class GameStream extends Stream {
 		console.log(moveInformation);
 
 		if (wasOpponentsTurn) {
-			PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
-		}
-
-		if (!wasOpponentsTurn) {
-			//it`s my turn
-			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
+			PhysicalBoardController.getInstance()
+				.movePiece(lastMove, pieceType, moveInformation)
+				.then(() => {
+					if (!wasOpponentsTurn) {
+						//it`s my turn
+						PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
+					}
+				});
 		}
 	}
 
