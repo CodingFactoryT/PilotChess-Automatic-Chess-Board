@@ -135,6 +135,7 @@ export default class PhysicalBoardController {
 	}
 
 	async waitForPieceMovementAndSendToLichess() {
+		console.log("Waiting for previous tasks to finish...");
 		await this.#waitForRemainingRequestsToBeFulfilled();
 		console.log("All finished!");
 

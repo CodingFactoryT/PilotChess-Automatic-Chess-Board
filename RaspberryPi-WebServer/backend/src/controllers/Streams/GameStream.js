@@ -109,6 +109,9 @@ export default class GameStream extends Stream {
 						PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 					}
 				});
+		} else {
+			//it`s my turn
+			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 		}
 	}
 
