@@ -136,6 +136,7 @@ export default class PhysicalBoardController {
 
 	async waitForPieceMovementAndSendToLichess() {
 		await this.#waitForRemainingRequestsToBeFulfilled();
+		console.log("All finished!");
 
 		//TODO: endless loop in dev mode
 		const data = await this.#waitForPieceMovement();
