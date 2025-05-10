@@ -101,13 +101,13 @@ export default class GameStream extends Stream {
 		console.log(moveInformation);
 
 		if (wasOpponentsTurn) {
+			//don't handle my moves as they were already executed by hand
 			PhysicalBoardController.getInstance()
 				.movePiece(lastMove, pieceType, moveInformation)
 				.then(() => {
-					if (!wasOpponentsTurn) {
-						//it`s my turn
-						PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
-					}
+					//after the opponent's turn, it's my turn
+					//TODO dont execute if game is over
+					PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 				});
 		}
 	}
