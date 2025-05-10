@@ -92,9 +92,24 @@ export default class GameStream extends Stream {
 			},
 		});
 
+		const wasOpponentsTurn = !VirtualBoardController.getInstance().isMyTurn();
+		console.log(`Was opponents turn: ${wasOpponentsTurn}`);
 		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
+		console.log(`PieceType: ${pieceType}`);
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
-		PhysicalBoardController.getInstance().movePiece(lastMove, pieceType, moveInformation);
+		console.log(`Move: ${lastMove}`);
+		console.log(moveInformation);
+
+		if (wasOpponentsTurn) {
+			//don't handle my moves as they were already executed by hand
+			PhysicalBoardController.getInstance()
+				.movePiece(lastMove, pieceType, moveInformation)
+				.then(() => {
+					//after the opponent's turn, it's my turn
+					//TODO dont execute if game is over
+					PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
+				});
+		}
 	}
 
 	#handleChatLine(data) {

@@ -1,6 +1,6 @@
 export function hexToBinary64(hex) {
 	const num = BigInt("0x" + hex);
-	const binaryString = concatZeroUntilSizeMatches(num.toString(2), 64);
+	const binaryString = concatZeroesUntilSizeMatches(num.toString(2), 64);
 	return binaryString.slice(-64); // Ensure it's exactly 64 bits
 }
 

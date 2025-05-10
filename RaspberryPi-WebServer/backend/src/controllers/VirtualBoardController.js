@@ -3,6 +3,7 @@ import { Chess } from "chess.js";
 export default class VirtualBoardController {
 	static #instance = null;
 	static #fen = null;
+	static #myColor = "w"; //default value: white
 
 	constructor(fen) {
 		if (VirtualBoardController.#instance) {
@@ -23,6 +24,20 @@ export default class VirtualBoardController {
 
 	static setFen(fen) {
 		VirtualBoardController.#fen = fen;
+	}
+
+	static setMyColor(color) {
+		if (color !== "w" && color != "b") throw new Error(`Your Board-Color could not be set: "${color}" doesn't match "b" or "w"`);
+
+		VirtualBoardController.#myColor = color;
+	}
+
+	static doIBegin() {
+		return VirtualBoardController.#myColor === "w";
+	}
+
+	isMyTurn() {
+		return this.board.turn() === VirtualBoardController.#myColor;
 	}
 
 	/**

@@ -7,6 +7,7 @@ import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
 import "@root/helpers/consoleExtensions.js";
 import WebSocketController from "@src/controllers/WebSocketController.js";
+import { ArduinoCommunicator } from "./services/ArduinoCommunicator.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.use(express.json());
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(getAccessTokenFromHeader);
+ArduinoCommunicator.getInstance(); //opens the COM-Port
 
 app.use("/api", apiRouter);
 

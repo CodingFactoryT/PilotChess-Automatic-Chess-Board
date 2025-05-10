@@ -2,6 +2,8 @@ import WebSocketController from "@src/controllers/WebSocketController.js";
 import Stream from "./Stream.js";
 import config from "@shared/config.js";
 import GameStream from "./GameStream.js";
+import VirtualBoardController from "../VirtualBoardController.js";
+import PhysicalBoardController from "../PhysicalBoardController.js";
 
 export default class MainEventStream extends Stream {
 	static #instance = null;
@@ -61,6 +63,7 @@ export default class MainEventStream extends Stream {
 	#handleGameStart(data) {
 		const game = data.game;
 		GameStream.getInstance(game.gameId, game.fen).listen();
+		VirtualBoardController.setMyColor(game.color[0]);
 		WebSocketController.getInstance().send({
 			type: this.Events.GAME_START,
 			data: {
@@ -71,9 +74,14 @@ export default class MainEventStream extends Stream {
 					username: game.opponent.username,
 					rating: game.opponent.rating,
 				},
-				secondsLeft: data.game.secondsLeft,
+				secondsLeft: game.secondsLeft,
 			},
 		});
+
+		if (VirtualBoardController.doIBegin()) {
+			//TODO not completely correct: if I am black and I jump into a running game where it's my turn, this won't trigger
+			PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
+		}
 	}
 
 	#handleGameFinish(data) {

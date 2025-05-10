@@ -1,5 +1,5 @@
+import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator.js";
 import express from "express";
-import fetchArduino from "@src/services/ArduinoCommunicator.js";
 
 const router = express.Router();
 
@@ -10,7 +10,8 @@ router.post("/send-command-to-arduino", (req, res) => {
 	const argumentsStr = data.arguments;
 	const arduinoRequestStr = `${type}:${method}:${argumentsStr}`;
 
-	fetchArduino(arduinoRequestStr)
+	ArduinoCommunicator.getInstance()
+		.fetchArduino(arduinoRequestStr)
 		.then((response) => {
 			console.log("Success: " + response.data);
 			res.status(200).send();

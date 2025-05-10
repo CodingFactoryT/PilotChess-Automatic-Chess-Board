@@ -1,7 +1,10 @@
-import fetchArduino from "@src/services/ArduinoCommunicator.js";
 import { BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 import BoardPosition from "@src/helpers/BoardPosition.js";
 import VirtualBoardController from "./VirtualBoardController.js";
+import LichessGameController from "./LichessControllers/LichessGameController.js";
+import GameStream from "./Streams/GameStream.js";
+import { concatZeroesUntilSizeMatches, hexToBinary64 } from "@src/helpers/util.js";
+import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator.js";
 
 export default class PhysicalBoardController {
 	static #instance = null;
@@ -11,7 +14,7 @@ export default class PhysicalBoardController {
 			throw new Error("Use PhysicalBoardController.getInstance() instead of new.");
 		}
 
-		//this.lastReadPositioning = null;
+		this.lastReadPositioning = null;
 		PhysicalBoardController.#instance = this;
 	}
 
@@ -117,59 +120,83 @@ export default class PhysicalBoardController {
 	 */
 	async #executePhysicalMovesInOrder(...moves) {
 		if (moves.length < 2) return;
-
+		const communicator = ArduinoCommunicator.getInstance();
 		try {
-			await fetchArduino(`REQ:RELS:`);
-			await fetchArduino(`REQ:MOVE:${moves[0].toString()}`); //move to the starting position without dragging any piece
-			await fetchArduino(`REQ:GRAB:`);
+			await communicator.fetchArduino(`REQ:RELS:`);
+			await communicator.fetchArduino(`REQ:MOVE:${moves[0].toString()}`); //move to the starting position without dragging any piece
+			await communicator.fetchArduino(`REQ:GRAB:`);
 			for (let i = 1; i < moves.length; i++) {
-				await fetchArduino(`REQ:MOVE:${moves[i].toString()}`);
+				await communicator.fetchArduino(`REQ:MOVE:${moves[i].toString()}`);
 			}
-			await fetchArduino(`REQ:RELS:`);
+			await communicator.fetchArduino(`REQ:RELS:`);
 		} catch (error) {
 			console.error("Couldn't physically move the piece: " + error);
 		}
 	}
 
-	/* async waitForPieceMovement() {
-    let fromPosition = null;
-    let toPosition = null;
+	async waitForPieceMovementAndSendToLichess() {
+		console.log("Waiting for previous tasks to finish...");
+		await this.#waitForRemainingRequestsToBeFulfilled();
+		console.log("All finished!");
 
-    while (fromPosition === toPosition) {
-      while (!(fromPosition = await this.hasTileGridChanged()));
-      while (!(toPosition = await this.hasTileGridChanged()));
-    }
+		//TODO: endless loop in dev mode
+		const data = await this.#waitForPieceMovement();
+		const move = data.from + data.to;
+		console.log(`Final Move: ${move}`);
+		const gameId = GameStream.getInstance().getGameId();
+		LichessGameController.makeMove(gameId, move);
+	}
 
-    return { from: fromPosition, to: toPosition };
-  }
+	async #waitForRemainingRequestsToBeFulfilled() {
+		const communicator = ArduinoCommunicator.getInstance();
+		while (communicator.isArduinoBusy()) {
+			console.log(`Waiting for ${communicator.getAmountOfTasksToBeFulfilled()} tasks to be fulfilled...`);
+			await new Promise((resolve) => setTimeout(resolve, 20)); //check every 20ms if all requests to the Arduino were fulfilled
+		}
+	}
 
-  async #hasTileGridChanged() {
-    try {
-      const response = await fetchArduino("REQ:READ:");
-      const boardPositioning = hexToBinary64(response.data.split(",")[1]);
-      if (lastReadPositioning !== null && lastReadPositioning !== boardPositioning) {
-        const changedPosition = getChangedPosition(lastReadPositioning, boardPositioning);
-        lastReadPositioning = null; //reset for next call
-        return changedPosition;
-      }
-      lastReadPositioning = boardPositioning;
-      return null;
-    } catch (error) {
-      console.log(error);
-      return null;
-    }
-  }
+	async #waitForPieceMovement() {
+		let fromPosition = null;
+		let toPosition = null;
+		this.lastReadPositioning = null; //reset
 
-  #getChangedPosition(pos1, pos2) {
-    const num1 = BigInt("0b" + pos1);
-    const num2 = BigInt("0b" + pos2);
+		while (fromPosition === toPosition) {
+			while (!(fromPosition = await this.#hasTileGridChanged()));
+			console.log(`From: ${fromPosition}`);
+			while (!(toPosition = await this.#hasTileGridChanged()));
+			console.log(`To: ${toPosition}`);
+		}
 
-    const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf(1); //because of the xor, theres a 1 only at the changed position
-    const xPositionStr = String.fromCharCode("a".charCodeAt(0) + (position_int % 8));
-    const yPositionStr = parseInt(position_int / 8) + 1;
-    const positionInChessNotation = xPositionStr + yPositionStr;
-    return positionInChessNotation;
-  } */
+		return { from: fromPosition, to: toPosition };
+	}
+
+	async #hasTileGridChanged() {
+		try {
+			const response = await ArduinoCommunicator.getInstance().fetchArduino("REQ:READ:");
+			const boardPositioning = hexToBinary64(response.data.split(",")[1]);
+			if (this.lastReadPositioning !== null && this.lastReadPositioning !== boardPositioning) {
+				const changedPosition = this.#getChangedPosition(this.lastReadPositioning, boardPositioning);
+				this.lastReadPositioning = null; //reset for next call
+				return changedPosition;
+			}
+			this.lastReadPositioning = boardPositioning;
+			return null;
+		} catch (error) {
+			console.error(`Error while checking for change in the TileGrid: ${error}`);
+			return null;
+		}
+	}
+
+	#getChangedPosition(pos1, pos2) {
+		const num1 = BigInt("0b" + pos1);
+		const num2 = BigInt("0b" + pos2);
+
+		const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf(1); //because of the xor, theres a 1 only at the changed position
+		const xPositionStr = String.fromCharCode("a".charCodeAt(0) + (position_int % 8));
+		const yPositionStr = parseInt(position_int / 8) + 1;
+		const positionInChessNotation = xPositionStr + yPositionStr;
+		return positionInChessNotation;
+	}
 
 	/**
 	 *

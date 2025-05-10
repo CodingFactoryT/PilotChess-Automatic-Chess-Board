@@ -135,6 +135,6 @@ export default class BoardPosition {
 	 * @returns {string}
 	 */
 	toString() {
-		return this.toChessNotationString + String(this.getAppendix());
+		return this.toChessNotationString() + String(this.getAppendix());
 	}
 }
