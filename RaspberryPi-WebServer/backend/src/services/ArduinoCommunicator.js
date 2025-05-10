@@ -45,7 +45,7 @@ export class ArduinoCommunicator {
 			return Promise.reject(`The serial port ${ArduinoCommunicator.portPath} is not open`);
 		}
 
-		if (getAmountOfTasksToBeFulfilled() > 20) {
+		if (this.getAmountOfTasksToBeFulfilled() > 20) {
 			return Promise.reject("There are already 20 tasks in the queue, please wait before sending more requests to the Arduino!");
 		}
 
