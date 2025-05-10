@@ -20,7 +20,7 @@ export class ArduinoCommunicator {
 			baudRate: ArduinoCommunicator.baudRate,
 		});
 		this.port.on("error", (error) => {
-			console.error("Error with serial port: " + error);
+			console.error(`Error with serial port ${ArduinoCommunicator.portPath}` + error);
 		});
 		this.lineStream = this.port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
@@ -37,7 +37,7 @@ export class ArduinoCommunicator {
 
 	async fetchArduino(requestString) {
 		if (!this.port.isOpen) {
-			return Promise.reject("The serial port is not open");
+			return Promise.reject(`The serial port ${ArduinoCommunicator.portPath} is not open`);
 		}
 
 		if (getAmountOfTasksToBeFulfilled() > 20) {
