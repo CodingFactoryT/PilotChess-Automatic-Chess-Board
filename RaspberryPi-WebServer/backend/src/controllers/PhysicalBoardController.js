@@ -134,16 +134,15 @@ export default class PhysicalBoardController {
 		}
 	}
 
-	waitForPieceMovementAndSendToLichess() {
-		this.#waitForRemainingRequestsToBeFulfilled();
+	async waitForPieceMovementAndSendToLichess() {
+		await this.#waitForRemainingRequestsToBeFulfilled();
 
 		//TODO: endless loop in dev mode
-		this.#waitForPieceMovement().then((data) => {
-			const move = data.from + data.to;
-			console.log(`Final Move: ${move}`);
-			const gameId = GameStream.getInstance().getGameId();
-			LichessGameController.makeMove(gameId, move);
-		});
+		const data = await this.#waitForPieceMovement();
+		const move = data.from + data.to;
+		console.log(`Final Move: ${move}`);
+		const gameId = GameStream.getInstance().getGameId();
+		LichessGameController.makeMove(gameId, move);
 	}
 
 	async #waitForRemainingRequestsToBeFulfilled() {
