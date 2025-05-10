@@ -5,7 +5,6 @@ import { Chess } from "chess.js";
 import VirtualBoardController from "@src/controllers/VirtualBoardController.js";
 import LichessUserController from "@src/controllers/LichessControllers/LichessUserController.js";
 import PhysicalBoardController from "../PhysicalBoardController.js";
-import { isArduinoBusy } from "@src/services/ArduinoCommunicator.js";
 
 export default class GameStream extends Stream {
 	static #instance = null;
