@@ -1,10 +1,10 @@
-import fetchArduino from "@src/services/ArduinoCommunicator.js";
 import { BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
 import BoardPosition from "@src/helpers/BoardPosition.js";
 import VirtualBoardController from "./VirtualBoardController.js";
 import LichessGameController from "./LichessControllers/LichessGameController.js";
 import GameStream from "./Streams/GameStream.js";
 import { concatZeroesUntilSizeMatches, hexToBinary64 } from "@src/helpers/util.js";
+import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator.js";
 
 export default class PhysicalBoardController {
 	static #instance = null;
@@ -120,21 +120,23 @@ export default class PhysicalBoardController {
 	 */
 	async #executePhysicalMovesInOrder(...moves) {
 		if (moves.length < 2) return;
-
+		const communicator = ArduinoCommunicator.getInstance();
 		try {
-			await fetchArduino(`REQ:RELS:`);
-			await fetchArduino(`REQ:MOVE:${moves[0].toString()}`); //move to the starting position without dragging any piece
-			await fetchArduino(`REQ:GRAB:`);
+			await communicator.fetchArduino(`REQ:RELS:`);
+			await communicator.fetchArduino(`REQ:MOVE:${moves[0].toString()}`); //move to the starting position without dragging any piece
+			await communicator.fetchArduino(`REQ:GRAB:`);
 			for (let i = 1; i < moves.length; i++) {
-				await fetchArduino(`REQ:MOVE:${moves[i].toString()}`);
+				await communicator.fetchArduino(`REQ:MOVE:${moves[i].toString()}`);
 			}
-			await fetchArduino(`REQ:RELS:`);
+			await communicator.fetchArduino(`REQ:RELS:`);
 		} catch (error) {
 			console.error("Couldn't physically move the piece: " + error);
 		}
 	}
 
 	waitForPieceMovementAndSendToLichess() {
+		this.#waitForRemainingRequestsToBeFulfilled();
+
 		//TODO: endless loop in dev mode
 		this.#waitForPieceMovement().then((data) => {
 			const move = data.from + data.to;
@@ -142,6 +144,13 @@ export default class PhysicalBoardController {
 			const gameId = GameStream.getInstance().getGameId();
 			LichessGameController.makeMove(gameId, move);
 		});
+	}
+
+	async #waitForRemainingRequestsToBeFulfilled() {
+		const communicator = ArduinoCommunicator.getInstance();
+		while (communicator.isBusy()) {
+			await new Promise((resolve) => setTimeout(resolve, 20)); //check every 20ms if all requests to the Arduino were fulfilled
+		}
 	}
 
 	async #waitForPieceMovement() {
@@ -161,7 +170,7 @@ export default class PhysicalBoardController {
 
 	async #hasTileGridChanged() {
 		try {
-			const response = await fetchArduino("REQ:READ:");
+			const response = await ArduinoCommunicator.getInstance().fetchArduino("REQ:READ:");
 			const boardPositioning = hexToBinary64(response.data.split(",")[1]);
 			if (this.lastReadPositioning !== null && this.lastReadPositioning !== boardPositioning) {
 				const changedPosition = this.#getChangedPosition(this.lastReadPositioning, boardPositioning);
