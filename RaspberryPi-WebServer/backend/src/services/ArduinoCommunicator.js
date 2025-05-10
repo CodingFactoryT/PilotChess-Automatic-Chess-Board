@@ -22,6 +22,11 @@ export class ArduinoCommunicator {
 		this.port.on("error", (error) => {
 			console.error(`Error with serial port ${ArduinoCommunicator.portPath}` + error);
 		});
+		this.port.on("open", () => {
+			console.log("------------------------------------------------------------");
+			console.log("Serial port opened!");
+			console.log("------------------------------------------------------------");
+		});
 		this.lineStream = this.port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
 		ArduinoCommunicator.#instance = this;
