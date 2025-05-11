@@ -8,6 +8,7 @@ router.post("/move", (req, res) => {
 	const move = data.move;
 	const gameId = GameStream.getInstance().getGameId();
 	LichessGameController.makeMove(gameId, move);
+	res.status(200).send();
 });
 
 export default router;

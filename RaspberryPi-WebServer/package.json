@@ -42,7 +42,8 @@
     "dev:backend": "cross-env npm --workspace backend run dev",
     "prod": "npm run prod:build && npm run prod:execute",
     "prod:build": "npm install && npm --workspace frontend run build",
-    "prod:execute": "npm --workspace backend run start"
+    "prod:execute": "npm --workspace backend run start",
+    "lint": "npm --workspace frontend run lint && npm --workspace backend run lint"
   },
   "keywords": [],
   "author": "",

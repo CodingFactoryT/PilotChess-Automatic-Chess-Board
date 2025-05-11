@@ -29,6 +29,7 @@ export default class PhysicalBoardController {
 	/**
 	 * move: e.g. "a2a3"
 	 */
+	// eslint-disable-next-line no-unused-vars
 	async movePiece(move, pieceType, moveInformation) {
 		const fromPosition = new BoardPosition(move[0], Number(move[1]));
 		const toPosition = new BoardPosition(move[2], Number(move[3]));

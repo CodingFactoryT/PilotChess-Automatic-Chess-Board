@@ -71,6 +71,7 @@ export default class GameStream extends Stream {
 		}
 	}
 
+	// eslint-disable-next-line no-unused-vars
 	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
 	#handleGameState(data) {
