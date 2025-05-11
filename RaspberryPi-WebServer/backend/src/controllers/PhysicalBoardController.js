@@ -71,6 +71,7 @@ export default class PhysicalBoardController {
 	 */
 	async #moveKnight(fromPosition, toPosition) {
 		const helperPiecePositions = this.calculateKnightHelperPiecePositions(fromPosition, toPosition);
+		console.log(helperPiecePositions);
 
 		//if the tile near the from-position is empty
 		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toChessNotationString())) {
