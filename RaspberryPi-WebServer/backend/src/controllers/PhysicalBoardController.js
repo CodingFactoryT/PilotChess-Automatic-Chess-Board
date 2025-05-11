@@ -122,6 +122,9 @@ export default class PhysicalBoardController {
 	async #executePhysicalMovesInOrder(...moves) {
 		if (moves.length < 2) return;
 		const communicator = ArduinoCommunicator.getInstance();
+		console.log(moves);
+		console.log(moves[0]);
+		console.log(moves[1]);
 		try {
 			await communicator.fetchArduino(`REQ:RELS:`);
 			await communicator.fetchArduino(`REQ:MOVE:${moves[0].toString()}`); //move to the starting position without dragging any piece
