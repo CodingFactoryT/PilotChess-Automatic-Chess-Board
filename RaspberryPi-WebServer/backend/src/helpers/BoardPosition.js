@@ -36,6 +36,9 @@ export default class BoardPosition {
 		const newX = String.fromCharCode(this.getX().charCodeAt(0) + delta.x);
 		const newY = this.getY() + delta.y;
 
+		console.log(`Delta: ${delta}`);
+		console.log(`NewX: ${newX}, NewY ${newY}`);
+
 		if (!BoardPosition.isValid(newX, newY, this.getAppendix)) {
 			throw new Error("The delta results in a position that lies outside of the board!");
 		}
