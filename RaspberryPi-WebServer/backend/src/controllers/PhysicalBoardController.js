@@ -223,14 +223,14 @@ export default class PhysicalBoardController {
 
 		try {
 			nearFromPositionFrom = knightFromPosition.addDelta(nearFromDelta);
-			nearFromPositionTo = { ...nearFromPositionFrom };
+			nearFromPositionTo = nearFromPositionFrom.copy();
 		} catch (error) {
 			console.error(`Error while adding delta to position: ${error}`);
 		}
 
 		try {
 			nearToPositionFrom = knightFromPosition.addDelta(nearToDelta);
-			nearToPositionTo = { ...nearToPositionFrom };
+			nearToPositionTo = nearToPositionFrom.copy();
 		} catch (error) {
 			console.error(`Error while adding delta to position: ${error}`);
 		}

@@ -84,6 +84,7 @@ export default class MainEventStream extends Stream {
 		}
 	}
 
+	//TODO handle last move before check-mate, as this move is not sent via GameState
 	#handleGameFinish(data) {
 		GameStream.getInstance(data.game.gameId).stop();
 	}
