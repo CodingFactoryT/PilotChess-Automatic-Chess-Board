@@ -223,12 +223,16 @@ export default class PhysicalBoardController {
 		try {
 			nearFromPositionFrom = knightFromPosition.addDelta(nearFromDelta);
 			nearFromPositionTo = { ...nearFromPositionFrom };
-		} catch (error) {}
+		} catch (error) {
+			console.error(`Error while adding delta to position: ${error}`);
+		}
 
 		try {
 			nearToPositionFrom = knightFromPosition.addDelta(nearToDelta);
 			nearToPositionTo = { ...nearToPositionFrom };
-		} catch (error) {}
+		} catch (error) {
+			console.error(`Error while adding delta to position: ${error}`);
+		}
 
 		switch (delta.x + "|" + delta.y) {
 			case "1|-2": //fallthrough

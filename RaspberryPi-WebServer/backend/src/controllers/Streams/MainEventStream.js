@@ -111,7 +111,11 @@ export default class MainEventStream extends Stream {
 		});
 	}
 
-	#handleChallengeDeclined(data) {}
+	#handleChallengeDeclined(data) {
+		console.log(data);
+	}
 
-	#handleError(error) {}
+	#handleError(error) {
+		console.error(error);
+	}
 }

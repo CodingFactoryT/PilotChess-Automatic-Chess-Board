@@ -1,5 +1,5 @@
-export default function WifiConfigurationPage() {
+export default function WiFiConfigurationPage() {
     return (
-        <p>WifiConfigurationPage</p>
+        <p>WiFiConfigurationPage</p>
     )
 }

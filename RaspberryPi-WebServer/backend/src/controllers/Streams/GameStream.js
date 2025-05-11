@@ -74,13 +74,13 @@ export default class GameStream extends Stream {
 	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
 	#handleGameState(data) {
-		const tmpboard = new Chess();
+		const tmpBoard = new Chess();
 		const moves = data?.moves?.split(" ");
 		moves.forEach((move) => {
-			tmpboard.move(move);
+			tmpBoard.move(move);
 		});
 
-		const newFen = tmpboard.fen();
+		const newFen = tmpBoard.fen();
 		const lastMove = moves.at(-1);
 		if (VirtualBoardController.getInstance().compareFen(newFen)) return;
 
@@ -106,7 +106,7 @@ export default class GameStream extends Stream {
 				.movePiece(lastMove, pieceType, moveInformation)
 				.then(() => {
 					//after the opponent's turn, it's my turn
-					//TODO dont execute if game is over
+					//TODO don't execute if game is over
 					PhysicalBoardController.getInstance().waitForPieceMovementAndSendToLichess();
 				});
 		}

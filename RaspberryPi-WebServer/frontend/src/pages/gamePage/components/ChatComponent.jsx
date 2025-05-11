@@ -1,4 +1,4 @@
-import {Stack, Divider, ListItem, Box} from "@mui/material"
+import {Stack, Divider, ListItem} from "@mui/material"
 import { useChat } from "@src/context/ChatContext";
 import { useEffect } from "react";
 

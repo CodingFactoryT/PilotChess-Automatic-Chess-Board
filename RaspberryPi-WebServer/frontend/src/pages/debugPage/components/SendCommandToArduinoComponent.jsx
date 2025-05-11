@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem, Menu, FormLabel } from "@mui/material";
+import { TextField, Button, Box, FormControl, Typography, InputLabel, Select, MenuItem } from "@mui/material";
 import { apiPost } from "@src/helpers/fetchBackendApi";
 
 const typeOptions = [
@@ -29,7 +29,7 @@ export default function SendCommandToArduinoComponent() {
     .then((response) => {
 			console.log("Success: " + response.data);
 		})
-		.catch(e => {}); //axios handles the error message
+		.catch(() => {}); //axios handles the error message
   };
   
   return (

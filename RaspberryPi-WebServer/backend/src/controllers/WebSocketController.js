@@ -62,9 +62,10 @@ export default class WebSocketController {
 				return LichessChallengeController.acceptChallenge(message.data.id);
 			case "challengeDeclined":
 				return LichessChallengeController.declineChallenge(message.data.id);
-			case "chat":
+			case "chat": {
 				const gameId = GameStream.getInstance().getGameId();
-				LichessChatController.sendMessage(gameId, message.data.message);
+				return LichessChatController.sendMessage(gameId, message.data.message);
+			}
 			default:
 				return console.error(`Unknown incoming websocket message type from frontend: ${message.type}`);
 		}

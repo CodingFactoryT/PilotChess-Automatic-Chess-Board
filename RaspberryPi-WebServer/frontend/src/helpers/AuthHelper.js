@@ -48,8 +48,7 @@ export async function obtainAccessToken(lichessURL, code, codeVerifier, redirect
 }
 
 function generatePKCEPair(length) {
-	const BYTE_AMOUNT = 32;
-	const randomVerifier = generateRandomString(BYTE_AMOUNT);
+	const randomVerifier = generateRandomString(length);
 	const hash = Base64.stringify(sha256(randomVerifier));
 	const challenge = hash.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); // Clean base64 to make it URL safe
 	return { code_verifier: randomVerifier, code_challenge: challenge };

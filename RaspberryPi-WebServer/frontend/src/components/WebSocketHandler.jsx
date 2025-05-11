@@ -13,7 +13,7 @@ export default function WebSocketHandler() {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const navigate = useNavigate();
   const {setFenPosition} = useGameBoard();
-  const {addEntry, clearEntries} = useChat();
+  const {addEntry} = useChat();
 
   useEffect(() => {
 		WebSocketController.initConnection(handleWebsocketMessage);
