@@ -1,6 +1,6 @@
 import axios from "axios";
-import config from "@shared/config.js";
-import LichessTokenVault from "./LichessTokenVault.js";
+import config from "@shared/config";
+import LichessTokenVault from "./LichessTokenVault";
 
 const challengeBaseURL = `${config.lichess_base_url}/api/challenge`;
 export default class LichessChallengeController {

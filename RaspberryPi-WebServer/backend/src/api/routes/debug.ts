@@ -1,4 +1,4 @@
-import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator.js";
+import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator";
 import express from "express";
 
 const router = express.Router();

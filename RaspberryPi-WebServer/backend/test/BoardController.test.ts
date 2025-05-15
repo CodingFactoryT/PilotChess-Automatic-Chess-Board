@@ -1,7 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import BoardController from "@src/api/controllers/BoardController.js";
-import { DEFAULT_POSITION } from "chess.js";
+import BoardController from "@src/api/controllers/BoardController";
+import { DEFAULT_POSITION } from "chess";
 
 test("Validate Position on the board", () => {
 	BoardController.setFen(DEFAULT_POSITION);

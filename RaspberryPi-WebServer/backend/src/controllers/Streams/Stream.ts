@@ -1,5 +1,5 @@
 import axios from "axios";
-import LichessTokenVault from "@src/controllers/LichessControllers/LichessTokenVault.js";
+import LichessTokenVault from "@src/controllers/LichessControllers/LichessTokenVault";
 
 export default class Stream {
 	constructor(name, url, dataFunction, errorFunction) {

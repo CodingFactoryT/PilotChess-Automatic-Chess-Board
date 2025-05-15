@@ -1,13 +1,13 @@
 import express from "express";
 import cors from "cors";
-import config from "@shared/config.js";
-import apiRouter from "./routes/api.js";
-import frontendRouter from "./routes/frontend.js";
+import config from "@shared/config";
+import apiRouter from "./routes/api";
+import frontendRouter from "./routes/frontend";
 import cookieParser from "cookie-parser";
-import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
-import WebSocketController from "@src/controllers/WebSocketController.js";
-import { ArduinoCommunicator } from "./services/ArduinoCommunicator.js";
-import "@root/helpers/consoleExtensions.js"
+import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader";
+import WebSocketController from "@src/controllers/WebSocketController";
+import { ArduinoCommunicator } from "./services/ArduinoCommunicator";
+import "@root/helpers/consoleExtensions"
 
 const app = express();
 

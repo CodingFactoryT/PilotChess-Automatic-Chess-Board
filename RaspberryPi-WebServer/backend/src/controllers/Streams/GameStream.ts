@@ -1,10 +1,10 @@
-import WebSocketController from "@src/controllers/WebSocketController.js";
-import Stream from "./Stream.js";
-import config from "@shared/config.js";
+import WebSocketController from "@src/controllers/WebSocketController";
+import Stream from "./Stream";
+import config from "@shared/config";
 import { Chess } from "chess.js";
-import VirtualBoardController from "@src/controllers/VirtualBoardController.js";
-import LichessUserController from "@src/controllers/LichessControllers/LichessUserController.js";
-import PhysicalBoardController from "../PhysicalBoardController.js";
+import VirtualBoardController from "@src/controllers/VirtualBoardController";
+import LichessUserController from "@src/controllers/LichessControllers/LichessUserController";
+import PhysicalBoardController from "../PhysicalBoardController";
 
 export default class GameStream extends Stream {
 	static #instance = null;

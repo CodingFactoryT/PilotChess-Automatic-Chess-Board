@@ -1,7 +1,7 @@
 import { SerialPort } from "serialport";
 import { ReadlineParser } from "@serialport/parser-readline";
-import config from "@shared/config.js";
-import { ArduinoFetchQueue } from "@src/helpers/ArduinoFetchQueue.js";
+import config from "@shared/config";
+import { ArduinoFetchQueue } from "@src/helpers/ArduinoFetchQueue";
 
 export class ArduinoCommunicator {
 	static #instance = null;

@@ -1,9 +1,9 @@
-import WebSocketController from "@src/controllers/WebSocketController.js";
-import Stream from "./Stream.js";
-import config from "@shared/config.js";
-import GameStream from "./GameStream.js";
-import VirtualBoardController from "../VirtualBoardController.js";
-import PhysicalBoardController from "../PhysicalBoardController.js";
+import WebSocketController from "@src/controllers/WebSocketController";
+import Stream from "./Stream";
+import config from "@shared/config";
+import GameStream from "./GameStream";
+import VirtualBoardController from "../VirtualBoardController";
+import PhysicalBoardController from "../PhysicalBoardController";
 
 export default class MainEventStream extends Stream {
 	static #instance = null;
