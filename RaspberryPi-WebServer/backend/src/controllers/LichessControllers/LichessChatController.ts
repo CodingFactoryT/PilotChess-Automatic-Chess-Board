@@ -5,7 +5,7 @@ import LichessTokenVault from "./LichessTokenVault";
 const gameBaseURL = `${config.lichess_base_url}/api/board/game`;
 
 export default class LichessChatController {
-	static async sendMessage(gameId, message) {
+	static async sendMessage(gameId: string, message: string) {
 		try {
 			await axios.post(
 				`${gameBaseURL}/${gameId}/chat`,
@@ -20,7 +20,7 @@ export default class LichessChatController {
 		}
 	}
 
-	static async fetchChat(gameId) {
+	static async fetchChat(gameId: string) {
 		try {
 			const response = await axios.get(`${gameBaseURL}/${gameId}/chat`, LichessTokenVault.getAuthorizationHeaderObject());
 			return response.data;

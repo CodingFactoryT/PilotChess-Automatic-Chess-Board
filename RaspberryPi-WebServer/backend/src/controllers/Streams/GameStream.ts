@@ -7,18 +7,24 @@ import LichessUserController from "@src/controllers/LichessControllers/LichessUs
 import PhysicalBoardController from "../PhysicalBoardController";
 
 export default class GameStream extends Stream {
-	static #instance = null;
-	static name = "GameStream";
+	private static instance : GameStream | null;
+	private gameId : string;
+	private readonly events = {
+		GAME_FULL: "gameFull",
+		GAME_STATE: "gameState",
+		CHAT_LINE: "chatLine",
+		OPPONENT_GONE: "opponentGone",
+	}
 
-	constructor(gameId, initialFen) {
+	constructor(gameId: string, initialFen: string) {
 		const url = `${config.lichess_base_url}/api/board/game/stream/${gameId}`;
 
-		if (GameStream.#instance) {
+		if (GameStream.instance) {
 			throw new Error("Use GameStream.getInstance() instead of new.");
 		}
 
 		super(
-			GameStream.name,
+			"GameStream",
 			url,
 			(data) => this.#handleData(data),
 			(error) => this.#handleError(error)
@@ -26,28 +32,21 @@ export default class GameStream extends Stream {
 
 		this.gameId = gameId;
 
-		this.Events = {
-			GAME_FULL: "gameFull",
-			GAME_STATE: "gameState",
-			CHAT_LINE: "chatLine",
-			OPPONENT_GONE: "opponentGone",
-		};
-
-		GameStream.#instance = this;
+		GameStream.instance = this;
 		VirtualBoardController.setFen(initialFen);
 	}
 
-	stop() {
+	override stop() {
 		super.stop();
-		GameStream.#instance = null;
+		GameStream.instance = null;
 	}
 
-	static getInstance(gameId, initialFen) {
-		if (!GameStream.#instance) {
-			GameStream.#instance = new GameStream(gameId, initialFen);
+	static getInstance(gameId: string, initialFen: string) {
+		if (!GameStream.instance) {
+			GameStream.instance = new GameStream(gameId, initialFen);
 		}
 
-		return GameStream.#instance;
+		return GameStream.instance;
 	}
 
 	getGameId() {
@@ -55,19 +54,17 @@ export default class GameStream extends Stream {
 	}
 
 	#handleData(data) {
-		const Events = this.Events;
-
 		switch (data.type) {
-			case Events.GAME_FULL:
+			case this.events.GAME_FULL:
 				return this.#handleGameFull(data);
-			case Events.GAME_STATE:
+			case this.events.GAME_STATE:
 				return this.#handleGameState(data);
-			case Events.CHAT_LINE:
+			case this.events.CHAT_LINE:
 				return this.#handleChatLine(data);
-			case Events.OPPONENT_GONE:
+			case this.events.OPPONENT_GONE:
 				return this.#handleOpponentGone(data);
 			default:
-				return console.error(`Stream "${this.name}": Unknown incoming data type "${data.type}"`);
+				return console.error(`Stream "${super.getName()}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
@@ -77,7 +74,7 @@ export default class GameStream extends Stream {
 	#handleGameState(data) {
 		const tmpBoard = new Chess();
 		const moves = data?.moves?.split(" ");
-		moves.forEach((move) => {
+		moves.forEach((move: string) => {
 			tmpBoard.move(move);
 		});
 

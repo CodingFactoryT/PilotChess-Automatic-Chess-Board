@@ -1,4 +1,4 @@
-import { BISHOP, KING, KNIGHT, PAWN, QUEEN, ROOK } from "chess.js";
+import { BISHOP, KING, KNIGHT, PAWN, PieceSymbol, QUEEN, ROOK, Move } from "chess.js";
 import BoardPosition from "@src/helpers/BoardPosition";
 import VirtualBoardController from "./VirtualBoardController";
 import LichessGameController from "./LichessControllers/LichessGameController";
@@ -7,30 +7,31 @@ import { concatZeroesUntilSizeMatches, hexToBinary64 } from "@src/helpers/util";
 import { ArduinoCommunicator } from "@src/services/ArduinoCommunicator";
 
 export default class PhysicalBoardController {
-	static #instance = null;
+	private static instance : PhysicalBoardController;
+	private lastReadPositioning : string | null = null;
 
 	constructor() {
-		if (PhysicalBoardController.#instance) {
+		if (PhysicalBoardController.instance) {
 			throw new Error("Use PhysicalBoardController.getInstance() instead of new.");
 		}
 
 		this.lastReadPositioning = null;
-		PhysicalBoardController.#instance = this;
+		PhysicalBoardController.instance = this;
 	}
 
 	static getInstance() {
-		if (!PhysicalBoardController.#instance) {
-			PhysicalBoardController.#instance = new PhysicalBoardController();
+		if (!PhysicalBoardController.instance) {
+			PhysicalBoardController.instance = new PhysicalBoardController();
 		}
 
-		return PhysicalBoardController.#instance;
+		return PhysicalBoardController.instance;
 	}
 
 	/**
 	 * move: e.g. "a2a3"
 	 */
 	// eslint-disable-next-line no-unused-vars
-	async movePiece(move, pieceType, moveInformation) {
+	async movePiece(move: string, pieceType: PieceSymbol, moveInformation: Move) {
 		const fromPosition = new BoardPosition(move[0], Number(move[1]));
 		const toPosition = new BoardPosition(move[2], Number(move[3]));
 
@@ -61,7 +62,7 @@ export default class PhysicalBoardController {
 		}
 	}
 
-	async #movePawn(fromPosition, toPosition) {
+	async #movePawn(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		await this.#executePhysicalMovesInOrder(fromPosition, toPosition);
 	}
 
@@ -69,16 +70,16 @@ export default class PhysicalBoardController {
 	 * Tries to move the knight without moving another piece first.
 	 * If thats's not possible, it moves a helper piece to a corner, moves the knight, and the moves the helper piece back
 	 */
-	async #moveKnight(fromPosition, toPosition) {
+	async #moveKnight(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		const helperPiecePositions = this.calculateKnightHelperPiecePositions(fromPosition, toPosition);
 
 		//if the tile near the from-position is empty
-		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toChessNotationString())) {
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toSquareString())) {
 			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearFromPositionFrom, toPosition);
 		}
 
 		//if the tile near the to-position is empty
-		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearToPositionFrom?.toChessNotationString())) {
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearToPositionFrom?.toSquareString())) {
 			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearToPositionFrom, toPosition);
 		}
 
@@ -96,19 +97,19 @@ export default class PhysicalBoardController {
 		await this.#executePhysicalMovesInOrder(helperToPositionToUse, helperFromPositionToUse);
 	}
 
-	async #moveBishop(fromPosition, toPosition) {
+	async #moveBishop(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		await this.#executePhysicalMovesInOrder(fromPosition, toPosition);
 	}
 
-	async #moveRook(fromPosition, toPosition) {
+	async #moveRook(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		await this.#executePhysicalMovesInOrder(fromPosition, toPosition);
 	}
 
-	async #moveQueen(fromPosition, toPosition) {
+	async #moveQueen(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		await this.#executePhysicalMovesInOrder(fromPosition, toPosition);
 	}
 
-	async #moveKing(fromPosition, toPosition) {
+	async #moveKing(fromPosition: BoardPosition, toPosition: BoardPosition) {
 		await this.#executePhysicalMovesInOrder(fromPosition, toPosition);
 	}
 
@@ -119,7 +120,7 @@ export default class PhysicalBoardController {
 	 * along the rest of the positions and is released at the last position in the array
 	 * @param {BoardPosition} moves
 	 */
-	async #executePhysicalMovesInOrder(...moves) {
+	async #executePhysicalMovesInOrder(...moves: BoardPosition[]) {
 		if (moves.length < 2) return;
 		const communicator = ArduinoCommunicator.getInstance();
 		try {
@@ -188,13 +189,13 @@ export default class PhysicalBoardController {
 		}
 	}
 
-	#getChangedPosition(pos1, pos2) {
+	#getChangedPosition(pos1: string, pos2: string) {
 		const num1 = BigInt("0b" + pos1);
 		const num2 = BigInt("0b" + pos2);
 
-		const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf(1); //because of the xor, theres a 1 only at the changed position
+		const position_int = concatZeroesUntilSizeMatches((num1 ^ num2).toString(2), 64).indexOf("1"); //because of the xor, theres a 1 only at the changed position
 		const xPositionStr = String.fromCharCode("a".charCodeAt(0) + (position_int % 8));
-		const yPositionStr = parseInt(position_int / 8) + 1;
+		const yPositionStr = String.fromCharCode(position_int / 8 + 1);
 		const positionInChessNotation = xPositionStr + yPositionStr;
 		return positionInChessNotation;
 	}
@@ -205,7 +206,7 @@ export default class PhysicalBoardController {
 	 * @param {BoardPosition} knightToPosition
 	 * @returns and object containing the from and to positions of the two potential helper pieces
 	 */
-	calculateKnightHelperPiecePositions(knightFromPosition, knightToPosition) {
+	calculateKnightHelperPiecePositions(knightFromPosition: BoardPosition, knightToPosition: BoardPosition) {
 		const delta = knightFromPosition.getDelta(knightToPosition);
 		let nearFromDelta = { x: Math.ceil(delta.x / 2), y: Math.ceil(delta.y / 2) };
 		let nearToDelta = { x: Math.floor(delta.x / 2), y: Math.floor(delta.y / 2) };

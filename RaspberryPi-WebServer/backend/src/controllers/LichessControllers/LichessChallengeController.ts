@@ -4,7 +4,7 @@ import LichessTokenVault from "./LichessTokenVault";
 
 const challengeBaseURL = `${config.lichess_base_url}/api/challenge`;
 export default class LichessChallengeController {
-	static async acceptChallenge(challengeId) {
+	static async acceptChallenge(challengeId: string) {
 		try {
 			await axios.post(`${challengeBaseURL}/${challengeId}/accept`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
@@ -12,7 +12,7 @@ export default class LichessChallengeController {
 		}
 	}
 
-	static async declineChallenge(challengeId) {
+	static async declineChallenge(challengeId: string) {
 		try {
 			await axios.post(`${challengeBaseURL}/${challengeId}/decline`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {

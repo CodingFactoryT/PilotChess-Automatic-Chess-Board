@@ -5,7 +5,7 @@ import LichessTokenVault from "./LichessTokenVault";
 const gameBaseURL = `${config.lichess_base_url}/api/board/game`;
 
 export default class LichessGameController {
-	static async makeMove(gameId, move) {
+	static async makeMove(gameId: string, move: string) {
 		try {
 			await axios.post(`${gameBaseURL}/${gameId}/move/${move}`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
@@ -13,7 +13,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async abortGame(gameId) {
+	static async abortGame(gameId: string) {
 		try {
 			await axios.post(`${gameBaseURL}/${gameId}/abort`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
@@ -21,7 +21,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async resignGame(gameId) {
+	static async resignGame(gameId: string) {
 		try {
 			await axios.post(`${gameBaseURL}/${gameId}/resign`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
@@ -29,7 +29,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async offerDraw(gameId) {
+	static async offerDraw(gameId: string) {
 		try {
 			await LichessGameController.#handleDrawOffer(gameId, "yes");
 		} catch (error) {
@@ -37,7 +37,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async acceptDraw(gameId) {
+	static async acceptDraw(gameId: string) {
 		try {
 			await LichessGameController.#handleDrawOffer(gameId, "yes");
 		} catch (error) {
@@ -45,7 +45,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async declineDraw(gameId) {
+	static async declineDraw(gameId: string) {
 		try {
 			await LichessGameController.#handleDrawOffer(gameId, "no");
 		} catch (error) {
@@ -53,7 +53,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async createTakeback(gameId) {
+	static async createTakeback(gameId: string) {
 		try {
 			await LichessGameController.#handleTakebackOffer(gameId, "yes");
 		} catch (error) {
@@ -61,7 +61,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async acceptTakeback(gameId) {
+	static async acceptTakeback(gameId: string) {
 		try {
 			await LichessGameController.#handleTakebackOffer(gameId, "yes");
 		} catch (error) {
@@ -69,7 +69,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async declineTakeback(gameId) {
+	static async declineTakeback(gameId: string) {
 		try {
 			await LichessGameController.#handleTakebackOffer(gameId, "no");
 		} catch (error) {
@@ -77,7 +77,7 @@ export default class LichessGameController {
 		}
 	}
 
-	static async claimVictory(gameId) {
+	static async claimVictory(gameId: string) {
 		try {
 			await axios.post(`${gameBaseURL}/${gameId}/claim-victory`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 		} catch (error) {
@@ -85,11 +85,11 @@ export default class LichessGameController {
 		}
 	}
 
-	static async #handleDrawOffer(gameId, accept) {
+	static async #handleDrawOffer(gameId: string, accept: "yes" | "no") {
 		await axios.post(`${gameBaseURL}/${gameId}/draw/${accept}`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 	}
 
-	static async #handleTakebackOffer(gameId, accept) {
+	static async #handleTakebackOffer(gameId: string, accept: "yes" | "no") {
 		await axios.post(`${gameBaseURL}/${gameId}/takeback/${accept}`, {}, LichessTokenVault.getAuthorizationHeaderObject());
 	}
 }

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import axios from "axios";
 import config from "@shared/config";
 import MainEventStream from "@src/controllers/Streams/MainEventStream";
@@ -24,7 +24,7 @@ router.get("/login", (req, res) => {
 router.get("/logout", (req, res) => {
 	res.clearCookie("lichess-access-token", {
 		httpOnly: true,
-		sameSite: "Strict",
+		sameSite: "strict",
 	});
 
 	if (LichessTokenVault.getAccessToken()) {
@@ -47,13 +47,13 @@ router.get("/logout", (req, res) => {
 	MainEventStream.getInstance().stop();
 });
 
-router.post("/set-access-token", (req, res) => {
+router.post("/set-access-token", (req: Request, res: Response) => {
 	const token = req.accessToken;
 	const expiresIn_seconds = req.body.expiresIn_seconds;
 	if (!token || !expiresIn_seconds) {
 		res.status(401).send();
 	}
-	LichessTokenVault.setAccessToken(token, expiresIn_seconds);
+	LichessTokenVault.setAccessToken(token, BigInt(expiresIn_seconds));
 
 	res.status(204).send();
 });

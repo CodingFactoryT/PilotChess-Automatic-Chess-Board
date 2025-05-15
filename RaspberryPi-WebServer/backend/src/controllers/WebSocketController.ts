@@ -1,29 +1,33 @@
-import { WebSocketServer } from "ws";
-import { createServer } from "http";
+import WebSocket, { WebSocketServer } from "ws";
+import { createServer, Server } from "http";
 import MainEventStream from "./Streams/MainEventStream";
 import LichessChallengeController from "./LichessControllers/LichessChallengeController";
 import GameStream from "./Streams/GameStream";
 import LichessChatController from "./LichessControllers/LichessChatController";
-
+import { Express } from 'express';
 export default class WebSocketController {
-	static #instance = null;
+	private static instance: WebSocketController;
+	private static app: Express;
+	private server: Server;
+	private wss: WebSocketServer;
+	private clients: Set<WebSocket>;
 
-	constructor(app) {
-		this.app = app;
+	constructor(app: Express) {
+		WebSocketController.app = app;
 
-		if (WebSocketController.#instance) {
+		if (WebSocketController.instance) {
 			throw new Error("Use WebSocketController.getInstance() instead of new.");
 		}
 
-		this.server = createServer(this.app);
+		this.server = createServer(WebSocketController.app);
 		this.wss = new WebSocketServer({ server: this.server });
 		this.clients = new Set();
 
-		this.wss.on("connection", (ws) => {
+		this.wss.on("connection", (ws: WebSocket) => {
 			this.clients.add(ws);
 			console.logConnectionStatus("Frontend connected to WebSocket!");
 
-			ws.onmessage = (event) => this.#handleIncomingData(JSON.parse(event.data));
+			ws.onmessage = (event: MessageEvent) => this.#handleIncomingData(JSON.parse(event.data));
 
 			ws.onclose = () => {
 				console.logConnectionStatus("Frontend disconnected from WebSocket!");
@@ -32,18 +36,18 @@ export default class WebSocketController {
 			};
 		});
 
-		WebSocketController.#instance = this;
+		WebSocketController.instance = this;
 	}
 
 	static getInstance() {
-		if (!WebSocketController.#instance) {
-			WebSocketController.#instance = new WebSocketController(this.app);
+		if (!WebSocketController.instance) {
+			WebSocketController.instance = new WebSocketController(this.app);
 		}
-		return WebSocketController.#instance;
+		return WebSocketController.instance;
 	}
 
-	static setApp(app) {
-		this.app = app;
+	static setApp(app: Express) {
+		WebSocketController.app = app;
 	}
 
 	getServer() {

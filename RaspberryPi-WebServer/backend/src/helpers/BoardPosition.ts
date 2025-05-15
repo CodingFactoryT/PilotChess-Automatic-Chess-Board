@@ -1,3 +1,5 @@
+import { Square } from "chess.js";
+
 /**
  * Represents a tile position on a chessboard
  * it has the following components:
@@ -17,7 +19,11 @@ export default class BoardPosition {
 	 * @param {number} y
 	 * @param {number} appendix default value is 5, which represents the center of a tile
 	 */
-	constructor(x, y, appendix = 5) {
+	private x : string;
+	private y : number;
+	private appendix : number;
+
+	constructor(x: string, y: number, appendix = 5) {
 		if (!BoardPosition.isValid(x, y, appendix)) {
 			throw new Error(`Invalid parameters for class BoardPosition: x=${x}, y=${y}, appendix=${appendix}`);
 		}
@@ -32,7 +38,7 @@ export default class BoardPosition {
 	 * @param {object} delta an object containing x and y which represent deltaX and deltaX as a number
 	 * @returns A new BoardPosition with the applied delta
 	 */
-	addDelta(delta) {
+	addDelta(delta: {x: number, y: number}) {
 		const newX = String.fromCharCode(this.getX().charCodeAt(0) + delta.x);
 		const newY = this.getY() + delta.y;
 
@@ -48,7 +54,7 @@ export default class BoardPosition {
 	 * @param {BoardPosition} pos2
 	 * @returns an object containing the x and y delta of the two positions
 	 */
-	getDelta(pos2) {
+	getDelta(pos2: BoardPosition): {x: number, y: number} {
 		const fromXCharCode = this.getX().charCodeAt(0);
 		const fromY = this.getY();
 		const toXCharCode = pos2.getX().charCodeAt(0);
@@ -67,7 +73,7 @@ export default class BoardPosition {
 	 * @param {number} appendix
 	 * @returns {boolean} true if all components are valid, false otherwise
 	 */
-	static isValid(x, y, appendix = 5) {
+	static isValid(x: string, y: number, appendix = 5) {
 		return BoardPosition.#validateX(x) && BoardPosition.#validateY(y) && BoardPosition.#validateAppendix(appendix);
 	}
 
@@ -76,7 +82,7 @@ export default class BoardPosition {
 	 * @param {string} x
 	 * @returns {boolean} true if valid, false otherwise
 	 */
-	static #validateX(x) {
+	static #validateX(x: string) {
 		return x.length == 1 && x.charCodeAt(0) >= "a".charCodeAt(0) && x.charCodeAt(0) <= "h".charCodeAt(0);
 	}
 
@@ -85,7 +91,7 @@ export default class BoardPosition {
 	 * @param {number} y
 	 * @returns {boolean} true if valid, false otherwise
 	 */
-	static #validateY(y) {
+	static #validateY(y: number) {
 		return Number.isInteger(y) && y >= 1 && y <= 8;
 	}
 
@@ -94,7 +100,7 @@ export default class BoardPosition {
 	 * @param {number} appendix
 	 * @returns {boolean} true if valid, false otherwise
 	 */
-	static #validateAppendix(appendix) {
+	static #validateAppendix(appendix: number) {
 		return Number.isInteger(appendix) && appendix >= 1 && appendix <= 9;
 	}
 
@@ -119,7 +125,7 @@ export default class BoardPosition {
 		return this.appendix;
 	}
 
-	setAppendix(appendix) {
+	setAppendix(appendix: number) {
 		if (!BoardPosition.#validateAppendix(appendix)) throw new Error(`The given appendix is not valid: ${appendix}`);
 		this.appendix = appendix;
 	}
@@ -127,7 +133,7 @@ export default class BoardPosition {
 	/**
 	 * @returns {string}
 	 */
-	toChessNotationString() {
+	toSquareString() : Square {
 		return this.getX() + String(this.getY());
 	}
 
@@ -135,7 +141,7 @@ export default class BoardPosition {
 	 * @returns {string}
 	 */
 	toString() {
-		return this.toChessNotationString() + String(this.getAppendix());
+		return this.toSquareString() + String(this.getAppendix());
 	}
 
 	copy() {

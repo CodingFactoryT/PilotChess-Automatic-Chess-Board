@@ -4,14 +4,16 @@ import config from "@shared/config";
 import { ArduinoFetchQueue } from "@src/helpers/ArduinoFetchQueue";
 
 export class ArduinoCommunicator {
-	static #instance = null;
+	private static instance : ArduinoCommunicator;
+	private static portPath = config.arduino_com_port;
+	private static baudRate = 115200; //TODO move to config
 
-	static portPath = config.arduino_com_port;
-	static baudRate = 115200; //TODO move to config
-	#queue = new ArduinoFetchQueue();
+	private port: SerialPort;
+	private lineStream: ReadlineParser;
+	private queue = new ArduinoFetchQueue();
 
 	constructor() {
-		if (ArduinoCommunicator.#instance) {
+		if (ArduinoCommunicator.instance) {
 			throw new Error("Use ArduinoCommunicator.getInstance() instead of new.");
 		}
 
@@ -29,18 +31,18 @@ export class ArduinoCommunicator {
 		});
 		this.lineStream = this.port.pipe(new ReadlineParser({ delimiter: "\n" }));
 
-		ArduinoCommunicator.#instance = this;
+		ArduinoCommunicator.instance = this;
 	}
 
 	static getInstance() {
-		if (!ArduinoCommunicator.#instance) {
-			ArduinoCommunicator.#instance = new ArduinoCommunicator();
+		if (!ArduinoCommunicator.instance) {
+			ArduinoCommunicator.instance = new ArduinoCommunicator();
 		}
 
-		return ArduinoCommunicator.#instance;
+		return ArduinoCommunicator.instance;
 	}
 
-	async fetchArduino(requestString) {
+	async fetchArduino(requestString: string) {
 		if (!this.port.isOpen) {
 			return Promise.reject(`The serial port ${ArduinoCommunicator.portPath} is not open`);
 		}
@@ -49,18 +51,18 @@ export class ArduinoCommunicator {
 			return Promise.reject("There are already 20 tasks in the queue, please wait before sending more requests to the Arduino!");
 		}
 
-		return this.#queue.enqueue(() => this.#request(requestString));
+		return this.queue.enqueue(() => this.#request(requestString));
 	}
 
-	async #request(requestString) {
+	async #request(requestString: string) {
 		return new Promise((resolve, reject) => {
 			this.port.write(requestString + "\n", (error) => {
 				if (error) {
 					return reject("Error while sending request: " + error);
 				}
 
-				const handleData = (data) => {
-					const response = data.toString().replaceAll("\n", "");
+				const handleData = (data: string) => {
+					const response = data.replaceAll("\n", "");
 
 					this.lineStream.removeListener("data", handleData);
 					if (response.includes("ERRO")) {
@@ -80,6 +82,6 @@ export class ArduinoCommunicator {
 	}
 
 	getAmountOfTasksToBeFulfilled() {
-		return this.#queue.size();
+		return this.queue.size();
 	}
 }
