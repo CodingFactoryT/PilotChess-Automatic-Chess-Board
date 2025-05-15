@@ -5,9 +5,9 @@ import apiRouter from "./routes/api.js";
 import frontendRouter from "./routes/frontend.js";
 import cookieParser from "cookie-parser";
 import { getAccessTokenFromHeader } from "./api/middleware/getAccessTokenFromHeader.js";
-import "@root/helpers/consoleExtensions.js";
 import WebSocketController from "@src/controllers/WebSocketController.js";
 import { ArduinoCommunicator } from "./services/ArduinoCommunicator.js";
+import "@root/helpers/consoleExtensions.js"
 
 const app = express();
 

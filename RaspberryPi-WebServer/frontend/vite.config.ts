@@ -1,6 +1,6 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
-import config from '../config.js'
+import config from '../shared/config.js'
 import * as path from "path"
 
 // https://vite.dev/config/
@@ -16,7 +16,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@src": path.resolve(__dirname, "./src"),
-      "@shared": path.resolve(__dirname, "..")
+      "@shared": path.resolve(__dirname, "../shared"),
+      "@mainRoot": path.resolve(__dirname, "..")
     }
   }
 })

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState } from "react";
-import BoardPosition from "@shared/backend/src/helpers/BoardPosition.js"
+import BoardPosition from "@mainRoot/backend/src/helpers/BoardPosition.js"
 const CurrentMoveContext = createContext();
 
 export function CurrentMoveProvider({children}) {

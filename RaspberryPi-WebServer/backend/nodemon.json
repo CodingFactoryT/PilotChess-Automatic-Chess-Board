@@ -1,7 +1,7 @@
 {
   "watch": [
-    "src",
-    "custom-loader.js"
+    "src"
   ],
-  "exec": "node --import \"data:text/javascript,import { register } from 'node:module'; import { pathToFileURL } from 'node:url'; register('./custom-loader.js', pathToFileURL('./'));\" ./src/server.js"
+  "ext": "ts,tsx,js,json",
+  "exec": "tsx ./src/server.ts"
 }

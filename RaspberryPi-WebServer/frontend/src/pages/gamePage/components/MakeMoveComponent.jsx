@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { TextField, Button, Box, FormControl, Typography} from "@mui/material";
 import { apiPost } from "@src/helpers/fetchBackendApi";
-import BoardPosition from "@shared/backend/src/helpers/BoardPosition";
+import BoardPosition from "@mainRoot/backend/src/helpers/BoardPosition";
 import { useCurrentMove } from "@src/context/CurrentMoveContext";
 
 export default function MakeMoveComponent() {
