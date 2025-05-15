@@ -50,6 +50,8 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.18",
     "concurrently": "^9.1.2"
   }
 }
