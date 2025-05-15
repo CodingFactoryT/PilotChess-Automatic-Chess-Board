@@ -20,7 +20,7 @@ export class ArduinoCommunicator {
 			baudRate: ArduinoCommunicator.baudRate,
 		});
 		this.port.on("error", (error) => {
-			console.error(`Error with serial port ${ArduinoCommunicator.portPath}` + error);
+			console.error(`Error with serial port ${ArduinoCommunicator.portPath}: ` + error);
 		});
 		this.port.on("open", () => {
 			console.log("------------------------------------------------------------");
