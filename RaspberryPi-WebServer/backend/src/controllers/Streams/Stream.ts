@@ -31,7 +31,12 @@ export default class Stream {
 				const dataStr = data.toString().trim();
 				if (dataStr.length > 0) {
 					dataStr.split("\n").forEach((element: string) => {
-						this.dataFunction(JSON.parse(element));
+						const parsedObject = JSON.parse(element);
+						if(this.#isLichessError(parsedObject)) {
+							this.errorFunction(parsedObject.error);
+						} else {
+							this.dataFunction(parsedObject);
+						}
 					});
 				}
 			});
@@ -56,4 +61,9 @@ export default class Stream {
 	getName() {
 		return this.streamName;
 	}
+
+	#isLichessError(obj: any): obj is LichessError {
+  	return typeof obj === "object" && typeof obj?.error === "string";
+	}
+
 }

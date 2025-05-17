@@ -60,7 +60,7 @@ export default class WebSocketController {
 		});
 	}
 
-	#handleIncomingData(message) {
+	#handleIncomingData(message: any) {
 		switch (message.type) {
 			case "challengeAccepted":
 				return LichessChallengeController.acceptChallenge(message.data.id);
