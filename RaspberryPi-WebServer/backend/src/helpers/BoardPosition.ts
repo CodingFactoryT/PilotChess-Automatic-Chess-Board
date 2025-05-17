@@ -134,7 +134,7 @@ export default class BoardPosition {
 	 * @returns {string}
 	 */
 	toSquareString() : Square {
-		return this.getX() + String(this.getY());
+		return <Square>(this.getX() + String(this.getY()));
 	}
 
 	/**

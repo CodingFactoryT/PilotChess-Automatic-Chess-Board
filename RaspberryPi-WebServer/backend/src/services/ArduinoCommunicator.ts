@@ -69,7 +69,7 @@ export class ArduinoCommunicator {
 						return reject("Error from Arduino: " + response); //TODO still invalid char in http response code
 					}
 
-					resolve({ data: response });
+					resolve(response);
 				};
 
 				this.lineStream.on("data", handleData);

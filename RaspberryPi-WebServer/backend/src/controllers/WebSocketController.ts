@@ -27,7 +27,7 @@ export default class WebSocketController {
 			this.clients.add(ws);
 			console.logConnectionStatus("Frontend connected to WebSocket!");
 
-			ws.onmessage = (event: MessageEvent) => this.#handleIncomingData(JSON.parse(event.data));
+			ws.onmessage = (event: import("ws").MessageEvent) => {void this.#handleIncomingData(JSON.parse(event.data.toString()))};
 
 			ws.onclose = () => {
 				console.logConnectionStatus("Frontend disconnected from WebSocket!");
@@ -54,7 +54,7 @@ export default class WebSocketController {
 		return this.server;
 	}
 
-	send(data) {
+	send(data: object) {
 		this.clients.forEach((client) => {
 			client.send(JSON.stringify(data));
 		});

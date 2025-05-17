@@ -26,8 +26,8 @@ export default class GameStream extends Stream {
 		super(
 			"GameStream",
 			url,
-			(data) => this.#handleData(data),
-			(error) => this.#handleError(error)
+			(data: object) => this.#handleData(<GameStreamEvent>data),
+			(error: string) => this.#handleError(error)
 		);
 
 		this.gameId = gameId;
@@ -53,33 +53,33 @@ export default class GameStream extends Stream {
 		return this.gameId;
 	}
 
-	#handleData(data) {
+	#handleData(data: GameStreamEvent) {
 		switch (data.type) {
 			case this.events.GAME_FULL:
-				return this.#handleGameFull(data);
+				return this.#handleGameFull(<GameFullEvent>data);
 			case this.events.GAME_STATE:
-				return this.#handleGameState(data);
+				return this.#handleGameState(<GameStateEvent>data);
 			case this.events.CHAT_LINE:
-				return this.#handleChatLine(data);
+				return this.#handleChatLine(<ChatLineEvent>data);
 			case this.events.OPPONENT_GONE:
-				return this.#handleOpponentGone(data);
+				return this.#handleOpponentGone(<OpponentGoneEvent>data);
 			default:
 				return console.error(`Stream "${super.getName()}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
 	// eslint-disable-next-line no-unused-vars
-	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
+	#handleGameFull(data: GameFullEvent) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
-	#handleGameState(data) {
+	#handleGameState(data: GameStateEvent) {
 		const tmpBoard = new Chess();
-		const moves = data?.moves?.split(" ");
+		const moves = data.moves.split(" ");
 		moves.forEach((move: string) => {
 			tmpBoard.move(move);
 		});
 
 		const newFen = tmpBoard.fen();
-		const lastMove = moves.at(-1);
+		const lastMove = moves.at(-1)!;
 		if (VirtualBoardController.getInstance().compareFen(newFen)) return;
 
 		WebSocketController.getInstance().send({
@@ -110,7 +110,7 @@ export default class GameStream extends Stream {
 		}
 	}
 
-	#handleChatLine(data) {
+	#handleChatLine(data: ChatLineEvent) {
 		if (data.room === "player") {
 			const dataUsername = data.username;
 			LichessUserController.fetchLoggedInUsername()
@@ -130,11 +130,11 @@ export default class GameStream extends Stream {
 		}
 	}
 
-	#handleOpponentGone(data) {
+	#handleOpponentGone(data: OpponentGoneEvent) {
 		console.log(data);
 	}
 
-	#handleError(error) {
+	#handleError(error: string) {
 		console.error(error);
 	}
 }

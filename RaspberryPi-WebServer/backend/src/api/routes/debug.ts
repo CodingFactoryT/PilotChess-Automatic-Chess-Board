@@ -13,7 +13,7 @@ router.post("/send-command-to-arduino", (req, res) => {
 	ArduinoCommunicator.getInstance()
 		.fetchArduino(arduinoRequestStr)
 		.then((response) => {
-			console.log("Success: " + response.data);
+			console.log("Success: " + response);
 			res.status(200).send();
 		})
 		.catch((error) => {

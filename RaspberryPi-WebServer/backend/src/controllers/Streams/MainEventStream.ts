@@ -4,6 +4,7 @@ import config from "@shared/config";
 import GameStream from "./GameStream";
 import VirtualBoardController from "../VirtualBoardController";
 import PhysicalBoardController from "../PhysicalBoardController";
+import { Color } from "chess.js";
 
 export default class MainEventStream extends Stream {
 	private static instance : MainEventStream;
@@ -24,8 +25,8 @@ export default class MainEventStream extends Stream {
 		super(
 			"MainEventStream",
 			MainEventStream.url,
-			(data) => this.#handleData(data),
-			(error) => this.#handleError(error)
+			(data: object) => this.#handleData(<MainEventStreamEvent>data),
+			(error: string) => this.#handleError(error)
 		);
 
 		MainEventStream.instance = this;
@@ -39,27 +40,27 @@ export default class MainEventStream extends Stream {
 		return MainEventStream.instance;
 	}
 
-	#handleData(data) {
+	#handleData(data: MainEventStreamEvent) {
 		switch (data.type) {
 			case this.events.GAME_START:
-				return this.#handleGameStart(data);
+				return this.#handleGameStart(<GameStartEvent>data);
 			case this.events.GAME_FINISH:
-				return this.#handleGameFinish(data);
+				return this.#handleGameFinish(<GameFinishEvent>data);
 			case this.events.CHALLENGE:
-				return this.#handleChallenge(data);
+				return this.#handleChallenge(<ChallengeEvent>data);
 			case this.events.CHALLENGE_CANCELED:
-				return this.#handleChallengeCanceled(data);
+				return this.#handleChallengeCanceled(<ChallengeCanceledEvent>data);
 			case this.events.CHALLENGE_DECLINED:
-				return this.#handleChallengeDeclined(data);
+				return this.#handleChallengeDeclined(<ChallengeDeclinedEvent>data);
 			default:
 				return console.error(`Stream "${super.getName()}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
-	#handleGameStart(data) {
+	#handleGameStart(data: GameStartEvent) {
 		const game = data.game;
 		GameStream.getInstance(game.gameId, game.fen).listen();
-		VirtualBoardController.setMyColor(game.color[0]);
+		VirtualBoardController.setMyColor(<Color>game.color[0]);
 		WebSocketController.getInstance().send({
 			type: "gameStart",
 			data: {
@@ -81,11 +82,11 @@ export default class MainEventStream extends Stream {
 	}
 
 	//TODO handle last move before check-mate, as this move is not sent via GameState
-	#handleGameFinish(data) {
+	#handleGameFinish(data: GameFinishEvent) {
 		GameStream.getInstance(data.game.gameId).stop();
 	}
 
-	#handleChallenge(data) {
+	#handleChallenge(data: ChallengeEvent) {
 		WebSocketController.getInstance().send({
 			type: this.events.CHALLENGE,
 			data: {
@@ -94,12 +95,12 @@ export default class MainEventStream extends Stream {
 				variant: data.challenge.variant.name,
 				rated: data.challenge.rated,
 				speed: data.challenge.speed,
-				timeControl: data.timeControl,
+				timeControl: data.challenge.timeControl,
 			},
 		});
 	}
 
-	#handleChallengeCanceled(data) {
+	#handleChallengeCanceled(data: ChallengeCanceledEvent) {
 		WebSocketController.getInstance().send({
 			type: this.events.CHALLENGE_CANCELED,
 			data: {
@@ -108,11 +109,11 @@ export default class MainEventStream extends Stream {
 		});
 	}
 
-	#handleChallengeDeclined(data) {
+	#handleChallengeDeclined(data: ChallengeDeclinedEvent) {
 		console.log(data);
 	}
 
-	#handleError(error) {
+	#handleError(error: string) {
 		console.error(error);
 	}
 }
