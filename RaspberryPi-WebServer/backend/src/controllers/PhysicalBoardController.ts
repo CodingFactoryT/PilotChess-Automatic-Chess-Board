@@ -74,13 +74,13 @@ export default class PhysicalBoardController {
 		const helperPiecePositions = this.calculateKnightHelperPiecePositions(fromPosition, toPosition);
 
 		//if the tile near the from-position is empty
-		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toSquareString())) {
-			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearFromPositionFrom, toPosition);
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearFromPositionFrom?.toSquare())) {
+			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearFromPositionFrom!, toPosition);
 		}
 
 		//if the tile near the to-position is empty
-		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearToPositionFrom?.toSquareString())) {
-			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearToPositionFrom, toPosition);
+		if (!VirtualBoardController.getInstance().getPieceAtPosition(helperPiecePositions.nearToPositionFrom?.toSquare())) {
+			return await this.#executePhysicalMovesInOrder(fromPosition, helperPiecePositions.nearToPositionFrom!, toPosition);
 		}
 
 		//if none of the tiles is empty, a helper piece has to be moved
@@ -92,9 +92,9 @@ export default class PhysicalBoardController {
 			helperToPositionToUse = helperPiecePositions.nearToPositionTo;
 		}
 
-		await this.#executePhysicalMovesInOrder(helperFromPositionToUse, helperToPositionToUse);
-		await this.#executePhysicalMovesInOrder(fromPosition, helperFromPositionToUse, toPosition);
-		await this.#executePhysicalMovesInOrder(helperToPositionToUse, helperFromPositionToUse);
+		await this.#executePhysicalMovesInOrder(helperFromPositionToUse!, helperToPositionToUse!);
+		await this.#executePhysicalMovesInOrder(fromPosition, helperFromPositionToUse!, toPosition);
+		await this.#executePhysicalMovesInOrder(helperToPositionToUse!, helperFromPositionToUse!);
 	}
 
 	async #moveBishop(fromPosition: BoardPosition, toPosition: BoardPosition) {
@@ -145,7 +145,7 @@ export default class PhysicalBoardController {
 		const data = await this.#waitForPieceMovement();
 		const move = data.from + data.to;
 		console.log(`Final Move: ${move}`);
-		const gameId = GameStream.getInstance().getGameId();
+		const gameId = GameStream.getGameId();
 		LichessGameController.makeMove(gameId, move);
 	}
 
@@ -169,13 +169,13 @@ export default class PhysicalBoardController {
 			console.log(`To: ${toPosition}`);
 		}
 
-		return { from: fromPosition, to: toPosition };
+		return { from: fromPosition!, to: toPosition! };
 	}
 
 	async #hasTileGridChanged() {
 		try {
 			const response = await ArduinoCommunicator.getInstance().fetchArduino("REQ:READ:");
-			const boardPositioning = hexToBinary64(response.data.split(",")[1]);
+			const boardPositioning = hexToBinary64(Number(response.split(",")[1]));
 			if (this.lastReadPositioning !== null && this.lastReadPositioning !== boardPositioning) {
 				const changedPosition = this.#getChangedPosition(this.lastReadPositioning, boardPositioning);
 				this.lastReadPositioning = null; //reset for next call

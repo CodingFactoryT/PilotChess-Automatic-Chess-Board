@@ -6,7 +6,7 @@ const router = express.Router();
 router.post("/move", (req, res) => {
 	const data = req.body;
 	const move = data.move;
-	const gameId = GameStream.getInstance().getGameId();
+	const gameId = GameStream.getGameId();
 	LichessGameController.makeMove(gameId, move);
 	res.status(200).send();
 });

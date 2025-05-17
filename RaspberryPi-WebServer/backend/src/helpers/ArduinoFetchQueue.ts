@@ -2,7 +2,7 @@ export class ArduinoFetchQueue {
 	private queue : Promise<string> | Promise<void> | Promise<unknown>= Promise.resolve();
 	private queueSize = 0;
 
-	enqueue(task: () => Promise<unknown>) {
+	enqueue(task: () => Promise<string>) {
 		this.queueSize++;
 
 		const result = this.queue.then(() => {

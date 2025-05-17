@@ -67,7 +67,7 @@ export default class WebSocketController {
 			case "challengeDeclined":
 				return LichessChallengeController.declineChallenge(message.data.id);
 			case "chat": {
-				const gameId = GameStream.getInstance().getGameId();
+				const gameId = GameStream.getGameId();
 				return LichessChatController.sendMessage(gameId, message.data.message);
 			}
 			default:

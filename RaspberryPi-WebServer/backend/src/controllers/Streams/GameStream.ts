@@ -1,14 +1,14 @@
 import WebSocketController from "@src/controllers/WebSocketController";
 import Stream from "./Stream";
 import config from "@shared/config";
-import { Chess } from "chess.js";
+import { Chess, Square } from "chess.js";
 import VirtualBoardController from "@src/controllers/VirtualBoardController";
 import LichessUserController from "@src/controllers/LichessControllers/LichessUserController";
 import PhysicalBoardController from "../PhysicalBoardController";
 
 export default class GameStream extends Stream {
 	private static instance : GameStream | null;
-	private gameId : string;
+	private static gameId : string;
 	private readonly events = {
 		GAME_FULL: "gameFull",
 		GAME_STATE: "gameState",
@@ -16,8 +16,8 @@ export default class GameStream extends Stream {
 		OPPONENT_GONE: "opponentGone",
 	}
 
-	constructor(gameId: string, initialFen: string) {
-		const url = `${config.lichess_base_url}/api/board/game/stream/${gameId}`;
+	constructor() {
+		const url = `${config.lichess_base_url}/api/board/game/stream/${GameStream.gameId}`;
 
 		if (GameStream.instance) {
 			throw new Error("Use GameStream.getInstance() instead of new.");
@@ -30,10 +30,7 @@ export default class GameStream extends Stream {
 			(error: string) => this.#handleError(error)
 		);
 
-		this.gameId = gameId;
-
 		GameStream.instance = this;
-		VirtualBoardController.setFen(initialFen);
 	}
 
 	override stop() {
@@ -41,16 +38,20 @@ export default class GameStream extends Stream {
 		GameStream.instance = null;
 	}
 
-	static getInstance(gameId: string, initialFen: string) {
+	static getInstance() {
 		if (!GameStream.instance) {
-			GameStream.instance = new GameStream(gameId, initialFen);
+			GameStream.instance = new GameStream();
 		}
 
 		return GameStream.instance;
 	}
 
-	getGameId() {
-		return this.gameId;
+	static setGameId(gameId: string) {
+		GameStream.gameId = gameId;
+	}
+
+	static getGameId() {
+		return GameStream.gameId;
 	}
 
 	#handleData(data: GameStreamEvent) {
@@ -85,14 +86,14 @@ export default class GameStream extends Stream {
 		WebSocketController.getInstance().send({
 			type: "pieceMoved",
 			data: {
-				id: this.gameId,
+				id: GameStream.gameId,
 				fen: newFen,
 			},
 		});
 
 		const wasOpponentsTurn = !VirtualBoardController.getInstance().isMyTurn();
 		console.log(`Was opponents turn: ${wasOpponentsTurn}`);
-		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
+		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(<Square>lastMove.substring(0, 2))!.type;
 		console.log(`PieceType: ${pieceType}`);
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
 		console.log(`Move: ${lastMove}`);

@@ -133,7 +133,7 @@ export default class BoardPosition {
 	/**
 	 * @returns {string}
 	 */
-	toSquareString() : Square {
+	toSquare() : Square {
 		return <Square>(this.getX() + String(this.getY()));
 	}
 
@@ -141,7 +141,7 @@ export default class BoardPosition {
 	 * @returns {string}
 	 */
 	toString() {
-		return this.toSquareString() + String(this.getAppendix());
+		return this.toSquare() + String(this.getAppendix());
 	}
 
 	copy() {

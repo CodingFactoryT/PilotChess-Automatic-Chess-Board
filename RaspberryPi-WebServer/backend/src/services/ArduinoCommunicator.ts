@@ -42,7 +42,7 @@ export class ArduinoCommunicator {
 		return ArduinoCommunicator.instance;
 	}
 
-	async fetchArduino(requestString: string) {
+	async fetchArduino(requestString: string) : Promise<string> {
 		if (!this.port.isOpen) {
 			return Promise.reject(`The serial port ${ArduinoCommunicator.portPath} is not open`);
 		}
@@ -54,7 +54,7 @@ export class ArduinoCommunicator {
 		return this.queue.enqueue(() => this.#request(requestString));
 	}
 
-	async #request(requestString: string) {
+	async #request(requestString: string) : Promise<string> {
 		return new Promise((resolve, reject) => {
 			this.port.write(requestString + "\n", (error) => {
 				if (error) {

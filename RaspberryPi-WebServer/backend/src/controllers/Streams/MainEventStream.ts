@@ -59,7 +59,8 @@ export default class MainEventStream extends Stream {
 
 	#handleGameStart(data: GameStartEvent) {
 		const game = data.game;
-		GameStream.getInstance(game.gameId, game.fen).listen();
+		GameStream.setGameId(game.gameId);
+		GameStream.getInstance().listen();
 		VirtualBoardController.setMyColor(<Color>game.color[0]);
 		WebSocketController.getInstance().send({
 			type: "gameStart",
@@ -83,7 +84,7 @@ export default class MainEventStream extends Stream {
 
 	//TODO handle last move before check-mate, as this move is not sent via GameState
 	#handleGameFinish(data: GameFinishEvent) {
-		GameStream.getInstance(data.game.gameId).stop();
+		GameStream.getInstance().stop();
 	}
 
 	#handleChallenge(data: ChallengeEvent) {

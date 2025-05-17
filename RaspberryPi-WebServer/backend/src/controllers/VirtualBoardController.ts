@@ -51,7 +51,8 @@ export default class VirtualBoardController {
 		return this.board.fen() === fen;
 	}
 
-	getPieceAtPosition(position: Square) {
+	getPieceAtPosition(position: Square | undefined) {
+		if(!position) return undefined;
 		return this.board.get(position);
 	}
 
