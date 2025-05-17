@@ -1,15 +1,15 @@
 export class ArduinoFetchQueue {
-	#queue = Promise.resolve();
-	#size = 0;
+	private queue : Promise<string> | Promise<void> | Promise<unknown>= Promise.resolve();
+	private queueSize = 0;
 
-	enqueue(task) {
-		this.#size++;
+	enqueue(task: () => Promise<string>) {
+		this.queueSize++;
 
-		const result = this.#queue.then(() => {
-			return task().finally(() => this.#size--);
+		const result = this.queue.then(() => {
+			return task().finally(() => this.queueSize--);
 		});
 
-		this.#queue = result.catch((error) => {
+		this.queue = result.catch((error) => {
 			console.error(`Error while executing fetch to Arduino: ${error}`);
 		});
 
@@ -17,6 +17,6 @@ export class ArduinoFetchQueue {
 	}
 
 	size() {
-		return this.#size;
+		return this.queueSize;
 	}
 }

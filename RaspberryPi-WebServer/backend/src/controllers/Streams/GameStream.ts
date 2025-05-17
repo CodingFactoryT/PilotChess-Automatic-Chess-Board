@@ -1,101 +1,99 @@
-import WebSocketController from "@src/controllers/WebSocketController.js";
-import Stream from "./Stream.js";
-import config from "@shared/config.js";
-import { Chess } from "chess.js";
-import VirtualBoardController from "@src/controllers/VirtualBoardController.js";
-import LichessUserController from "@src/controllers/LichessControllers/LichessUserController.js";
-import PhysicalBoardController from "../PhysicalBoardController.js";
+import WebSocketController from "@src/controllers/WebSocketController";
+import Stream from "./Stream";
+import config from "@shared/config";
+import { Chess, Square } from "chess.js";
+import VirtualBoardController from "@src/controllers/VirtualBoardController";
+import LichessUserController from "@src/controllers/LichessControllers/LichessUserController";
+import PhysicalBoardController from "../PhysicalBoardController";
 
 export default class GameStream extends Stream {
-	static #instance = null;
-	static name = "GameStream";
+	private static instance : GameStream | null;
+	private static gameId : string;
+	private readonly events = {
+		GAME_FULL: "gameFull",
+		GAME_STATE: "gameState",
+		CHAT_LINE: "chatLine",
+		OPPONENT_GONE: "opponentGone",
+	}
 
-	constructor(gameId, initialFen) {
-		const url = `${config.lichess_base_url}/api/board/game/stream/${gameId}`;
+	constructor() {
+		const url = `${config.lichess_base_url}/api/board/game/stream/${GameStream.gameId}`;
 
-		if (GameStream.#instance) {
+		if (GameStream.instance) {
 			throw new Error("Use GameStream.getInstance() instead of new.");
 		}
 
 		super(
-			GameStream.name,
+			"GameStream",
 			url,
-			(data) => this.#handleData(data),
-			(error) => this.#handleError(error)
+			(data: object) => this.#handleData(<GameStreamEvent>data),
+			(error: string) => this.#handleError(error)
 		);
 
-		this.gameId = gameId;
-
-		this.Events = {
-			GAME_FULL: "gameFull",
-			GAME_STATE: "gameState",
-			CHAT_LINE: "chatLine",
-			OPPONENT_GONE: "opponentGone",
-		};
-
-		GameStream.#instance = this;
-		VirtualBoardController.setFen(initialFen);
+		GameStream.instance = this;
 	}
 
-	stop() {
+	override stop() {
 		super.stop();
-		GameStream.#instance = null;
+		GameStream.instance = null;
 	}
 
-	static getInstance(gameId, initialFen) {
-		if (!GameStream.#instance) {
-			GameStream.#instance = new GameStream(gameId, initialFen);
+	static getInstance() {
+		if (!GameStream.instance) {
+			GameStream.instance = new GameStream();
 		}
 
-		return GameStream.#instance;
+		return GameStream.instance;
 	}
 
-	getGameId() {
-		return this.gameId;
+	static setGameId(gameId: string) {
+		GameStream.gameId = gameId;
 	}
 
-	#handleData(data) {
-		const Events = this.Events;
+	static getGameId() {
+		return GameStream.gameId;
+	}
 
+	#handleData(data: GameStreamEvent) {
 		switch (data.type) {
-			case Events.GAME_FULL:
-				return this.#handleGameFull(data);
-			case Events.GAME_STATE:
-				return this.#handleGameState(data);
-			case Events.CHAT_LINE:
-				return this.#handleChatLine(data);
-			case Events.OPPONENT_GONE:
-				return this.#handleOpponentGone(data);
+			case this.events.GAME_FULL:
+				return this.#handleGameFull(<GameFullEvent>data);
+			case this.events.GAME_STATE:
+				return this.#handleGameState(<GameStateEvent>data);
+			case this.events.CHAT_LINE:
+				return this.#handleChatLine(<ChatLineEvent>data);
+			case this.events.OPPONENT_GONE:
+				return this.#handleOpponentGone(<OpponentGoneEvent>data);
 			default:
-				return console.error(`Stream "${this.name}": Unknown incoming data type "${data.type}"`);
+				return console.error(`Stream "${super.getName()}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
 	// eslint-disable-next-line no-unused-vars
-	#handleGameFull(data) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
+	#handleGameFull(data: GameFullEvent) {} //ignore as it does not provide information that isn't send by the gameStart-event in the MainEventStream
 
-	#handleGameState(data) {
+	#handleGameState(data: GameStateEvent) {
 		const tmpBoard = new Chess();
-		const moves = data?.moves?.split(" ");
-		moves.forEach((move) => {
+		const moves = data.moves.split(" ");
+		moves.forEach((move: string) => {
 			tmpBoard.move(move);
 		});
 
 		const newFen = tmpBoard.fen();
-		const lastMove = moves.at(-1);
+		const lastMove = moves.at(-1)!;
 		if (VirtualBoardController.getInstance().compareFen(newFen)) return;
 
 		WebSocketController.getInstance().send({
 			type: "pieceMoved",
 			data: {
-				id: this.gameId,
+				id: GameStream.gameId,
 				fen: newFen,
 			},
 		});
 
 		const wasOpponentsTurn = !VirtualBoardController.getInstance().isMyTurn();
 		console.log(`Was opponents turn: ${wasOpponentsTurn}`);
-		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(lastMove.substring(0, 2)).type;
+		const pieceType = VirtualBoardController.getInstance().getPieceAtPosition(<Square>lastMove.substring(0, 2))!.type;
 		console.log(`PieceType: ${pieceType}`);
 		const moveInformation = VirtualBoardController.getInstance().move(lastMove);
 		console.log(`Move: ${lastMove}`);
@@ -113,7 +111,7 @@ export default class GameStream extends Stream {
 		}
 	}
 
-	#handleChatLine(data) {
+	#handleChatLine(data: ChatLineEvent) {
 		if (data.room === "player") {
 			const dataUsername = data.username;
 			LichessUserController.fetchLoggedInUsername()
@@ -133,11 +131,11 @@ export default class GameStream extends Stream {
 		}
 	}
 
-	#handleOpponentGone(data) {
+	#handleOpponentGone(data: OpponentGoneEvent) {
 		console.log(data);
 	}
 
-	#handleError(error) {
+	#handleError(error: string) {
 		console.error(error);
 	}
 }

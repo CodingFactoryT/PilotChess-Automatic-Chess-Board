@@ -1,11 +1,11 @@
 import axios from "axios";
-import config from "@shared/config.js";
-import LichessTokenVault from "./LichessTokenVault.js";
+import config from "@shared/config";
+import LichessTokenVault from "./LichessTokenVault";
 
 const userBaseURL = `${config.lichess_base_url}/api/user`;
 
 export default class LichessUserController {
-	static async fetchUserInformation(username) {
+	static async fetchUserInformation(username: string) {
 		try {
 			const response = await axios.get(`${userBaseURL}/${username}`, LichessTokenVault.getAuthorizationHeaderObject());
 			return response.data;
@@ -24,6 +24,6 @@ export default class LichessUserController {
 	}
 
 	static async fetchLoggedInUsername() {
-		return await this.fetchLoggedInUserInformation().username;
+		return (await this.fetchLoggedInUserInformation()).username;
 	}
 }

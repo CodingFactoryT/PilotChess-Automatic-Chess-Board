@@ -1,71 +1,69 @@
-import WebSocketController from "@src/controllers/WebSocketController.js";
-import Stream from "./Stream.js";
-import config from "@shared/config.js";
-import GameStream from "./GameStream.js";
-import VirtualBoardController from "../VirtualBoardController.js";
-import PhysicalBoardController from "../PhysicalBoardController.js";
+import WebSocketController from "@src/controllers/WebSocketController";
+import Stream from "./Stream";
+import config from "@shared/config";
+import GameStream from "./GameStream";
+import VirtualBoardController from "../VirtualBoardController";
+import PhysicalBoardController from "../PhysicalBoardController";
+import { Color } from "chess.js";
 
 export default class MainEventStream extends Stream {
-	static #instance = null;
-	static name = "MainEventStream";
-	static url = `${config.lichess_base_url}/api/stream/event`;
+	private static instance : MainEventStream;
+	private static url = `${config.lichess_base_url}/api/stream/event`;
+	private readonly events = {
+		GAME_START: "gameStart",
+		GAME_FINISH: "gameFinish",
+		CHALLENGE: "challenge",
+		CHALLENGE_CANCELED: "challengeCanceled",
+		CHALLENGE_DECLINED: "challengeDeclined",
+	}
 
 	constructor() {
-		if (MainEventStream.#instance) {
+		if (MainEventStream.instance) {
 			throw new Error("Use MainEventStream.getInstance() instead of new.");
 		}
 
 		super(
-			MainEventStream.name,
+			"MainEventStream",
 			MainEventStream.url,
-			(data) => this.#handleData(data),
-			(error) => this.#handleError(error)
+			(data: object) => this.#handleData(<MainEventStreamEvent>data),
+			(error: string) => this.#handleError(error)
 		);
 
-		this.Events = {
-			GAME_START: "gameStart",
-			GAME_FINISH: "gameFinish",
-			CHALLENGE: "challenge",
-			CHALLENGE_CANCELED: "challengeCanceled",
-			CHALLENGE_DECLINED: "challengeDeclined",
-		};
-
-		MainEventStream.#instance = this;
+		MainEventStream.instance = this;
 	}
 
 	static getInstance() {
-		if (!MainEventStream.#instance) {
-			MainEventStream.#instance = new MainEventStream();
+		if (!MainEventStream.instance) {
+			MainEventStream.instance = new MainEventStream();
 		}
 
-		return MainEventStream.#instance;
+		return MainEventStream.instance;
 	}
 
-	#handleData(data) {
-		const Events = this.Events;
-
+	#handleData(data: MainEventStreamEvent) {
 		switch (data.type) {
-			case Events.GAME_START:
-				return this.#handleGameStart(data);
-			case Events.GAME_FINISH:
-				return this.#handleGameFinish(data);
-			case Events.CHALLENGE:
-				return this.#handleChallenge(data);
-			case Events.CHALLENGE_CANCELED:
-				return this.#handleChallengeCanceled(data);
-			case Events.CHALLENGE_DECLINED:
-				return this.#handleChallengeDeclined(data);
+			case this.events.GAME_START:
+				return this.#handleGameStart(<GameStartEvent>data);
+			case this.events.GAME_FINISH:
+				return this.#handleGameFinish(<GameFinishEvent>data);
+			case this.events.CHALLENGE:
+				return this.#handleChallenge(<ChallengeEvent>data);
+			case this.events.CHALLENGE_CANCELED:
+				return this.#handleChallengeCanceled(<ChallengeCanceledEvent>data);
+			case this.events.CHALLENGE_DECLINED:
+				return this.#handleChallengeDeclined(<ChallengeDeclinedEvent>data);
 			default:
-				return console.error(`Stream "${this.name}": Unknown incoming data type "${data.type}"`);
+				return console.error(`Stream "${super.getName()}": Unknown incoming data type "${data.type}"`);
 		}
 	}
 
-	#handleGameStart(data) {
+	#handleGameStart(data: GameStartEvent) {
 		const game = data.game;
-		GameStream.getInstance(game.gameId, game.fen).listen();
-		VirtualBoardController.setMyColor(game.color[0]);
+		GameStream.setGameId(game.gameId);
+		GameStream.getInstance().listen();
+		VirtualBoardController.setMyColor(<Color>game.color[0]);
 		WebSocketController.getInstance().send({
-			type: this.Events.GAME_START,
+			type: "gameStart",
 			data: {
 				id: game.gameId,
 				color: game.color,
@@ -85,38 +83,38 @@ export default class MainEventStream extends Stream {
 	}
 
 	//TODO handle last move before check-mate, as this move is not sent via GameState
-	#handleGameFinish(data) {
-		GameStream.getInstance(data.game.gameId).stop();
+	#handleGameFinish(data: GameFinishEvent) {
+		GameStream.getInstance().stop();
 	}
 
-	#handleChallenge(data) {
+	#handleChallenge(data: ChallengeEvent) {
 		WebSocketController.getInstance().send({
-			type: this.Events.CHALLENGE,
+			type: this.events.CHALLENGE,
 			data: {
 				id: data.challenge.id,
 				challenger: data.challenge.challenger.name,
 				variant: data.challenge.variant.name,
 				rated: data.challenge.rated,
 				speed: data.challenge.speed,
-				timeControl: data.timeControl,
+				timeControl: data.challenge.timeControl,
 			},
 		});
 	}
 
-	#handleChallengeCanceled(data) {
+	#handleChallengeCanceled(data: ChallengeCanceledEvent) {
 		WebSocketController.getInstance().send({
-			type: this.Events.CHALLENGE_CANCELED,
+			type: this.events.CHALLENGE_CANCELED,
 			data: {
 				id: data.challenge.id,
 			},
 		});
 	}
 
-	#handleChallengeDeclined(data) {
+	#handleChallengeDeclined(data: ChallengeDeclinedEvent) {
 		console.log(data);
 	}
 
-	#handleError(error) {
+	#handleError(error: string) {
 		console.error(error);
 	}
 }

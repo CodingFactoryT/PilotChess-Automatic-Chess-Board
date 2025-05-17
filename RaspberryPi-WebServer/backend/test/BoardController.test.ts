@@ -1,6 +1,6 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import BoardController from "@src/api/controllers/BoardController.js";
+import BoardController from "@src/api/controllers/BoardController";
 import { DEFAULT_POSITION } from "chess.js";
 
 test("Validate Position on the board", () => {
